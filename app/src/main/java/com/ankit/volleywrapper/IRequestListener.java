@@ -3,6 +3,7 @@
  */
 package com.ankit.volleywrapper;
 
+import com.android.volley.NetworkResponse;
 import com.android.volley.VolleyError;
 
 /**
@@ -13,6 +14,8 @@ public interface IRequestListener<T> {
      Object onRequestSuccess(T response);
 
      void onParseSuccess(Object response);
+
+     String onNetworkResponse(NetworkResponse response);
 
      void onRequestErrorCode(VolleyError volleyError);
 

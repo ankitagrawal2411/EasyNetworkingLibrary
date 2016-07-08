@@ -7,6 +7,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
@@ -84,7 +85,10 @@ public class CacheRequestHandler implements ICacheRequest {
                 // parser task callbacks
                 return null;
             }
-
+            @Override
+            public String onNetworkResponse(NetworkResponse response) {
+                return jsonRequestFinishedListener.onNetworkResponse(response);
+            }
             @Override
             public void onParseSuccess(Object response) {
              // this is never called dont use it
@@ -162,6 +166,11 @@ public class CacheRequestHandler implements ICacheRequest {
             @Override
             public void onParseSuccess(Object response) {
                // this is never called dont use it
+            }
+
+            @Override
+            public String onNetworkResponse(NetworkResponse response) {
+                return jsonRequestFinishedListener.onNetworkResponse(response);
             }
 
             @Override

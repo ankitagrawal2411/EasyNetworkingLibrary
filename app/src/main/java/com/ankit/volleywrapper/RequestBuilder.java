@@ -177,49 +177,10 @@ public class RequestBuilder implements IBuild {
          return this;
     }
     public void send(@NonNull Context context) {
-        if(context==null){
-            throw  new NullPointerException("context is null");
-        }
         CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
                 jsonObject, requestHeader, iRequestListener, retryPolicy, reqTAG,shouldCache);
     }
 }
 
-/*
-
-    public RequestBuilder params(JSONObject jsonObject) {
-        this.jsonObject = jsonObject;
-        return this;
-    }
-    public RequestBuilder requestUrl( String requestUrl) {
-        this.requestUrl = requestUrl;
-        return this;
-    }
-    public RequestBuilder requestUrl( int method) {
-        this.method = method;
-        return this;
-    }
-    public RequestBuilder cache( boolean shouldCache) {
-        this.shouldCache = shouldCache;
-        return this;
-    }
-    public RequestBuilder listener( IFcRequestListener<JSONObject>  iFcRequestListener) {
-        this.iFcRequestListener = iFcRequestListener;
-        return this;
-    }
-    public RequestBuilder retryPolicy( RetryPolicy retryPolicy) {
-        this.retryPolicy = retryPolicy;
-        return this;
-    }
-
-    public RequestBuilder requestHeader(HashMap<String, String> requestHeader) {
-        this.requestHeader = requestHeader;
-        return this;
-    }
-
-    public void send(Context context) {
-                 CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
-                         jsonObject, requestHeader, iFcRequestListener, retryPolicy, reqTAG,shouldCache);
-    }*/
 
 

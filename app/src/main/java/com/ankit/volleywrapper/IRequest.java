@@ -16,11 +16,11 @@ import java.util.HashMap;
  */
 public interface IRequest {
 
-	 public void makeJsonRequest(int method, String requestUrl, JSONObject jsonObject,
+	  void makeJsonRequest(int method, String requestUrl, JSONObject jsonObject,
 								 IRequestListener<JSONObject> onJsonRequestFinishedListener,
 								 HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
 
-	    public void makeStringRequest(int method, String url, String stringParams,
+	     void makeStringRequest(int method, String url, String stringParams,
 									  IRequestListener<String> onStringRequestFinishedListener,
 									  HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
 
