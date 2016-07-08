@@ -10,18 +10,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 
 /**
- * Created by suyash.bhagwat on 5/25/2015.
+ * Created by ankit.agrawal on 5/25/2015.
  */
 public class ErrorCode {
 
-    public final static int NULL_POINTER_EXCEPTION = 100;
 
-    public final static int INVALID_JSON =101;
-
-    /**
-     * Error code when response is null.
-     */
-    public static final int RESPONSE_NULL = 20;
 
     /**
      * Error code when volley error is not predicted.
@@ -38,10 +31,7 @@ public class ErrorCode {
      */
     public static final int VOLLEY_NO_CONNECTION_ERROR = 112;
 
-    /**
-     * Error code when volley returns client error.
-     */
-    public static final int VOLLEY_CLIENT_ERROR = 113;
+
 
     /**
      * Error code when volley returns server error.
@@ -62,33 +52,7 @@ public class ErrorCode {
      * Error code when volley returns request timeout error.
      */
     public static final int VOLLEY_TIMEOUT_ERROR = 117;
-    
 
-	
-	
-	/**
-     * Error code when exception is catched and need to report to GA.
-     */
-    public static final int CATCH_EXCEPTION = 1001;
-
-	public static final int JSON_EXCEPTION = 1002;
-	
-	public static final int POST_PARAMS_IS_NULL = 1003;
-	
-	public static final int RESPONSE_TAG_IS_NULL = 1004;
-	/**
-	 * Error Code when invalid or insufficient request parameters
-	 * */
-	public static final int INSUFFICIENT_REQUEST_PARAM = 1005;
-	
-	
-	public static final int SHOW_TOAST_ON_FAILURE = 1006;
-	
-	public static final int SHOW_DIALOG_ON_FAILURE = 1007;
-	
-	public static final int URL_INVALID = 1008;
-
-    public static final int DATA_NOT_FOUND = 1009;
 
     /**
      * @param volleyError
@@ -105,11 +69,7 @@ public class ErrorCode {
 
             if (volleyError instanceof NetworkError) {
                 errorCode = ErrorCode.VOLLEY_NETWORK_ERROR;
-            } else if (volleyError instanceof NoConnectionError) {
-                errorCode = ErrorCode.VOLLEY_NO_CONNECTION_ERROR;
-            } /*else if (volleyError instanceof ClientError) {
-				errorCode = ErrorCode.VOLLEY_CLIENT_ERROR;
-			} */else if (volleyError instanceof ServerError) {
+            } else if (volleyError instanceof ServerError) {
                 errorCode = ErrorCode.VOLLEY_SERVER_ERROR;
             } else if (volleyError instanceof AuthFailureError) {
                 errorCode = ErrorCode.VOLLEY_AUTH_FAILURE_ERROR;
