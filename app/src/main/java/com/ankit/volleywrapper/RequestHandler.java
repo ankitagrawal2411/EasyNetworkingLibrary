@@ -3,6 +3,7 @@
  */
 package com.ankit.volleywrapper;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -14,6 +15,7 @@ import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
 
@@ -37,19 +39,16 @@ public class RequestHandler implements IRequest {
 	/**
 	 * Returns the instance of this singleton.
 	 */
-	public static RequestHandler getInstance() {
+	public static RequestHandler getInstance(Context context) {
 		if (instance == null) {
-			instance = new RequestHandler();
+			instance = new RequestHandler(context);
 		}
 		return instance;
 	}
 
-	public void setVolleyReqQueue(RequestQueue requestQueue) {
-		mRequestQueue = requestQueue;
-	}
 
-	public RequestHandler(){
-		
+	public RequestHandler(Context context){
+		mRequestQueue = Volley.newRequestQueue(context);
 	}
 
 

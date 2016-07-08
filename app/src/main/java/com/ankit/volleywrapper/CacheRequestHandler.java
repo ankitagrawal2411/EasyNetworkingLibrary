@@ -58,7 +58,7 @@ public class CacheRequestHandler implements ICacheRequest {
                 }
             }
         }
-        RequestHandler.getInstance().makeJsonRequest(method, URL, jsonObject, new IRequestListener<JSONObject>() {
+        RequestHandler.getInstance(context).makeJsonRequest(method, URL, jsonObject, new IRequestListener<JSONObject>() {
             @Override
             public Object onRequestSuccess(final JSONObject response) {
                 new ParserTask(reqTAG, new IParserListener() {
@@ -131,7 +131,7 @@ public class CacheRequestHandler implements ICacheRequest {
                     return;
             }
         }
-        RequestHandler.getInstance().makeStringRequest(method, URL, jsonObject, new IRequestListener<String>() {
+        RequestHandler.getInstance(context).makeStringRequest(method, URL, jsonObject, new IRequestListener<String>() {
             @Override
             public Object onRequestSuccess(final String response) {
 
