@@ -12,8 +12,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 /**
- * @author ankit.agrawal
- *
+ * Created by ankitagrawal on 6/7/16. yay
  */
 public interface ICacheRequest {
     public void makeJsonPostRequest(Context context, String URL, JSONObject jsonObject, HashMap<String, String> header, IRequestListener<JSONObject> jsonRequestFinishedListener, RetryPolicy retryPolicy, String reqTAG);

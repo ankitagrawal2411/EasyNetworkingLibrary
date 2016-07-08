@@ -4,9 +4,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
-
 /**
- * Created by ankitagrawal on 6/7/16.
+ * Created by ankitagrawal on 6/7/16. yay
  */
 public class Utils {
     /**
