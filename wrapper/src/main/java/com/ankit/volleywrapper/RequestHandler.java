@@ -32,7 +32,7 @@ public class RequestHandler implements IRequest {
 
 	private static RequestHandler instance;
 
-	private static RequestQueue mRequestQueue;
+	private  RequestQueue mRequestQueue;
 
 	public static final int timeout = 20000;
 	public static final int RETRY = 1;
@@ -52,6 +52,7 @@ public class RequestHandler implements IRequest {
 
 	public RequestHandler(Context context){
 		mRequestQueue = Volley.newRequestQueue(context);
+
 	}
 
 
@@ -181,8 +182,6 @@ public class RequestHandler implements IRequest {
 			protected Map<String, String> getParams() throws AuthFailureError {
 
 				if (stringParams != null) {
-
-					// TODO
 					HashMap<String, String> mParams = new HashMap<>();
 					mParams.put("key", stringParams);
 					return mParams;
@@ -240,10 +239,6 @@ public class RequestHandler implements IRequest {
 		mRequestQueue.add(req);
 	}
 
-	public <T> void addToRequestQueue(Request<T> req) {
-		req.setTag("REQUEST_TAG");
-		mRequestQueue.add(req);
-	}
 
 	public void cancelPendingRequests(String tag) {
 		if (mRequestQueue != null) {
@@ -253,6 +248,7 @@ public class RequestHandler implements IRequest {
 			Log.d(TAG, "Rquest Queue : " + mRequestQueue);
 		}
 	}
+
 
 
 }

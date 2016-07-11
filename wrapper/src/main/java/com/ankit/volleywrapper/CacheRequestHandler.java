@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 
 import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 
@@ -21,16 +22,20 @@ import java.util.HashMap;
  */
 public class CacheRequestHandler implements ICacheRequest {
 
-
+    private  MemoryCache mMemoryCache;
     private static CacheRequestHandler mInstance;
      static CacheRequestHandler getInstance()
     {
-        if(mInstance==null)
+        if(mInstance==null) {
             mInstance = new CacheRequestHandler();
+        }
         return mInstance;
     }
     private CacheRequestHandler(){
-
+        mMemoryCache = new MemoryCache();
+    }
+    public MemoryCache getMemoryCache() {
+        return mMemoryCache;
     }
   @Override
     public void makeJsonRequest(final Context context,int method, final String URL, JSONObject jsonObject,final HashMap<String,String> header, final IRequestListener<JSONObject> jsonRequestFinishedListener,final RetryPolicy retryPolicy,final String reqTAG, final int memoryPolicy,final int networkPolicy)
@@ -38,6 +43,19 @@ public class CacheRequestHandler implements ICacheRequest {
         if(!checkForInternetConnection(context)){
             jsonRequestFinishedListener.onRequestErrorCode(null);
             return;
+        }
+        if(MemoryPolicy.shouldReadFromMemoryCache(memoryPolicy)){
+            ICache.CacheEntry response =   mMemoryCache.get(reqTAG);
+            String data = response.getData();
+            if (!TextUtils.isEmpty(data)) {
+                try {
+                    JSONObject jsonObject1 = new JSONObject(data);
+                    jsonRequestFinishedListener.onRequestSuccess(jsonObject1);
+                    return;
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         if(NetworkPolicy.shouldReadFromDiskCache(networkPolicy)){
             String response = BaseCacheRequestManager.getInstance(context).getCacheResponse(reqTAG);
@@ -54,7 +72,12 @@ public class CacheRequestHandler implements ICacheRequest {
         RequestHandler.getInstance(context).makeJsonRequest(method, URL, jsonObject, new IRequestListener<JSONObject>() {
             @Override
             public Object onRequestSuccess(final JSONObject response) {
-                new ParserTask(reqTAG, new IParserListener() {
+                if(response==null){
+                    jsonRequestFinishedListener.onRequestErrorCode(new VolleyError("null " +
+                            "response"));
+                    return null;
+                }
+                ParserTask parserTask =new ParserTask(reqTAG, new IParserListener() {
                     @Override
                     public void onParseSuccess(String requestTag, Object parseData) {
                         jsonRequestFinishedListener.onParseSuccess(parseData);
@@ -68,11 +91,16 @@ public class CacheRequestHandler implements ICacheRequest {
                     @Override
                     public Object onParse(String requestTag) {
                         if (NetworkPolicy.shouldWriteToDiskCache(networkPolicy)) {
+                            BaseCacheRequestManager.getInstance(context).cacheResponse(new
+                                    ICache.CacheEntry(response.toString(),0,reqTAG,System.currentTimeMillis
+                                    ()));
                             BaseCacheRequestManager.getInstance(context).cacheResponse(reqTAG, response);
                         }
                         return jsonRequestFinishedListener.onRequestSuccess(response);
                     }
-                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                });
+
+                parserTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 // this is useless too so return null from it as we are returning data from
                 // parser task callbacks
                 return null;

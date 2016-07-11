@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Wrapper</string>
+   <string name="urlTagKey">asfurlTagKey</string>
 </resources>

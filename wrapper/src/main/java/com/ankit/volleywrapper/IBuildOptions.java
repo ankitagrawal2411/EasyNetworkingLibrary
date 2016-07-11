@@ -20,15 +20,17 @@ public interface IBuildOptions {
 
         IBuildOptions retryPolicy(@Nullable RetryPolicy val);
 
-
         void send(@NonNull Context context);
 
         IBuildOptions headers(HashMap<String, String> val);
 
-        IBuildOptions listener(IRequestListener<JSONObject> val);
+        IBuildOptions callback(IRequestListener<JSONObject> val);
 
-        IBuildOptions jsonObject(@Nullable JSONObject val);
+        IBuildOptions params(@Nullable JSONObject val);
 
+        IBuildOptions addHeader(@NonNull String key,@NonNull String value);
+
+        IBuildOptions addParam(@NonNull String key,@NonNull String value);
 
         IBuildOptions memoryPolicy(@NonNull MemoryPolicy policy, @NonNull MemoryPolicy... additional);
 

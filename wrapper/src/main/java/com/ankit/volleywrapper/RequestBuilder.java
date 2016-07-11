@@ -10,6 +10,7 @@ import com.android.volley.RetryPolicy;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by ankitagrawal on 6/7/16. yay
@@ -19,12 +20,12 @@ public class RequestBuilder implements IBuildRequestType {
     private String requestUrl;
     private JSONObject jsonObject;
     private IRequestListener<JSONObject> iRequestListener;
-    private HashMap<String, String> requestHeader;
     private RetryPolicy retryPolicy;
     private String reqTAG;
     private int memoryPolicy;
     private int networkPolicy;
-
+    private HashMap<String, String> mHeaders;
+    private Map<String, String> mParams = new HashMap<>();
     public RequestBuilder(String requestUrl, String reqTAG) {
         this.requestUrl = requestUrl;
         this.reqTAG = reqTAG;
@@ -41,7 +42,7 @@ public class RequestBuilder implements IBuildRequestType {
         requestUrl = builder.requestUrl;
         jsonObject = builder.jsonObject;
         iRequestListener = builder.iRequestListener;
-        requestHeader = builder.requestHeader;
+        mHeaders = builder.mHeaders;
         retryPolicy = builder.retryPolicy;
         reqTAG = builder.reqTAG;
         memoryPolicy = builder.memoryPolicy;
@@ -54,7 +55,7 @@ public class RequestBuilder implements IBuildRequestType {
         builder.networkPolicy = copy.networkPolicy;
         builder.reqTAG = copy.reqTAG;
         builder.retryPolicy = copy.retryPolicy;
-        builder.requestHeader = copy.requestHeader;
+        builder.mHeaders = copy.mHeaders;
         builder.iRequestListener = copy.iRequestListener;
         builder.jsonObject = copy.jsonObject;
         builder.requestUrl = copy.requestUrl;
@@ -111,8 +112,22 @@ public class RequestBuilder implements IBuildRequestType {
           }
           return this;
       }
+      @Override
+      public IBuildOptions addHeader(@NonNull String key,@NonNull String value) {
+          if(mHeaders==null){
+              mHeaders = new HashMap<>();
+          }
+          mHeaders.put(key, value);
+          return this;
+      }
 
-
+      public IBuildOptions addParam(@NonNull String key,@NonNull String value) {
+          if(mParams==null){
+              mParams = new HashMap<>();
+          }
+          mParams.put(key, value);
+          return this;
+      }
 
       /**
        * Sets the {@code retryPolicy} and returns a reference to {@code IReqTAG}
@@ -140,7 +155,7 @@ public class RequestBuilder implements IBuildRequestType {
               throw new NullPointerException("reqTag cannot be null");
           }
           CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
-                  jsonObject, requestHeader, iRequestListener, retryPolicy, reqTAG, memoryPolicy,
+                  jsonObject, mHeaders, iRequestListener, retryPolicy, reqTAG, memoryPolicy,
                   networkPolicy);
       }
 
@@ -152,7 +167,7 @@ public class RequestBuilder implements IBuildRequestType {
        */
       @Override
       public IBuildOptions headers(@Nullable HashMap<String, String> val) {
-          requestHeader = val;
+          mHeaders = val;
           return this;
       }
 
@@ -163,7 +178,7 @@ public class RequestBuilder implements IBuildRequestType {
        * @return a reference to this Builder
        */
       @Override
-      public IBuildOptions listener(@NonNull IRequestListener<JSONObject> val) {
+      public IBuildOptions callback(@NonNull IRequestListener<JSONObject> val) {
           iRequestListener = val;
           return this;
       }
@@ -175,7 +190,7 @@ public class RequestBuilder implements IBuildRequestType {
        * @return a reference to this Builder
        */
       @Override
-      public IBuildOptions jsonObject(@Nullable JSONObject val) {
+      public IBuildOptions params(@Nullable JSONObject val) {
           jsonObject = val;
           return this;
       }

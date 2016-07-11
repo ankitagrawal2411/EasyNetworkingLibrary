@@ -4,8 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.Log;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 
@@ -61,7 +63,23 @@ public class BaseCacheRequestManager {
        return mSharedPreferences.getString(url, null);
     }
     public String getCacheResponse(String url) {
-        return loadPreference(url);
+        String obj = loadPreference(url);
+        if(TextUtils.isEmpty(obj)){
+            return null;
+        }
+        try {
+            JSONObject jsonObject1 = new JSONObject(obj);
+            long cacheTime =jsonObject1.optLong("timestamp");
+            int hours =jsonObject1.optInt("hours");
+           // if(cacheTime+hours<System.currentTimeMillis()) {
+                return jsonObject1.optString("response");
+          /*  }else{
+                invalidateCacheResponse(url);
+            }*/
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -70,4 +88,16 @@ public class BaseCacheRequestManager {
     }
 
 
+    public void cacheResponse(ICache.CacheEntry cacheEntry) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("response",cacheEntry.getData());
+            jsonObject.put("timestamp",cacheEntry.getTimeStampMillis());
+            jsonObject.put("hours",cacheEntry.getCacheDuration());
+            savePreference(cacheEntry.getUrl(), jsonObject.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
 }
