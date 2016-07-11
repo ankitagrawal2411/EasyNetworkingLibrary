@@ -22,7 +22,6 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +42,7 @@ public class RequestHandler implements IRequest {
 	/**
 	 * Returns the instance of this singleton.
 	 */
-	public static RequestHandler getInstance(Context context) {
+	protected static RequestHandler getInstance(Context context) {
 		if (instance == null) {
 			instance = new RequestHandler(context);
 		}

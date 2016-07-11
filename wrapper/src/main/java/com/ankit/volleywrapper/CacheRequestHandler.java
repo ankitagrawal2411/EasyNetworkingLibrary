@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 
 import com.android.volley.NetworkResponse;
-import com.android.volley.Request;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 
@@ -24,7 +23,7 @@ public class CacheRequestHandler implements ICacheRequest {
 
 
     private static CacheRequestHandler mInstance;
-    public static CacheRequestHandler getInstance()
+     static CacheRequestHandler getInstance()
     {
         if(mInstance==null)
             mInstance = new CacheRequestHandler();
@@ -33,21 +32,14 @@ public class CacheRequestHandler implements ICacheRequest {
     private CacheRequestHandler(){
 
     }
-    @Override
-    public void makeJsonPostRequest(Context context, String URL, JSONObject jsonObject,final HashMap<String,String> header, final IRequestListener<JSONObject> jsonRequestFinishedListener,final RetryPolicy retryPolicy,final String reqTAG)
-    {
-        makeJsonRequest(context, Request.Method.POST, URL, jsonObject, header,
-                jsonRequestFinishedListener,
-                retryPolicy, reqTAG, false);
-
-    }
-    public void makeJsonRequest(final Context context,int method, final String URL, JSONObject jsonObject,final HashMap<String,String> header, final IRequestListener<JSONObject> jsonRequestFinishedListener,final RetryPolicy retryPolicy,final String reqTAG, final boolean shouldUseCache)
+  @Override
+    public void makeJsonRequest(final Context context,int method, final String URL, JSONObject jsonObject,final HashMap<String,String> header, final IRequestListener<JSONObject> jsonRequestFinishedListener,final RetryPolicy retryPolicy,final String reqTAG, final int memoryPolicy,final int networkPolicy)
     {
         if(!checkForInternetConnection(context)){
             jsonRequestFinishedListener.onRequestErrorCode(null);
             return;
         }
-        if(shouldUseCache){
+        if(NetworkPolicy.shouldReadFromDiskCache(networkPolicy)){
             String response = BaseCacheRequestManager.getInstance(context).getCacheResponse(reqTAG);
             if (!TextUtils.isEmpty(response)) {
                 try {
@@ -75,7 +67,7 @@ public class CacheRequestHandler implements ICacheRequest {
 
                     @Override
                     public Object onParse(String requestTag) {
-                        if(shouldUseCache) {
+                        if (NetworkPolicy.shouldWriteToDiskCache(networkPolicy)) {
                             BaseCacheRequestManager.getInstance(context).cacheResponse(reqTAG, response);
                         }
                         return jsonRequestFinishedListener.onRequestSuccess(response);
@@ -85,13 +77,15 @@ public class CacheRequestHandler implements ICacheRequest {
                 // parser task callbacks
                 return null;
             }
+
             @Override
             public String onNetworkResponse(NetworkResponse response) {
                 return jsonRequestFinishedListener.onNetworkResponse(response);
             }
+
             @Override
             public void onParseSuccess(Object response) {
-             // this is never called dont use it
+                // this is never called dont use it
             }
 
             @Override
@@ -101,34 +95,20 @@ public class CacheRequestHandler implements ICacheRequest {
         }, header, retryPolicy, reqTAG);
 
     }
+
+
     private boolean checkForInternetConnection(Context context) {
         return Utils.isConnected(context);
 
     }
-
     @Override
-    public void makeJsonGetRequest(Context context, String URL, final IRequestListener<JSONObject> jsonRequestFinishedListener, final RetryPolicy retryPolicy, final String reqTAG) {
-
-        makeJsonRequest(context, Request.Method.GET, URL, null, null,
-                jsonRequestFinishedListener,
-                retryPolicy, reqTAG, false);
-
-    }
-
-    @Override
-    public void makeStringGetRequest(Context context, String URL, final IRequestListener<String> jsonRequestFinishedListener,final RetryPolicy retryPolicy, final String reqTAG) {
-
-        makeStringRequest(context, Request.Method.GET, URL, null, null,
-                jsonRequestFinishedListener,
-                retryPolicy, reqTAG, false);
-    }
-    public void makeStringRequest(final Context context,int method, final String URL, String jsonObject,final HashMap<String,String> header, final IRequestListener<String> jsonRequestFinishedListener,final RetryPolicy retryPolicy,final String reqTAG,final boolean shouldUseCache)
+    public void makeStringRequest(final Context context,int method, final String URL, String jsonObject,final HashMap<String,String> header, final IRequestListener<String> jsonRequestFinishedListener,final RetryPolicy retryPolicy,final String reqTAG,final int memoryPolicy,final int networkPolicy)
     {
         if(!checkForInternetConnection(context)){
             jsonRequestFinishedListener.onRequestErrorCode(null);
             return;
         }
-        if(shouldUseCache){
+        if(NetworkPolicy.shouldReadFromDiskCache(networkPolicy)){
             String response = BaseCacheRequestManager.getInstance(context).getCacheResponse(reqTAG);
             if (!TextUtils.isEmpty(response)) {
                     jsonRequestFinishedListener.onRequestSuccess(response);
@@ -142,7 +122,7 @@ public class CacheRequestHandler implements ICacheRequest {
                 new ParserTask(reqTAG, new IParserListener() {
                     @Override
                     public void onParseSuccess(String requestTag, Object parseData) {
-                            jsonRequestFinishedListener.onParseSuccess(parseData);
+                        jsonRequestFinishedListener.onParseSuccess(parseData);
                     }
 
                     @Override
@@ -152,7 +132,7 @@ public class CacheRequestHandler implements ICacheRequest {
 
                     @Override
                     public Object onParse(String requestTag) {
-                        if(shouldUseCache) {
+                        if(NetworkPolicy.shouldReadFromDiskCache(networkPolicy)){
                             BaseCacheRequestManager.getInstance(context).cacheResponse(reqTAG, response);
                         }
                         return jsonRequestFinishedListener.onRequestSuccess(response);
@@ -160,12 +140,12 @@ public class CacheRequestHandler implements ICacheRequest {
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 // this is useless too so return null from it as we are returning data from
                 // parser task callbacks
-                   return null;
+                return null;
             }
 
             @Override
             public void onParseSuccess(Object response) {
-               // this is never called dont use it
+                // this is never called dont use it
             }
 
             @Override
@@ -180,5 +160,6 @@ public class CacheRequestHandler implements ICacheRequest {
         }, header, retryPolicy, reqTAG);
 
     }
+
 
 }

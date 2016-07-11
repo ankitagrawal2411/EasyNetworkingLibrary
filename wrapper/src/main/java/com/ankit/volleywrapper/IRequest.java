@@ -17,12 +17,12 @@ import java.util.HashMap;
 public interface IRequest {
 
 	  void makeJsonRequest(int method, String requestUrl, JSONObject jsonObject,
-								 IRequestListener<JSONObject> onJsonRequestFinishedListener,
-								 HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
+						   IRequestListener<JSONObject> onJsonRequestFinishedListener,
+						   HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
 
 	     void makeStringRequest(int method, String url, String stringParams,
-									  IRequestListener<String> onStringRequestFinishedListener,
-									  HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
+								IRequestListener<String> onStringRequestFinishedListener,
+								HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
 
 
 }
