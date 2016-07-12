@@ -23,4 +23,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile project(':volley')
     compile 'com.android.support:support-annotations:23.1.1'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
 }

@@ -107,7 +107,7 @@ public class CacheRequestHandler implements ICacheRequest {
             }
 
             @Override
-            public String onNetworkResponse(NetworkResponse response) {
+            public JSONObject onNetworkResponse(NetworkResponse response) {
                 return jsonRequestFinishedListener.onNetworkResponse(response);
             }
 
