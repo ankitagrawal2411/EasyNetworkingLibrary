@@ -28,6 +28,8 @@ public interface IBuildOptions {
 
         IBuildOptions params(@Nullable JSONObject val);
 
+        IBuildOptions cacheTime( long time);
+
         IBuildOptions addHeader(@NonNull String key,@NonNull String value);
 
         IBuildOptions addParam(@NonNull String key,@NonNull String value);

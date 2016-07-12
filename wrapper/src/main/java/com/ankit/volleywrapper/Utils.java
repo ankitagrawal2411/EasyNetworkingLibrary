@@ -3,6 +3,7 @@ package com.ankit.volleywrapper;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.support.annotation.NonNull;
 
 /**
@@ -22,5 +23,9 @@ public class Utils {
                         .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnected();
+    }
+    public static boolean hasHoneycomb()
+    {
+        return Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB;
     }
 }

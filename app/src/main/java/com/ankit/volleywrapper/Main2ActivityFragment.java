@@ -27,7 +27,8 @@ public class Main2ActivityFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         //for post request
-        new RequestBuilder().post(new JSONObject()).url("enter url here").tag("tag").send(getActivity());
+        new RequestBuilder().post(new JSONObject()).url("enter url here").tag("tag").send
+                (getActivity());
 
         //for get request
         new RequestBuilder().get().url("enter url here").tag("tag").send(getActivity());

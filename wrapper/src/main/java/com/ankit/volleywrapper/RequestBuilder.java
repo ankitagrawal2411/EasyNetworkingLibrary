@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import com.android.volley.Request;
 import com.android.volley.RetryPolicy;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -24,6 +25,7 @@ public class RequestBuilder implements IBuildRequestType {
     private String reqTAG;
     private int memoryPolicy;
     private int networkPolicy;
+    private long cacheTime;
     private HashMap<String, String> mHeaders;
     private Map<String, String> mParams = new HashMap<>();
     public RequestBuilder(String requestUrl, String reqTAG) {
@@ -154,9 +156,28 @@ public class RequestBuilder implements IBuildRequestType {
           if(reqTAG==null){
               throw new NullPointerException("reqTag cannot be null");
           }
+
+          if(mParams!=null){
+              Map<?, ?> contentsTyped = (Map<?, ?>) mParams;
+              for (Map.Entry<?, ?> entry : contentsTyped.entrySet()) {
+            /*
+             * Deviate from the original by checking that keys are non-null and
+             * of the proper type. (We still defer validating the values).
+             */
+                  String key = (String) entry.getKey();
+                  if (key == null) {
+                      throw new NullPointerException("key == null");
+                  }
+                  try {
+                      jsonObject.put(key, entry.getValue());
+                  } catch (JSONException e) {
+                      e.printStackTrace();
+                  }
+              }
+          }
           CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
                   jsonObject, mHeaders, iRequestListener, retryPolicy, reqTAG, memoryPolicy,
-                  networkPolicy);
+                  networkPolicy,cacheTime);
       }
 
       /**
@@ -194,6 +215,14 @@ public class RequestBuilder implements IBuildRequestType {
           jsonObject = val;
           return this;
       }
+
+      @Override
+      public IBuildOptions cacheTime(long time) {
+          cache(true);
+          cacheTime = time;
+          return this;
+      }
+
       /**
        * Returns a {@code RequestBuilder} built from the parameters previously set.
        *

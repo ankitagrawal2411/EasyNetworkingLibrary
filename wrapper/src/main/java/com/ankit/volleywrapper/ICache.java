@@ -17,13 +17,13 @@ public interface ICache {
         private static final String TAG = CacheEntry.class.getName();
 
         private String mData;
-        private int mHour;
+        private long mTtl;
         private String mKey;
         private long timeStampMillis;
 
-        public CacheEntry(String data, int size, String url, long timeStampMillis) {
+        public CacheEntry(String data, long time, String url, long timeStampMillis) {
             this.mData = data;
-            this.mHour = size;
+            this.mTtl = time;
             this.mKey = url;
             this.timeStampMillis = timeStampMillis;
         }
@@ -32,8 +32,8 @@ public interface ICache {
             return mData;
         }
 
-        public int getCacheDuration() {
-            return mHour;
+        public long getCacheDuration() {
+            return mTtl;
         }
 
         public String getUrl() {

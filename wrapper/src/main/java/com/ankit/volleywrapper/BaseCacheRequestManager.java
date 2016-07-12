@@ -3,12 +3,15 @@ package com.ankit.volleywrapper;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Calendar;
 
 
 /**
@@ -70,17 +73,19 @@ public class BaseCacheRequestManager {
         try {
             JSONObject jsonObject1 = new JSONObject(obj);
             long cacheTime =jsonObject1.optLong("timestamp");
-            int hours =jsonObject1.optInt("hours");
-           // if(cacheTime+hours<System.currentTimeMillis()) {
+            long hours =jsonObject1.optLong("hours");
+            if(cacheTime+hours< SystemClock.elapsedRealtime() || hours==0) {
                 return jsonObject1.optString("response");
-          /*  }else{
+            }else{
                 invalidateCacheResponse(url);
-            }*/
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return null;
     }
+
+
 
     @SuppressLint("CommitPrefEdits")
     public void clearCache() {

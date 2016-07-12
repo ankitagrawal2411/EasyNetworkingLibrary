@@ -115,6 +115,19 @@ public class RequestHandler implements IRequest {
 				}
 
 			}
+			@Override
+			protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
+
+				if(response!=null) {
+					JSONObject json =iRequestListener.onNetworkResponse(response);
+					return Response.success(
+							json, HttpHeaderParser.parseCacheHeaders(response));
+				}
+				else{
+					return Response.error(new ParseError());
+				}
+
+			}
 		};
 
 		jsonObjectRequest.setRetryPolicy(retryPolicy);

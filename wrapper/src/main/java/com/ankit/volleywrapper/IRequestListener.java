@@ -15,7 +15,7 @@ public interface IRequestListener<T> {
 
      void onParseSuccess(Object response);
 
-     String onNetworkResponse(NetworkResponse response);
+     T onNetworkResponse(NetworkResponse response);
 
      void onRequestErrorCode(VolleyError volleyError);
 

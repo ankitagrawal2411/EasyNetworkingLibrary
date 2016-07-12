@@ -5,6 +5,7 @@ package com.ankit.volleywrapper;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.text.TextUtils;
 
 import com.android.volley.NetworkResponse;
@@ -38,35 +39,29 @@ public class CacheRequestHandler implements ICacheRequest {
         return mMemoryCache;
     }
   @Override
-    public void makeJsonRequest(final Context context,int method, final String URL, JSONObject jsonObject,final HashMap<String,String> header, final IRequestListener<JSONObject> jsonRequestFinishedListener,final RetryPolicy retryPolicy,final String reqTAG, final int memoryPolicy,final int networkPolicy)
+    public void makeJsonRequest(final Context context,int method, final String URL, JSONObject jsonObject,final HashMap<String,String> header, final IRequestListener<JSONObject> jsonRequestFinishedListener,final RetryPolicy retryPolicy,final String reqTAG, final int memoryPolicy,final int networkPolicy, final long
+          cachetime)
     {
         if(!checkForInternetConnection(context)){
             jsonRequestFinishedListener.onRequestErrorCode(null);
             return;
         }
+
         if(MemoryPolicy.shouldReadFromMemoryCache(memoryPolicy)){
-            ICache.CacheEntry response =   mMemoryCache.get(reqTAG);
-            String data = response.getData();
-            if (!TextUtils.isEmpty(data)) {
-                try {
-                    JSONObject jsonObject1 = new JSONObject(data);
+            ICache.CacheEntry entry =   mMemoryCache.get(reqTAG);
+            String data = entry.getData();
+            JSONObject jsonObject1 = parseJson(data);
+            if (jsonObject1!=null) {
                     jsonRequestFinishedListener.onRequestSuccess(jsonObject1);
                     return;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
             }
         }
         if(NetworkPolicy.shouldReadFromDiskCache(networkPolicy)){
             String response = BaseCacheRequestManager.getInstance(context).getCacheResponse(reqTAG);
-            if (!TextUtils.isEmpty(response)) {
-                try {
-                    JSONObject jsonObject1 = new JSONObject(response);
-                    jsonRequestFinishedListener.onRequestSuccess(jsonObject1);
-                    return;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+            JSONObject jsonObject1 = parseJson(response);
+            if (jsonObject1!=null) {
+                jsonRequestFinishedListener.onRequestSuccess(jsonObject1);
+                return;
             }
         }
         RequestHandler.getInstance(context).makeJsonRequest(method, URL, jsonObject, new IRequestListener<JSONObject>() {
@@ -90,17 +85,22 @@ public class CacheRequestHandler implements ICacheRequest {
 
                     @Override
                     public Object onParse(String requestTag) {
+                        if (MemoryPolicy.shouldWriteToMemoryCache(memoryPolicy)) {
+                            getMemoryCache().put(reqTAG, new
+                                    ICache.CacheEntry(response.toString(), cachetime, reqTAG, SystemClock.elapsedRealtime()));
+                        }
                         if (NetworkPolicy.shouldWriteToDiskCache(networkPolicy)) {
                             BaseCacheRequestManager.getInstance(context).cacheResponse(new
-                                    ICache.CacheEntry(response.toString(),0,reqTAG,System.currentTimeMillis
-                                    ()));
-                            BaseCacheRequestManager.getInstance(context).cacheResponse(reqTAG, response);
+                                    ICache.CacheEntry(response.toString(),cachetime,reqTAG, SystemClock.elapsedRealtime()));
                         }
                         return jsonRequestFinishedListener.onRequestSuccess(response);
                     }
                 });
-
-                parserTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                 if(Utils.hasHoneycomb()) {
+                     parserTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                 }else{
+                     parserTask.execute();
+                 }
                 // this is useless too so return null from it as we are returning data from
                 // parser task callbacks
                 return null;
@@ -124,17 +124,37 @@ public class CacheRequestHandler implements ICacheRequest {
 
     }
 
+    private JSONObject parseJson(String response) {
+        if (!TextUtils.isEmpty(response)) {
+            try {
+                return new JSONObject(response);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
 
     private boolean checkForInternetConnection(Context context) {
         return Utils.isConnected(context);
 
     }
     @Override
-    public void makeStringRequest(final Context context,int method, final String URL, String jsonObject,final HashMap<String,String> header, final IRequestListener<String> jsonRequestFinishedListener,final RetryPolicy retryPolicy,final String reqTAG,final int memoryPolicy,final int networkPolicy)
+    public void makeStringRequest(final Context context,int method, final String URL, String jsonObject,final HashMap<String,String> header, final IRequestListener<String> jsonRequestFinishedListener,final RetryPolicy retryPolicy,final String reqTAG,final int memoryPolicy,final int networkPolicy,final
+                                  long cacheTime)
     {
         if(!checkForInternetConnection(context)){
             jsonRequestFinishedListener.onRequestErrorCode(null);
             return;
+        }
+        if(MemoryPolicy.shouldReadFromMemoryCache(memoryPolicy)){
+            ICache.CacheEntry response =   mMemoryCache.get(reqTAG);
+            String data = response.getData();
+            if (!TextUtils.isEmpty(data)) {
+                    jsonRequestFinishedListener.onRequestSuccess(data);
+                    return;
+            }
         }
         if(NetworkPolicy.shouldReadFromDiskCache(networkPolicy)){
             String response = BaseCacheRequestManager.getInstance(context).getCacheResponse(reqTAG);
@@ -146,8 +166,12 @@ public class CacheRequestHandler implements ICacheRequest {
         RequestHandler.getInstance(context).makeStringRequest(method, URL, jsonObject, new IRequestListener<String>() {
             @Override
             public Object onRequestSuccess(final String response) {
-
-                new ParserTask(reqTAG, new IParserListener() {
+                if(response==null){
+                    jsonRequestFinishedListener.onRequestErrorCode(new VolleyError("null " +
+                            "response"));
+                    return null;
+                }
+             ParserTask parserTask =   new ParserTask(reqTAG, new IParserListener() {
                     @Override
                     public void onParseSuccess(String requestTag, Object parseData) {
                         jsonRequestFinishedListener.onParseSuccess(parseData);
@@ -160,14 +184,25 @@ public class CacheRequestHandler implements ICacheRequest {
 
                     @Override
                     public Object onParse(String requestTag) {
-                        if(NetworkPolicy.shouldReadFromDiskCache(networkPolicy)){
-                            BaseCacheRequestManager.getInstance(context).cacheResponse(reqTAG, response);
+                        if (MemoryPolicy.shouldWriteToMemoryCache(memoryPolicy)) {
+                            getMemoryCache().put(reqTAG,new
+                                    ICache.CacheEntry(response, cacheTime, reqTAG, SystemClock.elapsedRealtime()));
+                        }
+                        if(NetworkPolicy.shouldWriteToDiskCache(networkPolicy)){
+                            BaseCacheRequestManager.getInstance(context).cacheResponse(new
+                                    ICache.CacheEntry(response,cacheTime,reqTAG, SystemClock.elapsedRealtime()));
+
                         }
                         return jsonRequestFinishedListener.onRequestSuccess(response);
                     }
-                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                });
                 // this is useless too so return null from it as we are returning data from
                 // parser task callbacks
+                if(Utils.hasHoneycomb()) {
+                    parserTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }else{
+                    parserTask.execute();
+                }
                 return null;
             }
 
