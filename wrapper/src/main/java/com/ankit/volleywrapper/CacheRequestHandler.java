@@ -9,7 +9,6 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 
 import com.android.volley.NetworkResponse;
-import com.android.volley.ParseError;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 
@@ -63,6 +62,9 @@ public class CacheRequestHandler implements ICacheRequest {
                 jsonRequestFinishedListener.onRequestSuccess(jsonObject1);
                 return;
             }
+        }
+        if(NetworkPolicy.isOfflineOnly(networkPolicy)){
+           return;
         }
         RequestHandler.getInstance(context).makeJsonRequest(method, URL, jsonObject, new IRequestListener<JSONObject>() {
             @Override

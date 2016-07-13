@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.android.volley.Request;
+
 import org.json.JSONObject;
 
 /**
@@ -25,7 +27,7 @@ public class Main2ActivityFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+             new RequestCaller.Builder().method(Request.Method.GET).url("").tag("").build();
         //for post request
         new RequestBuilder().post(new JSONObject()).url("enter url here").tag("tag").send
                 (getActivity());
