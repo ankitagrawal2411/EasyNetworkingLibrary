@@ -9,7 +9,7 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 
 import com.android.volley.NetworkResponse;
-import com.android.volley.RetryPolicy;
+
 import com.android.volley.VolleyError;
 
 import org.json.JSONException;

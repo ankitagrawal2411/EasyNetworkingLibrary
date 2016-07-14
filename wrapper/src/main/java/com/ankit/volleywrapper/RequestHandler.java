@@ -13,7 +13,7 @@ import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.RetryPolicy;
+
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -63,10 +63,15 @@ public class RequestHandler implements IRequest {
                                 final IRequestListener<JSONObject> iRequestListener,
                                 final HashMap<String, String> requestHeader,
                                 RetryPolicy retryPolicy, final String reqTAG) {
+		com.android.volley.RetryPolicy volleyRetryPolicy;
          if(retryPolicy==null) {
-			 retryPolicy= new DefaultRetryPolicy(timeout,
+			 volleyRetryPolicy= new DefaultRetryPolicy(timeout,
 					 RETRY,
 					 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+		 }else{
+			 volleyRetryPolicy =  new DefaultRetryPolicy(retryPolicy.getCurrentTimeout(),
+					 retryPolicy.getCurrentRetryCount(),
+					 retryPolicy.getBackoffMultiplier());
 		 }
 
 		Log.d(TAG, reqTAG + " request Url: " + requestUrl);
@@ -130,7 +135,7 @@ public class RequestHandler implements IRequest {
 			}
 		};
 
-		jsonObjectRequest.setRetryPolicy(retryPolicy);
+		jsonObjectRequest.setRetryPolicy(volleyRetryPolicy);
 		jsonObjectRequest.setShouldCache(false);
 
 		if (reqTAG!=null && reqTAG.trim().length()>0) {
@@ -150,13 +155,16 @@ public class RequestHandler implements IRequest {
                                   final IRequestListener<String> iRequestListener,
                                   final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
 
-		RetryPolicy retry = new DefaultRetryPolicy(timeout,
-				RETRY,
-				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-
-		/*if (retryPolicy != null) {
-			retry = retryPolicy;
-		}*/
+		com.android.volley.RetryPolicy volleyRetryPolicy;
+		if(retryPolicy==null) {
+			volleyRetryPolicy= new DefaultRetryPolicy(timeout,
+					RETRY,
+					DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+		}else{
+			volleyRetryPolicy =  new DefaultRetryPolicy(retryPolicy.getCurrentTimeout(),
+					retryPolicy.getCurrentRetryCount(),
+					retryPolicy.getBackoffMultiplier());
+		}
 
 		Log.d(TAG, reqTAG + " request Url: " + url);
 		Log.d(TAG, reqTAG + " request String Params: " + stringParams);
@@ -227,7 +235,7 @@ public class RequestHandler implements IRequest {
 			}
 		};
 
-		objStringRequest.setRetryPolicy(retry);
+		objStringRequest.setRetryPolicy(volleyRetryPolicy);
 		objStringRequest.setShouldCache(false);
 		
 		
