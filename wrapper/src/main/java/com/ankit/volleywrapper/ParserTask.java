@@ -37,7 +37,7 @@ public class ParserTask extends AsyncTask<Object, Integer, Object> {
         {
             this.mListener.onParseSuccess(this.mRequestTag, o);
         }else{
-            this.mListener.onParseError(this.mRequestTag, ErrorCode.VOLLEY_PARSE_ERROR);
+            this.mListener.onParseError(this.mRequestTag, ErrorCode.PARSE_ERROR);
         }
     }
 }

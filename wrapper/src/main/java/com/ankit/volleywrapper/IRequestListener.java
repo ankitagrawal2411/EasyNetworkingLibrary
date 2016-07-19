@@ -4,7 +4,6 @@
 package com.ankit.volleywrapper;
 
 
-import com.android.volley.VolleyError;
 
 /**
  * Created by ankitagrawal on 6/7/16. yay
@@ -17,6 +16,6 @@ public interface IRequestListener<T> {
 
      T onNetworkResponse(NetworkResponse response);
 
-     void onRequestErrorCode(VolleyError volleyError);
+     void onRequestErrorCode(int errorCode);
 
 }

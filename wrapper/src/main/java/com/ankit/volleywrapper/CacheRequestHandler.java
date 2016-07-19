@@ -8,9 +8,6 @@ import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.text.TextUtils;
 
-
-import com.android.volley.VolleyError;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,7 +38,7 @@ public class CacheRequestHandler implements ICacheRequest {
           cachetime)
     {
         if(!checkForInternetConnection(context)){
-            jsonRequestFinishedListener.onRequestErrorCode(null);
+            jsonRequestFinishedListener.onRequestErrorCode(ErrorCode.NO_CONNECTION_ERROR);
             return;
         }
 
@@ -70,8 +67,7 @@ public class CacheRequestHandler implements ICacheRequest {
             @Override
             public Object onRequestSuccess(final JSONObject response) {
                 if (response == null) {
-                    jsonRequestFinishedListener.onRequestErrorCode(new VolleyError("null " +
-                            "response"));
+                    jsonRequestFinishedListener.onRequestErrorCode(ErrorCode.RESPONSE_NULL);
                     return null;
                 }
                 ParserTask parserTask = new ParserTask(reqTAG, new IParserListener() {
@@ -82,7 +78,7 @@ public class CacheRequestHandler implements ICacheRequest {
 
                     @Override
                     public void onParseError(String requestTag, int errorCode) {
-                        jsonRequestFinishedListener.onRequestErrorCode(null);
+                        jsonRequestFinishedListener.onRequestErrorCode(ErrorCode.PARSE_ERROR);
                     }
 
                     @Override
@@ -114,14 +110,15 @@ public class CacheRequestHandler implements ICacheRequest {
             }
 
             @Override
+            public void onRequestErrorCode(int errorCode) {
+                jsonRequestFinishedListener.onRequestErrorCode(errorCode);
+            }
+
+            @Override
             public void onParseSuccess(Object response) {
                 // this is never called dont use it
             }
 
-            @Override
-            public void onRequestErrorCode(VolleyError volleyError) {
-                jsonRequestFinishedListener.onRequestErrorCode(volleyError);
-            }
         }, header, retryPolicy, reqTAG);
 
     }
@@ -147,7 +144,7 @@ public class CacheRequestHandler implements ICacheRequest {
                                   long cacheTime)
     {
         if(!checkForInternetConnection(context)){
-            jsonRequestFinishedListener.onRequestErrorCode(null);
+            jsonRequestFinishedListener.onRequestErrorCode(ErrorCode.NO_CONNECTION_ERROR);
             return;
         }
         if(MemoryPolicy.shouldReadFromMemoryCache(memoryPolicy)){
@@ -169,8 +166,7 @@ public class CacheRequestHandler implements ICacheRequest {
             @Override
             public Object onRequestSuccess(final String response) {
                 if(response==null){
-                    jsonRequestFinishedListener.onRequestErrorCode(new VolleyError("null " +
-                            "response"));
+                    jsonRequestFinishedListener.onRequestErrorCode(ErrorCode.RESPONSE_NULL);
                     return null;
                 }
              ParserTask parserTask =   new ParserTask(reqTAG, new IParserListener() {
@@ -181,7 +177,7 @@ public class CacheRequestHandler implements ICacheRequest {
 
                     @Override
                     public void onParseError(String requestTag, int errorCode) {
-                        jsonRequestFinishedListener.onRequestErrorCode(null);
+                        jsonRequestFinishedListener.onRequestErrorCode(ErrorCode.PARSE_ERROR);
                     }
 
                     @Override
@@ -219,8 +215,8 @@ public class CacheRequestHandler implements ICacheRequest {
             }
 
             @Override
-            public void onRequestErrorCode(VolleyError volleyError) {
-                jsonRequestFinishedListener.onRequestErrorCode(volleyError);
+            public void onRequestErrorCode(int errorCode) {
+                jsonRequestFinishedListener.onRequestErrorCode(errorCode);
             }
         }, header, retryPolicy, reqTAG);
 

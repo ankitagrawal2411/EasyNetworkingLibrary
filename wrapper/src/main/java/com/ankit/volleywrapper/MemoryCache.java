@@ -1,7 +1,6 @@
 package com.ankit.volleywrapper;
 
-import android.content.Context;
-import android.widget.SeekBar;
+
 
 import java.util.HashMap;
 
@@ -31,12 +30,7 @@ public class MemoryCache implements ICache {
         }
         return null;
     }
-    public static void swap(int a, int b){
-        int temp;
-        temp = a;
-        a = b;
-       b = temp;
-    }
+
     @Override
     public void put(String key, CacheEntry newEntry) {
         if (newEntry.getCacheDuration() > getMaxSize()) { // don't bother caching

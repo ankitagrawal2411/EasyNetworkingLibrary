@@ -88,12 +88,9 @@ public class RequestHandler implements IRequest {
 								+ jsonObject);
 
 						if (jsonObject != null) {
-
 							iRequestListener.onRequestSuccess(jsonObject);
-
 						} else {
-
-							iRequestListener.onRequestErrorCode(null);
+							iRequestListener.onRequestErrorCode(ErrorCode.RESPONSE_NULL);
 
 						}
 					}
@@ -107,7 +104,7 @@ public class RequestHandler implements IRequest {
 							error = volleyError.getMessage();
 						}
 						Log.v(TAG, reqTAG + " onErrorResponse >> errorCode: " + error);
-						iRequestListener.onRequestErrorCode(volleyError);
+						iRequestListener.onRequestErrorCode(ErrorCode.getErrorCode(volleyError));
 					}
 				}) {
 			@Override
@@ -182,7 +179,7 @@ public class RequestHandler implements IRequest {
 
 							iRequestListener.onRequestSuccess(response);
 						} else {
-							iRequestListener.onRequestErrorCode(null);
+							iRequestListener.onRequestErrorCode(ErrorCode.RESPONSE_NULL);
 						}
 
 					}
@@ -190,7 +187,7 @@ public class RequestHandler implements IRequest {
 				}, new Response.ErrorListener() {
 					@Override
 					public void onErrorResponse(VolleyError volleyError) {
-							iRequestListener.onRequestErrorCode(volleyError);
+						iRequestListener.onRequestErrorCode(ErrorCode.getErrorCode(volleyError));
 						String error = "";
 						if(volleyError!=null){
 							error = volleyError.getMessage();
