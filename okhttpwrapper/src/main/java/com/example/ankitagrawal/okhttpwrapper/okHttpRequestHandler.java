@@ -145,7 +145,7 @@ public class okHttpRequestHandler extends RequestManager {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (!response.isSuccessful()) {
-                    onJsonRequestFinishedListener.onRequestErrorCode(ErrorCode.NO_CONNECTION_ERROR);
+                    onJsonRequestFinishedListener.onRequestErrorCode(response.code());
                     throw new IOException("Unexpected code " + response);
 
                 }
