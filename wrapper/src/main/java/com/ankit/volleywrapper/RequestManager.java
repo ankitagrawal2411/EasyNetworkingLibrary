@@ -13,15 +13,15 @@ import java.util.HashMap;
  */
 public abstract class RequestManager {
 
-    abstract void init(Context context);
+    public abstract void init(Context context);
     public RequestManager(Context context){
 
     }
-    abstract void  makeJsonRequest(int method, String requestUrl, JSONObject jsonObject,
-                                   IRequestListener<JSONObject> onJsonRequestFinishedListener,
-                                   HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
+    protected abstract void  makeJsonRequest(int method, String requestUrl, JSONObject jsonObject,
+                                             IRequestListener<JSONObject> onJsonRequestFinishedListener,
+                                             HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
 
-    abstract void makeStringRequest(int method, String url, String stringParams,
+    protected abstract void makeStringRequest(int method, String url, String stringParams,
                            IRequestListener<String> onStringRequestFinishedListener,
                            HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
 }

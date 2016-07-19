@@ -1,7 +1,13 @@
-package com.ankit.volleywrapper;
+package com.example.ankitagrawal.okhttpwrapper;
 
 import android.content.Context;
 import android.util.Log;
+
+import com.ankit.volleywrapper.ErrorCode;
+import com.ankit.volleywrapper.IRequestListener;
+import com.ankit.volleywrapper.NetworkResponse;
+import com.ankit.volleywrapper.RequestManager;
+import com.ankit.volleywrapper.RetryPolicy;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,8 +22,8 @@ import okhttp3.Callback;
 import okhttp3.Headers;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
-import okhttp3.Request;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
@@ -29,11 +35,9 @@ public class okHttpRequestHandler extends RequestManager {
     private static final long READ_TIMEOUT_MILLIS = 10000;
     private  OkHttpClient client ;
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-    private Interceptor interceptor;
-
+    public static final MediaType STRING = MediaType.parse("text/plain; charset=utf-8");
     public okHttpRequestHandler(Context context) {
         super(context);
-
         client = new OkHttpClient.Builder()
                 .connectTimeout(CONNECT_TIMEOUT_MILLIS,TimeUnit.MILLISECONDS)
                 .readTimeout(READ_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
@@ -63,24 +67,26 @@ public class okHttpRequestHandler extends RequestManager {
     }
 
     @Override
-    void init(Context context) {
+    public void init(Context context) {
 
     }
 
     @Override
-    void makeJsonRequest(int method, String requestUrl, JSONObject jsonObject, final IRequestListener<JSONObject> onJsonRequestFinishedListener, HashMap<String, String> requestHeader, final RetryPolicy retryPolicy, String reqTAG) {
+    public void makeJsonRequest(int method, String requestUrl, JSONObject jsonObject, final IRequestListener<JSONObject> onJsonRequestFinishedListener, HashMap<String, String> requestHeader, final RetryPolicy retryPolicy, String reqTAG) {
 
         Request.Builder builder = new Request.Builder()
                 .url(requestUrl)
                 .tag(reqTAG);
-
+        if(jsonObject==null){
+            jsonObject= new JSONObject();
+        }
         if(requestHeader!=null){
             for (Map.Entry<String, String> entry : requestHeader.entrySet()) {
                 String key =  entry.getKey();
                 if (key == null) {
                     throw new NullPointerException("key == null");
                 }
-                    builder.addHeader(key, entry.getValue());
+                builder.addHeader(key, entry.getValue());
             }
         }
         switch (method){
@@ -88,27 +94,22 @@ public class okHttpRequestHandler extends RequestManager {
                 builder.get();
                 break;
             case com.ankit.volleywrapper.Request.Method.POST:
-                if(jsonObject!=null){
-                    builder.post(RequestBody.create(JSON, jsonObject.toString()));
-                }
+                builder.post(RequestBody.create(JSON, jsonObject.toString()));
+
                 break;
             case com.ankit.volleywrapper.Request.Method.DELETE:
-                if(jsonObject!=null){
-                    builder.delete(RequestBody.create(JSON, jsonObject.toString()));
-                }
+                builder.delete(RequestBody.create(JSON, jsonObject.toString()));
+
                 break;
             case com.ankit.volleywrapper.Request.Method.HEAD:
-                    builder.head();
+                builder.head();
                 break;
             case com.ankit.volleywrapper.Request.Method.PATCH:
-                if(jsonObject!=null){
-                    builder.patch(RequestBody.create(JSON, jsonObject.toString()));
-                }
+                builder.patch(RequestBody.create(JSON, jsonObject.toString()));
+
                 break;
             case com.ankit.volleywrapper.Request.Method.PUT:
-                if(jsonObject!=null){
-                    builder.put(RequestBody.create(JSON, jsonObject.toString()));
-                }
+                builder.put(RequestBody.create(JSON, jsonObject.toString()));
                 break;
             case com.ankit.volleywrapper.Request.Method.OPTIONS: {
                 throw new IllegalArgumentException("okhttp does not support Options request type," +
@@ -122,12 +123,12 @@ public class okHttpRequestHandler extends RequestManager {
         }
 
 
-            Request request =builder.build();
+        Request request =builder.build();
 
         if(client.interceptors().size()>0) {
             client.interceptors().clear();
         }
-            createInterceptor(client, retryPolicy);
+        createInterceptor(client, retryPolicy);
 
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -144,9 +145,13 @@ public class okHttpRequestHandler extends RequestManager {
 
                 }
                 Headers responseHeaders = response.headers();
+                HashMap<String,String> headers = new HashMap<>(responseHeaders.size());
                 for (int i = 0, size = responseHeaders.size(); i < size; i++) {
+                    headers.put(responseHeaders.name(i),responseHeaders.value(i));
                     System.out.println(responseHeaders.name(i) + ": " + responseHeaders.value(i));
                 }
+                onJsonRequestFinishedListener.onNetworkResponse(new NetworkResponse(response.code(),response.body().bytes(),headers,response.code()==304, response.receivedResponseAtMillis()-response
+                        .sentRequestAtMillis()));
                 String jsonData = response.body().string();
                 try {
                     JSONObject Jobject = new JSONObject(jsonData);
@@ -166,7 +171,7 @@ public class okHttpRequestHandler extends RequestManager {
     }
 
     private Interceptor getInterceptor(final RetryPolicy retryPolicy) {
-       return new Interceptor() {
+        return new Interceptor() {
             @Override
             public Response intercept(Interceptor.Chain chain) throws IOException {
                 Request request = chain.request();
@@ -192,11 +197,13 @@ public class okHttpRequestHandler extends RequestManager {
         };
     }
     @Override
-    void makeStringRequest(int method, String requestUrl, String jsonObject, final IRequestListener<String> onRequestFinishedListener, HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG) {
+    public void makeStringRequest(int method, String requestUrl, String jsonObject, final IRequestListener<String> onRequestFinishedListener, final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG) {
         Request.Builder builder = new Request.Builder()
                 .url(requestUrl)
                 .tag(reqTAG);
-
+        if(jsonObject==null){
+            jsonObject= "";
+        }
         if(requestHeader!=null){
             for (Map.Entry<String, String> entry : requestHeader.entrySet()) {
                 String key =  entry.getKey();
@@ -211,27 +218,19 @@ public class okHttpRequestHandler extends RequestManager {
                 builder.get();
                 break;
             case com.ankit.volleywrapper.Request.Method.POST:
-                if(jsonObject!=null){
-                    builder.post(RequestBody.create(JSON, jsonObject));
-                }
+                builder.post(RequestBody.create(STRING, jsonObject));
                 break;
             case com.ankit.volleywrapper.Request.Method.DELETE:
-                if(jsonObject!=null){
-                    builder.delete(RequestBody.create(JSON, jsonObject));
-                }
+                builder.delete(RequestBody.create(STRING, jsonObject));
                 break;
             case com.ankit.volleywrapper.Request.Method.HEAD:
                 builder.head();
                 break;
             case com.ankit.volleywrapper.Request.Method.PATCH:
-                if(jsonObject!=null){
-                    builder.patch(RequestBody.create(JSON, jsonObject));
-                }
+                builder.patch(RequestBody.create(STRING, jsonObject));
                 break;
             case com.ankit.volleywrapper.Request.Method.PUT:
-                if(jsonObject!=null){
-                    builder.put(RequestBody.create(JSON, jsonObject));
-                }
+                builder.put(RequestBody.create(STRING, jsonObject));
                 break;
             case com.ankit.volleywrapper.Request.Method.OPTIONS: {
                 throw new IllegalArgumentException("okhttp does not support Options request type," +
@@ -267,11 +266,15 @@ public class okHttpRequestHandler extends RequestManager {
 
                 }
                 Headers responseHeaders = response.headers();
+                HashMap<String,String> headers = new HashMap<>(responseHeaders.size());
                 for (int i = 0, size = responseHeaders.size(); i < size; i++) {
+                    headers.put(responseHeaders.name(i),responseHeaders.value(i));
                     System.out.println(responseHeaders.name(i) + ": " + responseHeaders.value(i));
                 }
+                onRequestFinishedListener.onNetworkResponse(new NetworkResponse(response.code(),response.body().bytes(),headers,response.code()==304, response.receivedResponseAtMillis()-response
+                        .sentRequestAtMillis()));
                 String jsonData = response.body().string();
-                    onRequestFinishedListener.onRequestSuccess(jsonData);
+                onRequestFinishedListener.onRequestSuccess(jsonData);
                 System.out.println(response.body().string());
             }
         });

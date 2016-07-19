@@ -20,7 +20,6 @@ public class CacheRequestHandler implements ICacheRequest {
 
     private  MemoryCache mMemoryCache;
     private static CacheRequestHandler mInstance;
-    private IRequest iRequest;
     private RequestManager requestManager;
      static CacheRequestHandler getInstance()
     {
@@ -233,10 +232,6 @@ public class CacheRequestHandler implements ICacheRequest {
 
     }
 
-
-    public void setRequestManager(IRequest iRequest) {
-        this.iRequest = iRequest;
-    }
     public void setRequestManager(RequestManager requestManager) {
         this.requestManager = requestManager;
     }
