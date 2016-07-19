@@ -17,6 +17,8 @@ public abstract class RequestManager {
     public RequestManager(Context context){
 
     }
+
+    public abstract boolean canHandleRequest(Context context, int method);
     protected abstract void  makeJsonRequest(int method, String requestUrl, JSONObject jsonObject,
                                              IRequestListener<JSONObject> onJsonRequestFinishedListener,
                                              HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);

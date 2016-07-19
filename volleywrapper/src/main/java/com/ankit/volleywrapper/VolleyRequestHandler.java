@@ -41,12 +41,15 @@ public class VolleyRequestHandler extends RequestManager {
     }
 
     @Override
-    void init(Context context) {
+    public  void init(Context context) {
 
     }
-
     @Override
-    void makeJsonRequest(int method, String requestUrl, JSONObject jsonObject, final IRequestListener<JSONObject> iRequestListener, final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
+    public boolean canHandleRequest(Context context, int method) {
+        return true;
+    }
+    @Override
+    public void makeJsonRequest(int method, String requestUrl, JSONObject jsonObject, final IRequestListener<JSONObject> iRequestListener, final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
         com.android.volley.RetryPolicy volleyRetryPolicy;
         if(retryPolicy==null) {
             volleyRetryPolicy= new com.android.volley.DefaultRetryPolicy(timeout,
@@ -131,7 +134,7 @@ public class VolleyRequestHandler extends RequestManager {
     }
 
     @Override
-    void makeStringRequest(int method, String url, final String stringParams, final IRequestListener<String> iRequestListener, final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
+    public void makeStringRequest(int method, String url, final String stringParams, final IRequestListener<String> iRequestListener, final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
         com.android.volley.RetryPolicy volleyRetryPolicy;
         if(retryPolicy==null) {
             volleyRetryPolicy= new com.android.volley.DefaultRetryPolicy(timeout,

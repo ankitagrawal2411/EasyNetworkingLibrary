@@ -67,6 +67,11 @@ public class okHttpRequestHandler extends RequestManager {
     }
 
     @Override
+    public boolean canHandleRequest(Context context, int method) {
+        return method != com.ankit.volleywrapper.Request.Method.OPTIONS && method != com.ankit.volleywrapper.Request.Method.TRACE;
+    }
+
+    @Override
     public void init(Context context) {
 
     }
