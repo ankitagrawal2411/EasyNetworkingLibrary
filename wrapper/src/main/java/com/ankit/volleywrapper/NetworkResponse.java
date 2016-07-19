@@ -16,15 +16,12 @@
 
 package com.ankit.volleywrapper;
 
-import com.android.volley.Network;
-import com.android.volley.Request;
-
 import java.net.HttpURLConnection;
 import java.util.Collections;
 import java.util.Map;
 
 /**
- * Data and headers returned from {@link Network#performRequest(Request)}.
+ * Data and headers returned from  NetworkRequest(Request).
  */
 public class NetworkResponse {
     /**
@@ -72,12 +69,5 @@ public class NetworkResponse {
     /** Network roundtrip time in milliseconds. */
     public final long networkTimeMs;
 
-    public NetworkResponse(com.android.volley.NetworkResponse response) {
-        this.statusCode = response.statusCode;
-        this.headers = response.headers;
-        this.data = response.data;
-        this.notModified = response.notModified;
-        this.networkTimeMs = response.networkTimeMs;
-    }
 }
 

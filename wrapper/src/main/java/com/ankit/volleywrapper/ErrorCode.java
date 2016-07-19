@@ -1,13 +1,6 @@
 package com.ankit.volleywrapper;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkError;
-import com.android.volley.NoConnectionError;
-import com.android.volley.ParseError;
-import com.android.volley.ServerError;
-import com.android.volley.TimeoutError;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.Volley;
+
 
 /**
  * Created by ankitagrawal on 6/7/16. yay
@@ -58,33 +51,5 @@ public class ErrorCode {
     public static final int TIMEOUT_ERROR = 118;
 
 
-    /**
-     * @param volleyError
-     *            - error encountered while executing request with
-     *            {@link Volley}
-     * @return Returns {@link ErrorCode} according to type of
-     *         {@link VolleyError}
-     */
-    public static int getErrorCode(VolleyError volleyError) {
 
-        int errorCode = ErrorCode.UNKNOWN_ERROR;
-
-        if (volleyError != null) {
-             if (volleyError instanceof AuthFailureError) {
-                errorCode = ErrorCode.AUTH_FAILURE_ERROR;
-            } else if (volleyError instanceof ServerError) {
-                errorCode = ErrorCode.NETWORK_ERROR;
-            } else if (volleyError instanceof NetworkError) {
-                errorCode = ErrorCode.NETWORK_ERROR;
-            } else if (volleyError instanceof ParseError) {
-                errorCode = ErrorCode.PARSE_ERROR;
-            } else if (volleyError instanceof TimeoutError) {
-                errorCode = ErrorCode.TIMEOUT_ERROR;
-            } else {
-                errorCode = ErrorCode.UNKNOWN_ERROR;
-            }
-        }
-
-        return errorCode;
-    }
 }

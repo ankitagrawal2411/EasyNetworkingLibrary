@@ -8,12 +8,15 @@ import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -104,7 +107,7 @@ public class RequestHandler implements IRequest {
 							error = volleyError.getMessage();
 						}
 						Log.v(TAG, reqTAG + " onErrorResponse >> errorCode: " + error);
-						iRequestListener.onRequestErrorCode(ErrorCode.getErrorCode(volleyError));
+						iRequestListener.onRequestErrorCode(getErrorCode(volleyError));
 					}
 				}) {
 			@Override
@@ -121,7 +124,7 @@ public class RequestHandler implements IRequest {
 			protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
 
 				if(response!=null) {
-					JSONObject json =iRequestListener.onNetworkResponse(new com.ankit.volleywrapper.NetworkResponse(response));
+					JSONObject json =iRequestListener.onNetworkResponse(createNetworkResponse(response));
 					return Response.success(
 							json, HttpHeaderParser.parseCacheHeaders(response));
 				}
@@ -146,6 +149,40 @@ public class RequestHandler implements IRequest {
 		}
 	}
 
+	private com.ankit.volleywrapper.NetworkResponse createNetworkResponse(NetworkResponse response) {
+		return new com.ankit.volleywrapper.NetworkResponse(response.statusCode,response.data,
+				response.headers,response.notModified,response.networkTimeMs);
+	}
+
+	/**
+	 * @param volleyError
+	 *            - error encountered while executing request with
+	 *            {@link Volley}
+	 * @return Returns {@link ErrorCode} according to type of
+	 *         {@link VolleyError}
+	 */
+	public static int getErrorCode(VolleyError volleyError) {
+
+		int errorCode = ErrorCode.UNKNOWN_ERROR;
+
+		if (volleyError != null) {
+			if (volleyError instanceof AuthFailureError) {
+				errorCode = ErrorCode.AUTH_FAILURE_ERROR;
+			} else if (volleyError instanceof ServerError) {
+				errorCode = ErrorCode.NETWORK_ERROR;
+			} else if (volleyError instanceof NetworkError) {
+				errorCode = ErrorCode.NETWORK_ERROR;
+			} else if (volleyError instanceof ParseError) {
+				errorCode = ErrorCode.PARSE_ERROR;
+			} else if (volleyError instanceof TimeoutError) {
+				errorCode = ErrorCode.TIMEOUT_ERROR;
+			} else {
+				errorCode = ErrorCode.UNKNOWN_ERROR;
+			}
+		}
+
+		return errorCode;
+	}
 	@Override
 	public void makeStringRequest(final int method, final String url,
                                   final String stringParams,
@@ -187,7 +224,7 @@ public class RequestHandler implements IRequest {
 				}, new Response.ErrorListener() {
 					@Override
 					public void onErrorResponse(VolleyError volleyError) {
-						iRequestListener.onRequestErrorCode(ErrorCode.getErrorCode(volleyError));
+						iRequestListener.onRequestErrorCode(getErrorCode(volleyError));
 						String error = "";
 						if(volleyError!=null){
 							error = volleyError.getMessage();
@@ -221,7 +258,7 @@ public class RequestHandler implements IRequest {
 			protected Response<String> parseNetworkResponse(NetworkResponse response) {
 
 					if(response!=null) {
-						String json =iRequestListener.onNetworkResponse(new com.ankit.volleywrapper.NetworkResponse(response));
+						String json =iRequestListener.onNetworkResponse(createNetworkResponse(response));
 						return Response.success(
 								json, HttpHeaderParser.parseCacheHeaders(response));
 					}
