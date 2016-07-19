@@ -54,8 +54,9 @@ public class RequestHandler implements IRequest {
 
 
 	public RequestHandler(Context context){
-		mRequestQueue = Volley.newRequestQueue(context);
-
+		if(mRequestQueue==null) {
+			mRequestQueue = Volley.newRequestQueue(context);
+		}
 	}
 
 

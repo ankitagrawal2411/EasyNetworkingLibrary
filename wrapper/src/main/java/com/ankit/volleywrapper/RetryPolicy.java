@@ -28,11 +28,14 @@ public interface RetryPolicy {
      int getCurrentTimeout();
 
     /**
-     * Returns the current retry count (used for logging).
+     * Returns the total retry count (used for logging).
      */
      int getRetryCount();
 
-
+    /**
+     * Returns the total retry count (used for logging).
+     */
+    void setCurrentTimeout(int timeOut);
     /**
      * Returns the backoff multiplier for the policy.
      */

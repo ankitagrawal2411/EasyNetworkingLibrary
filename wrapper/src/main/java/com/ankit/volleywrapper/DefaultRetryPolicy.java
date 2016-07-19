@@ -76,6 +76,16 @@ public class DefaultRetryPolicy implements RetryPolicy {
     }
 
     /**
+     * Returns the total retry count (used for logging).
+     *
+     * @param timeOut
+     */
+    @Override
+    public void setCurrentTimeout(int timeOut) {
+        mCurrentTimeoutMs = timeOut;
+    }
+
+    /**
      * Returns the backoff multiplier for the policy.
      */
     @Override

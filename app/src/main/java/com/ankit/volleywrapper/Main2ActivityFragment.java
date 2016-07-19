@@ -1,5 +1,6 @@
 package com.ankit.volleywrapper;
 
+
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -27,6 +28,7 @@ public class Main2ActivityFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        GlobalRequest.newBuilder().setRequestManager(new VolleyRequestHandler(getActivity()));
              new RequestCaller.Builder().method(Request.Method.GET).url("").tag("").build();
         //for post request
         new RequestBuilder().post(new JSONObject()).url("enter url here").tag("tag").send

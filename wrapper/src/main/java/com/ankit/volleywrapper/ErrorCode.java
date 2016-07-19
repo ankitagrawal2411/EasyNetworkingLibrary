@@ -24,6 +24,10 @@ public class ErrorCode {
      */
     public static final int NO_CONNECTION_ERROR = 112;
 
+    /**
+     * Error code when volley returns server error.
+     */
+    public static final int OFFLINE_ONLY_ERROR = 113;
 
 
     /**
