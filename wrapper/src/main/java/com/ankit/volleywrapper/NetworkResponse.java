@@ -71,5 +71,13 @@ public class NetworkResponse {
 
     /** Network roundtrip time in milliseconds. */
     public final long networkTimeMs;
+
+    public NetworkResponse(com.android.volley.NetworkResponse response) {
+        this.statusCode = response.statusCode;
+        this.headers = response.headers;
+        this.data = response.data;
+        this.notModified = response.notModified;
+        this.networkTimeMs = response.networkTimeMs;
+    }
 }
 

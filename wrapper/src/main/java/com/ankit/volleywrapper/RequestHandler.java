@@ -70,7 +70,7 @@ public class RequestHandler implements IRequest {
 					 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 		 }else{
 			 volleyRetryPolicy =  new DefaultRetryPolicy(retryPolicy.getCurrentTimeout(),
-					 retryPolicy.getCurrentRetryCount(),
+					 retryPolicy.getRetryCount(),
 					 retryPolicy.getBackoffMultiplier());
 		 }
 
@@ -124,7 +124,7 @@ public class RequestHandler implements IRequest {
 			protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
 
 				if(response!=null) {
-					JSONObject json =iRequestListener.onNetworkResponse(response);
+					JSONObject json =iRequestListener.onNetworkResponse(new com.ankit.volleywrapper.NetworkResponse(response));
 					return Response.success(
 							json, HttpHeaderParser.parseCacheHeaders(response));
 				}
@@ -162,7 +162,7 @@ public class RequestHandler implements IRequest {
 					DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 		}else{
 			volleyRetryPolicy =  new DefaultRetryPolicy(retryPolicy.getCurrentTimeout(),
-					retryPolicy.getCurrentRetryCount(),
+					retryPolicy.getRetryCount(),
 					retryPolicy.getBackoffMultiplier());
 		}
 
@@ -224,7 +224,7 @@ public class RequestHandler implements IRequest {
 			protected Response<String> parseNetworkResponse(NetworkResponse response) {
 
 					if(response!=null) {
-						String json =iRequestListener.onNetworkResponse(response);
+						String json =iRequestListener.onNetworkResponse(new com.ankit.volleywrapper.NetworkResponse(response));
 						return Response.success(
 								json, HttpHeaderParser.parseCacheHeaders(response));
 					}

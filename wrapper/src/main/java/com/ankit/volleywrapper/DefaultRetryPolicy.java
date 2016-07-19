@@ -16,7 +16,6 @@
 
 package com.ankit.volleywrapper;
 
-import com.android.volley.VolleyError;
 
 /**
  * Default retry policy for requests.
@@ -25,8 +24,6 @@ public class DefaultRetryPolicy implements RetryPolicy {
     /** The current timeout in milliseconds. */
     private int mCurrentTimeoutMs;
 
-    /** The current retry count. */
-    private int mCurrentRetryCount;
 
     /** The maximum number of attempts. */
     private final int mMaxNumRetries;
@@ -74,8 +71,8 @@ public class DefaultRetryPolicy implements RetryPolicy {
      * Returns the current retry count.
      */
     @Override
-    public int getCurrentRetryCount() {
-        return mCurrentRetryCount;
+    public int getRetryCount() {
+        return mMaxNumRetries;
     }
 
     /**
@@ -86,23 +83,4 @@ public class DefaultRetryPolicy implements RetryPolicy {
         return mBackoffMultiplier;
     }
 
-    /**
-     * Prepares for the next retry by applying a backoff to the timeout.
-     * @param error The error code of the last attempt.
-     */
-    @Override
-    public void retry(VolleyError error) throws VolleyError {
-        mCurrentRetryCount++;
-        mCurrentTimeoutMs += (mCurrentTimeoutMs * mBackoffMultiplier);
-        if (!hasAttemptRemaining()) {
-            throw error;
-        }
-    }
-
-    /**
-     * Returns true if this policy has attempts remaining, false otherwise.
-     */
-    protected boolean hasAttemptRemaining() {
-        return mCurrentRetryCount <= mMaxNumRetries;
-    }
 }

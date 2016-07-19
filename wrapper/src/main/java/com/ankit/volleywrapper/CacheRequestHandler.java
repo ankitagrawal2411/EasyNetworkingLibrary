@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.text.TextUtils;
 
-import com.android.volley.NetworkResponse;
 
 import com.android.volley.VolleyError;
 
@@ -66,15 +65,16 @@ public class CacheRequestHandler implements ICacheRequest {
         if(NetworkPolicy.isOfflineOnly(networkPolicy)){
            return;
         }
+
         RequestHandler.getInstance(context).makeJsonRequest(method, URL, jsonObject, new IRequestListener<JSONObject>() {
             @Override
             public Object onRequestSuccess(final JSONObject response) {
-                if(response==null){
+                if (response == null) {
                     jsonRequestFinishedListener.onRequestErrorCode(new VolleyError("null " +
                             "response"));
                     return null;
                 }
-                ParserTask parserTask =new ParserTask(reqTAG, new IParserListener() {
+                ParserTask parserTask = new ParserTask(reqTAG, new IParserListener() {
                     @Override
                     public void onParseSuccess(String requestTag, Object parseData) {
                         jsonRequestFinishedListener.onParseSuccess(parseData);
@@ -93,16 +93,16 @@ public class CacheRequestHandler implements ICacheRequest {
                         }
                         if (NetworkPolicy.shouldWriteToDiskCache(networkPolicy)) {
                             BaseCacheRequestManager.getInstance(context).cacheResponse(new
-                                    ICache.CacheEntry(response.toString(),cachetime,reqTAG, SystemClock.elapsedRealtime()));
+                                    ICache.CacheEntry(response.toString(), cachetime, reqTAG, SystemClock.elapsedRealtime()));
                         }
                         return jsonRequestFinishedListener.onRequestSuccess(response);
                     }
                 });
-                 if(Utils.hasHoneycomb()) {
-                     parserTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                 }else{
-                     parserTask.execute();
-                 }
+                if (Utils.hasHoneycomb()) {
+                    parserTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                } else {
+                    parserTask.execute();
+                }
                 // this is useless too so return null from it as we are returning data from
                 // parser task callbacks
                 return null;

@@ -3,7 +3,7 @@
  */
 package com.ankit.volleywrapper;
 
-import com.android.volley.NetworkResponse;
+
 import com.android.volley.VolleyError;
 
 /**
