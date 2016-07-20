@@ -22,4 +22,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':wrapper')
     compile project(':volley')
+    compile 'com.google.code.gson:gson:2.2.4'
 }

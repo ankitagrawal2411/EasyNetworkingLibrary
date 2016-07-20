@@ -18,14 +18,33 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by ankitagrawal on 19/7/16.
+ * Copyright (C) 2016 ankitagrawal on 19/7/16
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 public class VolleyRequestHandler extends RequestManager {
     private RequestQueue mRequestQueue;
@@ -109,8 +128,7 @@ public class VolleyRequestHandler extends RequestManager {
 
                 if(response!=null) {
                     JSONObject json =iRequestListener.onNetworkResponse(createNetworkResponse(response));
-                    return Response.success(
-                            json, HttpHeaderParser.parseCacheHeaders(response));
+                    return Response.success(json, HttpHeaderParser.parseCacheHeaders(response));
                 }
                 else{
                     return Response.error(new ParseError());
@@ -133,6 +151,101 @@ public class VolleyRequestHandler extends RequestManager {
         }
     }
 
+/*
+
+    public <T> void makeGsonRequest(int method, String requestUrl,  final Class<T> clazz, JSONObject jsonObject, final IRequestListener<Class<T>> iRequestListener, final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
+        com.android.volley.RetryPolicy volleyRetryPolicy;
+        if(retryPolicy==null) {
+            volleyRetryPolicy= new com.android.volley.DefaultRetryPolicy(timeout,
+                    RETRY,
+                    com.android.volley.DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        }else{
+            volleyRetryPolicy =  new com.android.volley.DefaultRetryPolicy(retryPolicy.getCurrentTimeout(),
+                    retryPolicy.getRetryCount(),
+                    retryPolicy.getBackoffMultiplier());
+        }
+     *//*   Object foo =  Proxy.newProxyInstance(
+                clazz.getClassLoader(),
+                new Class<?>[]{clazz},
+                new InvocationHandler() {
+                    @Override
+                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                        return null;
+                    }
+                });*//*
+        Log.d(TAG, reqTAG + " request Url: " + requestUrl);
+        Log.d(TAG, reqTAG + " request Json Params: " + jsonObject);
+        Log.d(TAG, reqTAG + " request Header: " + requestHeader);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(method,
+                requestUrl,jsonObject, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject jsonObject) {
+
+                Log.d(TAG, "onResponse jsonObject: "
+                        + jsonObject);
+
+                if (jsonObject != null) {
+                    iRequestListener.onRequestSuccess(null);
+                } else {
+                    iRequestListener.onRequestErrorCode(ErrorCode.RESPONSE_NULL);
+
+                }
+            }
+
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                String error = "";
+                if(volleyError!=null){
+                    error = volleyError.getMessage();
+                }
+                Log.v(TAG, reqTAG + " onErrorResponse >> errorCode: " + error);
+                iRequestListener.onRequestErrorCode(getErrorCode(volleyError));
+            }
+        }) {
+
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+
+                if (requestHeader != null) {
+                    return requestHeader;
+                } else {
+                    return super.getHeaders();
+                }
+
+            }
+
+            @Override
+            protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
+                try {
+                    String json = new String(response.data,
+                            HttpHeaderParser.parseCharset(response.headers));
+                    return Response.success(new Gson().fromJson(json, clazz),
+                            HttpHeaderParser.parseCacheHeaders(response));
+                } catch (UnsupportedEncodingException e) {
+                    return Response.error(new ParseError(e));
+                } catch (JsonSyntaxException e) {
+                    return Response.error(new ParseError(e));
+                }
+            }
+        };
+
+        jsonObjectRequest.setRetryPolicy(volleyRetryPolicy);
+        jsonObjectRequest.setShouldCache(false);
+
+        if (reqTAG!=null && reqTAG.trim().length()>0) {
+            Log.d("RequestHandler", "Tag is:" + reqTAG);
+            addToRequestQueue(jsonObjectRequest, reqTAG);
+
+        } else {
+            Log.d("RequestHandler", "Tag is:" + TAG);
+
+            addToRequestQueue(jsonObjectRequest, TAG);
+        }
+    }*/
     @Override
     public void makeStringRequest(int method, String url, final String stringParams, final IRequestListener<String> iRequestListener, final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
         com.android.volley.RetryPolicy volleyRetryPolicy;
