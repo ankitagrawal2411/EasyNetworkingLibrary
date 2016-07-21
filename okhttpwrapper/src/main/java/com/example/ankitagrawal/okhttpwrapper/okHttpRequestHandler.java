@@ -50,7 +50,7 @@ public class okHttpRequestHandler extends RequestManager {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     public static final MediaType STRING = MediaType.parse("text/plain; charset=utf-8");
     public okHttpRequestHandler(Context context) {
-        super(context);
+        super();
         client = new OkHttpClient.Builder()
                 .connectTimeout(CONNECT_TIMEOUT_MILLIS,TimeUnit.MILLISECONDS)
                 .readTimeout(READ_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
@@ -80,13 +80,8 @@ public class okHttpRequestHandler extends RequestManager {
     }
 
     @Override
-    public boolean canHandleRequest(Context context, int method) {
+    public boolean canHandleRequest(String url, int method) {
         return method != com.ankit.volleywrapper.Request.Method.OPTIONS && method != com.ankit.volleywrapper.Request.Method.TRACE;
-    }
-
-    @Override
-    public void init(Context context) {
-
     }
 
     @Override
@@ -183,6 +178,8 @@ public class okHttpRequestHandler extends RequestManager {
         });
 
     }
+
+
 
     private void createInterceptor(OkHttpClient client, final RetryPolicy retryPolicy) {
         client.interceptors().add(getInterceptor(retryPolicy));

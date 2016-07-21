@@ -5,24 +5,16 @@ package com.ankit.volleywrapper;
 
 
 
-
-import org.json.JSONObject;
-
-import java.util.HashMap;
-
-
 /**
  * Created by ankitagrawal on 6/7/16. yay
  */
-public interface IRequest {
+public interface IRequest<T> {
 
-	  void makeJsonRequest(int method, String requestUrl, JSONObject jsonObject,
-						   IRequestListener<JSONObject> onJsonRequestFinishedListener,
-						   HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
+	void onRequestSuccess(T response);
 
-	     void makeStringRequest(int method, String url, String stringParams,
-								IRequestListener<String> onStringRequestFinishedListener,
-								HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
+	void onNetworkResponse(NetworkResponse response);
+
+	void onRequestErrorCode(int errorCode);
 
 
 }

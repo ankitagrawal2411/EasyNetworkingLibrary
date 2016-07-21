@@ -19,12 +19,17 @@ public class RequestBuilder implements IBuildRequestType {
     private int method = Request.Method.POST;
     private String requestUrl;
     private JSONObject jsonObject;
-    private IRequestListener<JSONObject> iRequestListener;
+    private IRequestListener iRequestListener;
     private RetryPolicy retryPolicy;
     private String reqTAG;
     private int memoryPolicy;
     private int networkPolicy;
     private long cacheTime;
+    private int mRequestType;
+    private GsonModelListener<?> gsonModelListener;
+    private static final int JSON = 1;
+    private static final int GSON = 2;
+    private static final int STRING = 0;
     private HashMap<String, String> mHeaders;
     private Map<String, String> mParams = new HashMap<>();
     public RequestBuilder(String requestUrl, String reqTAG) {
@@ -174,9 +179,19 @@ public class RequestBuilder implements IBuildRequestType {
                   }
               }
           }
-          CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
-                  jsonObject, mHeaders, iRequestListener, retryPolicy, reqTAG, memoryPolicy,
-                  networkPolicy,cacheTime);
+          if(mRequestType==JSON) {
+              CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
+                      jsonObject, mHeaders, iRequestListener, retryPolicy, reqTAG, memoryPolicy,
+                      networkPolicy, cacheTime, gsonModelListener);
+          }else if(mRequestType==STRING){
+              CacheRequestHandler.getInstance().makeStringRequest(context, method, requestUrl,
+                      jsonObject.toString(), mHeaders, iRequestListener, retryPolicy, reqTAG, memoryPolicy,
+                      networkPolicy, cacheTime);
+          }else if(mRequestType==GSON){
+              CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
+                      jsonObject, mHeaders, iRequestListener, retryPolicy, reqTAG, memoryPolicy,
+                      networkPolicy, cacheTime,gsonModelListener);
+          }
       }
 
       /**
@@ -197,9 +212,31 @@ public class RequestBuilder implements IBuildRequestType {
        * @param val the {@code iFcRequestListener} to set
        * @return a reference to this Builder
        */
+      @Deprecated
       @Override
-      public IBuildOptions callback(@NonNull IRequestListener<JSONObject> val) {
+      public IBuildOptions callback(@NonNull IRequestListener val) {
           iRequestListener = val;
+          return this;
+      }
+
+      @Override
+      public IBuildOptions asJsonObject(@NonNull IRequestListener<JSONObject> val) {
+          mRequestType = JSON;
+          iRequestListener =val;
+          return this;
+      }
+
+      @Override
+      public IBuildOptions asGsonObject(@NonNull GsonModelListener<?> val) {
+          mRequestType = GSON;
+          gsonModelListener =val;
+          return this;
+      }
+
+      @Override
+      public IBuildOptions asString(@NonNull IRequestListener<String> val) {
+          mRequestType = STRING;
+          iRequestListener =val;
           return this;
       }
 

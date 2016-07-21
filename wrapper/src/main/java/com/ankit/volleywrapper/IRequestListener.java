@@ -10,11 +10,9 @@ package com.ankit.volleywrapper;
  */
 public interface IRequestListener<T> {
 
-     Object onRequestSuccess(T response);
+     Object onRequestSuccess(Response<T> response);
 
      void onParseSuccess(Object response);
-
-     T onNetworkResponse(NetworkResponse response);
 
      void onRequestErrorCode(int errorCode);
 

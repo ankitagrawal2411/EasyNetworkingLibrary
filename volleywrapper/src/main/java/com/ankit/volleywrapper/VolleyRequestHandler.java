@@ -19,27 +19,25 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Copyright (C) 2016 ankitagrawal on 19/7/16
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,27 +53,27 @@ public class VolleyRequestHandler extends RequestManager {
     private static final String TAG = "RequestHandler";
 
     public VolleyRequestHandler(Context context) {
-        super(context);
+        super();
         mRequestQueue = Volley.newRequestQueue(context);
     }
 
-    @Override
-    public  void init(Context context) {
 
-    }
     @Override
-    public boolean canHandleRequest(Context context, int method) {
+    public boolean canHandleRequest(String url, int method) {
         return true;
     }
+
     @Override
-    public void makeJsonRequest(int method, String requestUrl, JSONObject jsonObject, final IRequestListener<JSONObject> iRequestListener, final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
+    public void makeJsonRequest(int method, String requestUrl, final JSONObject jsonObject,
+                                final IRequest<JSONObject> iRequestListener,
+                                final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
         com.android.volley.RetryPolicy volleyRetryPolicy;
-        if(retryPolicy==null) {
-            volleyRetryPolicy= new com.android.volley.DefaultRetryPolicy(timeout,
+        if (retryPolicy == null) {
+            volleyRetryPolicy = new com.android.volley.DefaultRetryPolicy(timeout,
                     RETRY,
                     com.android.volley.DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        }else{
-            volleyRetryPolicy =  new com.android.volley.DefaultRetryPolicy(retryPolicy.getCurrentTimeout(),
+        } else {
+            volleyRetryPolicy = new com.android.volley.DefaultRetryPolicy(retryPolicy.getCurrentTimeout(),
                     retryPolicy.getRetryCount(),
                     retryPolicy.getBackoffMultiplier());
         }
@@ -85,10 +83,10 @@ public class VolleyRequestHandler extends RequestManager {
         Log.d(TAG, reqTAG + " request Header: " + requestHeader);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(method,
-                requestUrl, jsonObject, new Response.Listener<JSONObject>() {
+                requestUrl, jsonObject, new Response.Listener<com.ankit.volleywrapper.Response<JSONObject>>() {
 
             @Override
-            public void onResponse(JSONObject jsonObject) {
+            public void onResponse(com.ankit.volleywrapper.Response<JSONObject> jsonObject) {
 
                 Log.d(TAG, "onResponse jsonObject: "
                         + jsonObject);
@@ -106,7 +104,7 @@ public class VolleyRequestHandler extends RequestManager {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 String error = "";
-                if(volleyError!=null){
+                if (volleyError != null) {
                     error = volleyError.getMessage();
                 }
                 Log.v(TAG, reqTAG + " onErrorResponse >> errorCode: " + error);
@@ -123,24 +121,44 @@ public class VolleyRequestHandler extends RequestManager {
                 }
 
             }
+/*
             @Override
             protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
-
-                if(response!=null) {
-                    JSONObject json =iRequestListener.onNetworkResponse(createNetworkResponse(response));
-                    return Response.success(json, HttpHeaderParser.parseCacheHeaders(response));
+                try {
+                    String json = new String(response.data,
+                            HttpHeaderParser.parseCharset(response.headers));
+                    return Response.success(new Gson().fromJson(json, intTok),
+                            HttpHeaderParser.parseCacheHeaders(response));
+                } catch (UnsupportedEncodingException e) {
+                    return Response.error(new ParseError(e));
+                } catch (JsonSyntaxException e) {
+                    return Response.error(new ParseError(e));
                 }
-                else{
-                    return Response.error(new ParseError());
-                }
+            }*/
 
+            @Override
+            protected Response<com.ankit.volleywrapper.Response<JSONObject>> parseNetworkResponse(NetworkResponse response) {
+                try {
+                    String jsonString = new String(response.data,
+                            HttpHeaderParser.parseCharset(response.headers, PROTOCOL_CHARSET));
+                    JSONObject json = new JSONObject(jsonString);
+
+                    return Response.success(new com.ankit.volleywrapper.Response<JSONObject>(json, com.ankit.volleywrapper.Response.LoadedFrom.NETWORK), HttpHeaderParser.parseCacheHeaders
+                            (response));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    return Response.error(new ParseError(e));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return Response.error(new ParseError(e));
+                }
             }
         };
 
         jsonObjectRequest.setRetryPolicy(volleyRetryPolicy);
         jsonObjectRequest.setShouldCache(false);
 
-        if (reqTAG!=null && reqTAG.trim().length()>0) {
+        if (reqTAG != null && reqTAG.trim().length() > 0) {
             Log.d("RequestHandler", "Tag is:" + reqTAG);
             addToRequestQueue(jsonObjectRequest, reqTAG);
 
@@ -151,110 +169,18 @@ public class VolleyRequestHandler extends RequestManager {
         }
     }
 
-/*
 
-    public <T> void makeGsonRequest(int method, String requestUrl,  final Class<T> clazz, JSONObject jsonObject, final IRequestListener<Class<T>> iRequestListener, final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
-        com.android.volley.RetryPolicy volleyRetryPolicy;
-        if(retryPolicy==null) {
-            volleyRetryPolicy= new com.android.volley.DefaultRetryPolicy(timeout,
-                    RETRY,
-                    com.android.volley.DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        }else{
-            volleyRetryPolicy =  new com.android.volley.DefaultRetryPolicy(retryPolicy.getCurrentTimeout(),
-                    retryPolicy.getRetryCount(),
-                    retryPolicy.getBackoffMultiplier());
-        }
-     *//*   Object foo =  Proxy.newProxyInstance(
-                clazz.getClassLoader(),
-                new Class<?>[]{clazz},
-                new InvocationHandler() {
-                    @Override
-                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                        return null;
-                    }
-                });*//*
-        Log.d(TAG, reqTAG + " request Url: " + requestUrl);
-        Log.d(TAG, reqTAG + " request Json Params: " + jsonObject);
-        Log.d(TAG, reqTAG + " request Header: " + requestHeader);
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(method,
-                requestUrl,jsonObject, new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject jsonObject) {
-
-                Log.d(TAG, "onResponse jsonObject: "
-                        + jsonObject);
-
-                if (jsonObject != null) {
-                    iRequestListener.onRequestSuccess(null);
-                } else {
-                    iRequestListener.onRequestErrorCode(ErrorCode.RESPONSE_NULL);
-
-                }
-            }
-
-        }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                String error = "";
-                if(volleyError!=null){
-                    error = volleyError.getMessage();
-                }
-                Log.v(TAG, reqTAG + " onErrorResponse >> errorCode: " + error);
-                iRequestListener.onRequestErrorCode(getErrorCode(volleyError));
-            }
-        }) {
-
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-
-                if (requestHeader != null) {
-                    return requestHeader;
-                } else {
-                    return super.getHeaders();
-                }
-
-            }
-
-            @Override
-            protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
-                try {
-                    String json = new String(response.data,
-                            HttpHeaderParser.parseCharset(response.headers));
-                    return Response.success(new Gson().fromJson(json, clazz),
-                            HttpHeaderParser.parseCacheHeaders(response));
-                } catch (UnsupportedEncodingException e) {
-                    return Response.error(new ParseError(e));
-                } catch (JsonSyntaxException e) {
-                    return Response.error(new ParseError(e));
-                }
-            }
-        };
-
-        jsonObjectRequest.setRetryPolicy(volleyRetryPolicy);
-        jsonObjectRequest.setShouldCache(false);
-
-        if (reqTAG!=null && reqTAG.trim().length()>0) {
-            Log.d("RequestHandler", "Tag is:" + reqTAG);
-            addToRequestQueue(jsonObjectRequest, reqTAG);
-
-        } else {
-            Log.d("RequestHandler", "Tag is:" + TAG);
-
-            addToRequestQueue(jsonObjectRequest, TAG);
-        }
-    }*/
     @Override
-    public void makeStringRequest(int method, String url, final String stringParams, final IRequestListener<String> iRequestListener, final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
+    public void makeStringRequest(int method, String url, final String stringParams, final
+    IRequest<String> iRequestListener, final HashMap<String, String> requestHeader, RetryPolicy
+            retryPolicy, final String reqTAG) {
         com.android.volley.RetryPolicy volleyRetryPolicy;
-        if(retryPolicy==null) {
-            volleyRetryPolicy= new com.android.volley.DefaultRetryPolicy(timeout,
+        if (retryPolicy == null) {
+            volleyRetryPolicy = new com.android.volley.DefaultRetryPolicy(timeout,
                     RETRY,
                     com.android.volley.DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        }else{
-            volleyRetryPolicy =  new DefaultRetryPolicy(retryPolicy.getCurrentTimeout(),
+        } else {
+            volleyRetryPolicy = new DefaultRetryPolicy(retryPolicy.getCurrentTimeout(),
                     retryPolicy.getRetryCount(),
                     retryPolicy.getBackoffMultiplier());
         }
@@ -285,7 +211,7 @@ public class VolleyRequestHandler extends RequestManager {
             public void onErrorResponse(VolleyError volleyError) {
                 iRequestListener.onRequestErrorCode(getErrorCode(volleyError));
                 String error = "";
-                if(volleyError!=null){
+                if (volleyError != null) {
                     error = volleyError.getMessage();
                 }
 
@@ -313,15 +239,15 @@ public class VolleyRequestHandler extends RequestManager {
                     return super.getHeaders();
                 }
             }
+
             @Override
             protected Response<String> parseNetworkResponse(NetworkResponse response) {
 
-                if(response!=null) {
-                    String json =iRequestListener.onNetworkResponse(createNetworkResponse(response));
+                if (response != null) {
+                  iRequestListener.onNetworkResponse(createNetworkResponse(response));
                     return Response.success(
                             json, HttpHeaderParser.parseCacheHeaders(response));
-                }
-                else{
+                } else {
                     return Response.error(new ParseError());
                 }
 
@@ -332,7 +258,7 @@ public class VolleyRequestHandler extends RequestManager {
         objStringRequest.setShouldCache(false);
 
 
-        if (reqTAG!=null && reqTAG.trim().length()>0) {
+        if (reqTAG != null && reqTAG.trim().length() > 0) {
             Log.d(TAG, "Tag is:" + reqTAG);
             addToRequestQueue(objStringRequest, reqTAG);
 
@@ -342,17 +268,17 @@ public class VolleyRequestHandler extends RequestManager {
             addToRequestQueue(objStringRequest, TAG);
         }
     }
+
     private com.ankit.volleywrapper.NetworkResponse createNetworkResponse(NetworkResponse response) {
-        return new com.ankit.volleywrapper.NetworkResponse(response.statusCode,response.data,
-                response.headers,response.notModified,response.networkTimeMs);
+        return new com.ankit.volleywrapper.NetworkResponse(response.statusCode, response.data,
+                response.headers, response.notModified, response.networkTimeMs);
     }
 
     /**
-     * @param volleyError
-     *            - error encountered while executing request with
-     *            {@link Volley}
+     * @param volleyError - error encountered while executing request with
+     *                    {@link Volley}
      * @return Returns {@link ErrorCode} according to type of
-     *         {@link VolleyError}
+     * {@link VolleyError}
      */
     public static int getErrorCode(VolleyError volleyError) {
 
@@ -376,6 +302,7 @@ public class VolleyRequestHandler extends RequestManager {
 
         return errorCode;
     }
+
     public <T> void addToRequestQueue(Request<T> req, String tag) {
         // set the default tag if tag is empty
         // req.setTag(TextUtils.isEmpty(tag) ? TAG : tag);

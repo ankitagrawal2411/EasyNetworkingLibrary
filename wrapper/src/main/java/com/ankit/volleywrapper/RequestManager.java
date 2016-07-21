@@ -2,7 +2,7 @@ package com.ankit.volleywrapper;
 
 
 
-import android.content.Context;
+
 
 import org.json.JSONObject;
 
@@ -13,17 +13,18 @@ import java.util.HashMap;
  */
 public abstract class RequestManager {
 
-    public abstract void init(Context context);
-    public RequestManager(Context context){
+
+    public RequestManager(){
 
     }
 
-    public abstract boolean canHandleRequest(Context context, int method);
+    public abstract boolean canHandleRequest(String url, int method);
     protected abstract void  makeJsonRequest(int method, String requestUrl, JSONObject jsonObject,
-                                             IRequestListener<JSONObject> onJsonRequestFinishedListener,
+                                             IRequest<JSONObject> onJsonRequestFinishedListener,
                                              HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
 
+
     protected abstract void makeStringRequest(int method, String url, String stringParams,
-                           IRequestListener<String> onStringRequestFinishedListener,
+                                              IRequest<String> onStringRequestFinishedListener,
                            HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
 }

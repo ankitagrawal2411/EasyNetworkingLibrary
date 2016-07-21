@@ -19,7 +19,6 @@ import java.util.Map;
  */
 public class GsonRequest<T> extends JsonRequest<T> {
     private final Gson gson = new Gson();
-    private final Class<T> intTok;
     private final Map<String, String> headers;
     private final Response.Listener<T> listener;
 
@@ -34,7 +33,6 @@ public class GsonRequest<T> extends JsonRequest<T> {
                        JSONObject jsonObject,
                        Response.Listener<T> listener, Response.ErrorListener errorListener) {
         super(method, url,(jsonObject == null) ? null : jsonObject.toString(),listener, errorListener);
-        this.intTok = clazz;
         this.headers = headers;
         this.listener = listener;
     }
@@ -75,8 +73,7 @@ public class GsonRequest<T> extends JsonRequest<T> {
         try {
             String json = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));
-            return Response.success(gson.fromJson(json, intTok),
-                    HttpHeaderParser.parseCacheHeaders(response));
+      //      return Response.success(T, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
         } catch (JsonSyntaxException e) {

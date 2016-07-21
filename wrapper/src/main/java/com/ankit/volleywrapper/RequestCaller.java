@@ -194,7 +194,7 @@ public class RequestCaller {
                 }
                 CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
                         jsonObject, mHeaders, iRequestListener, retryPolicy, reqTAG, memoryPolicy,
-                        networkPolicy,cacheTime);
+                        networkPolicy,cacheTime, gsonModelListener);
             }
 
             /**
