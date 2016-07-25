@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Created by ankitagrawal on 20/7/16.
  */
-public class GsonRequest<T> extends JsonRequest<T> {
+public abstract class GsonRequest<T> extends JsonRequest<T> {
     private final Gson gson = new Gson();
     private final Map<String, String> headers;
     private final Response.Listener<T> listener;
@@ -29,10 +29,24 @@ public class GsonRequest<T> extends JsonRequest<T> {
      * @param clazz Relevant class object, for Gson's reflection
      * @param headers Map of request headers
      */
-    public GsonRequest(int method,String url, Class<T> clazz, Map<String, String> headers,
+    public GsonRequest(int method,String url,Map<String, String> headers,
                        JSONObject jsonObject,
                        Response.Listener<T> listener, Response.ErrorListener errorListener) {
         super(method, url,(jsonObject == null) ? null : jsonObject.toString(),listener, errorListener);
+        this.headers = headers;
+        this.listener = listener;
+    }
+    /**
+     * Make a GET request and return a parsed object from JSON.
+     *
+     * @param url URL of the request to make
+     * @param clazz Relevant class object, for Gson's reflection
+     * @param headers Map of request headers
+     */
+    public GsonRequest(int method,String url,Map<String, String> headers,
+                       String jsonObject,
+                       Response.Listener<T> listener, Response.ErrorListener errorListener) {
+        super(method, url,jsonObject,listener, errorListener);
         this.headers = headers;
         this.listener = listener;
     }
@@ -41,9 +55,9 @@ public class GsonRequest<T> extends JsonRequest<T> {
      * <code>null</code>, <code>POST</code> otherwise.
      *
      */
-    public GsonRequest(String url,Class<T> clazz, Map<String, String> headers,JSONObject jsonObject, Response.Listener<T> listener,
+    public GsonRequest(String url, Map<String, String> headers,JSONObject jsonObject, Response.Listener<T> listener,
                              Response.ErrorListener errorListener) {
-        this(jsonObject == null ? Method.GET : Method.POST, url,clazz, headers,jsonObject,
+        this(jsonObject == null ? Method.GET : Method.POST, url,headers,jsonObject,
                 listener, errorListener);
     }
 
@@ -67,17 +81,7 @@ public class GsonRequest<T> extends JsonRequest<T> {
      * @param response Response from the network
      * @return The parsed response, or null in the case of an error
      */
-
     @Override
-    protected Response<T> parseNetworkResponse(NetworkResponse response) {
-        try {
-            String json = new String(response.data,
-                    HttpHeaderParser.parseCharset(response.headers));
-      //      return Response.success(T, HttpHeaderParser.parseCacheHeaders(response));
-        } catch (UnsupportedEncodingException e) {
-            return Response.error(new ParseError(e));
-        } catch (JsonSyntaxException e) {
-            return Response.error(new ParseError(e));
-        }
-    }
+    abstract protected Response<T> parseNetworkResponse(NetworkResponse response);
+
 }

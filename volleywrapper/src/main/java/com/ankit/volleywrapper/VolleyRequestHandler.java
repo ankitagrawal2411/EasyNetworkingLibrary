@@ -15,12 +15,7 @@ import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,7 +60,7 @@ public class VolleyRequestHandler extends RequestManager {
 
     @Override
     public void makeJsonRequest(int method, String requestUrl, final JSONObject jsonObject,
-                                final IRequest<JSONObject> iRequestListener,
+                                final IRequest<com.ankit.volleywrapper.Response<JSONObject>> iRequestListener,
                                 final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
         com.android.volley.RetryPolicy volleyRetryPolicy;
         if (retryPolicy == null) {
@@ -82,8 +77,8 @@ public class VolleyRequestHandler extends RequestManager {
         Log.d(TAG, reqTAG + " request Json Params: " + jsonObject);
         Log.d(TAG, reqTAG + " request Header: " + requestHeader);
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(method,
-                requestUrl, jsonObject, new Response.Listener<com.ankit.volleywrapper.Response<JSONObject>>() {
+        GsonRequest jsonObjectRequest = new GsonRequest<com.ankit.volleywrapper.Response<JSONObject>>(method,
+                requestUrl,requestHeader, jsonObject, new Response.Listener<com.ankit.volleywrapper.Response<JSONObject>>() {
 
             @Override
             public void onResponse(com.ankit.volleywrapper.Response<JSONObject> jsonObject) {
@@ -111,40 +106,17 @@ public class VolleyRequestHandler extends RequestManager {
                 iRequestListener.onRequestErrorCode(getErrorCode(volleyError));
             }
         }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-
-                if (requestHeader != null) {
-                    return requestHeader;
-                } else {
-                    return super.getHeaders();
-                }
-
-            }
-/*
-            @Override
-            protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
-                try {
-                    String json = new String(response.data,
-                            HttpHeaderParser.parseCharset(response.headers));
-                    return Response.success(new Gson().fromJson(json, intTok),
-                            HttpHeaderParser.parseCacheHeaders(response));
-                } catch (UnsupportedEncodingException e) {
-                    return Response.error(new ParseError(e));
-                } catch (JsonSyntaxException e) {
-                    return Response.error(new ParseError(e));
-                }
-            }*/
-
-            @Override
+                 @Override
             protected Response<com.ankit.volleywrapper.Response<JSONObject>> parseNetworkResponse(NetworkResponse response) {
                 try {
                     String jsonString = new String(response.data,
                             HttpHeaderParser.parseCharset(response.headers, PROTOCOL_CHARSET));
                     JSONObject json = new JSONObject(jsonString);
 
-                    return Response.success(new com.ankit.volleywrapper.Response<JSONObject>(json, com.ankit.volleywrapper.Response.LoadedFrom.NETWORK), HttpHeaderParser.parseCacheHeaders
-                            (response));
+                    return Response.success(new com.ankit.volleywrapper.Response<>(json,response.headers,response.statusCode,response.networkTimeMs, com.ankit.volleywrapper.Response.LoadedFrom
+                            .NETWORK), HttpHeaderParser
+                            .parseCacheHeaders
+                                    (response));
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                     return Response.error(new ParseError(e));
@@ -172,7 +144,7 @@ public class VolleyRequestHandler extends RequestManager {
 
     @Override
     public void makeStringRequest(int method, String url, final String stringParams, final
-    IRequest<String> iRequestListener, final HashMap<String, String> requestHeader, RetryPolicy
+    IRequest<com.ankit.volleywrapper.Response<String>> iRequestListener, final HashMap<String, String> requestHeader, RetryPolicy
             retryPolicy, final String reqTAG) {
         com.android.volley.RetryPolicy volleyRetryPolicy;
         if (retryPolicy == null) {
@@ -189,11 +161,12 @@ public class VolleyRequestHandler extends RequestManager {
         Log.d(TAG, reqTAG + " request String Params: " + stringParams);
         Log.d(TAG, reqTAG + " request Header: " + requestHeader);
 
-        StringRequest objStringRequest = new StringRequest(method, url,
-                new Response.Listener<String>() {
+        GsonRequest objStringRequest = new GsonRequest<com.ankit.volleywrapper.Response<String>>
+                (method, url,requestHeader,stringParams,
+                new Response.Listener<com.ankit.volleywrapper.Response<String>>() {
 
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(com.ankit.volleywrapper.Response<String> response) {
 
                         Log.d(TAG, "onResponse String response: " + response);
 
@@ -241,16 +214,20 @@ public class VolleyRequestHandler extends RequestManager {
             }
 
             @Override
-            protected Response<String> parseNetworkResponse(NetworkResponse response) {
+            protected Response<com.ankit.volleywrapper.Response<String>> parseNetworkResponse(NetworkResponse response) {
+                try {
+                    String jsonString = new String(response.data,
+                            HttpHeaderParser.parseCharset(response.headers, PROTOCOL_CHARSET));
 
-                if (response != null) {
-                  iRequestListener.onNetworkResponse(createNetworkResponse(response));
-                    return Response.success(
-                            json, HttpHeaderParser.parseCacheHeaders(response));
-                } else {
-                    return Response.error(new ParseError());
+                    return Response.success(new com.ankit.volleywrapper.Response<>(jsonString,response.headers,response.statusCode,response.networkTimeMs, com.ankit.volleywrapper.Response.LoadedFrom
+                                    .NETWORK),
+                            HttpHeaderParser
+                            .parseCacheHeaders
+                                    (response));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    return Response.error(new ParseError(e));
                 }
-
             }
         };
 

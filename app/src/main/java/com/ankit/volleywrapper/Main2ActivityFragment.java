@@ -2,6 +2,7 @@ package com.ankit.volleywrapper;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -32,7 +33,22 @@ public class Main2ActivityFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         GlobalRequest.newBuilder().setRequestManager(new VolleyRequestHandler(getActivity()));
+             new RequestBuilder().get().url("").tag("tag").asJsonObject(new IRequestListener<JSONObject>() {
+                 @Override
+                 public Object onRequestSuccess(Response<JSONObject> response) {
+                     return null;
+                 }
 
+                 @Override
+                 public void onParseSuccess(Object response) {
+
+                 }
+
+                 @Override
+                 public void onRequestErrorCode(int errorCode) {
+
+                 }
+             });
 
     }
 }

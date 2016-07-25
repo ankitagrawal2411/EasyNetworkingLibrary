@@ -1,5 +1,6 @@
 package com.ankit.volleywrapper;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -25,5 +26,6 @@ public class Main2Activity extends AppCompatActivity {
             }
         });
     }
+
 
 }

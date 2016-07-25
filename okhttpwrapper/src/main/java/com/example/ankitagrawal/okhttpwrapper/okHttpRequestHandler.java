@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.ankit.volleywrapper.ErrorCode;
+import com.ankit.volleywrapper.IRequest;
 import com.ankit.volleywrapper.IRequestListener;
 import com.ankit.volleywrapper.NetworkResponse;
 import com.ankit.volleywrapper.RequestManager;
@@ -85,7 +86,7 @@ public class okHttpRequestHandler extends RequestManager {
     }
 
     @Override
-    public void makeJsonRequest(int method, String requestUrl, JSONObject jsonObject, final IRequestListener<JSONObject> onJsonRequestFinishedListener, HashMap<String, String> requestHeader, final RetryPolicy retryPolicy, String reqTAG) {
+    public void makeJsonRequest(int method, String requestUrl, JSONObject jsonObject, final IRequest<com.ankit.volleywrapper.Response<JSONObject>> onJsonRequestFinishedListener, HashMap<String, String> requestHeader, final RetryPolicy retryPolicy, String reqTAG) {
 
         Request.Builder builder = new Request.Builder()
                 .url(requestUrl)
@@ -163,12 +164,12 @@ public class okHttpRequestHandler extends RequestManager {
                     headers.put(responseHeaders.name(i),responseHeaders.value(i));
                     System.out.println(responseHeaders.name(i) + ": " + responseHeaders.value(i));
                 }
-                onJsonRequestFinishedListener.onNetworkResponse(new NetworkResponse(response.code(),response.body().bytes(),headers,response.code()==304, response.receivedResponseAtMillis()-response
-                        .sentRequestAtMillis()));
                 String jsonData = response.body().string();
                 try {
-                    JSONObject Jobject = new JSONObject(jsonData);
-                    onJsonRequestFinishedListener.onRequestSuccess(Jobject);
+                    JSONObject jObject = new JSONObject(jsonData);
+                    onJsonRequestFinishedListener.onRequestSuccess(new com.ankit.volleywrapper.Response<>(jObject,headers,response.code(), response.receivedResponseAtMillis()-response
+                            .sentRequestAtMillis(),com.ankit.volleywrapper.Response.LoadedFrom
+                            .NETWORK));
                 } catch (JSONException e) {
                     e.printStackTrace();
                     onJsonRequestFinishedListener.onRequestErrorCode(ErrorCode.PARSE_ERROR);
@@ -212,7 +213,7 @@ public class okHttpRequestHandler extends RequestManager {
         };
     }
     @Override
-    public void makeStringRequest(int method, String requestUrl, String jsonObject, final IRequestListener<String> onRequestFinishedListener, final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG) {
+    public void makeStringRequest(int method, String requestUrl, String jsonObject, final IRequest<com.ankit.volleywrapper.Response<String>> onRequestFinishedListener, final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG) {
         Request.Builder builder = new Request.Builder()
                 .url(requestUrl)
                 .tag(reqTAG);
@@ -286,10 +287,9 @@ public class okHttpRequestHandler extends RequestManager {
                     headers.put(responseHeaders.name(i),responseHeaders.value(i));
                     System.out.println(responseHeaders.name(i) + ": " + responseHeaders.value(i));
                 }
-                onRequestFinishedListener.onNetworkResponse(new NetworkResponse(response.code(),response.body().bytes(),headers,response.code()==304, response.receivedResponseAtMillis()-response
-                        .sentRequestAtMillis()));
-                String jsonData = response.body().string();
-                onRequestFinishedListener.onRequestSuccess(jsonData);
+                onRequestFinishedListener.onRequestSuccess(new com.ankit.volleywrapper.Response<String>(response.body().string(),headers,response.code(), response.receivedResponseAtMillis()-response
+                        .sentRequestAtMillis(),com.ankit.volleywrapper.Response.LoadedFrom
+                        .NETWORK));
                 System.out.println(response.body().string());
             }
         });

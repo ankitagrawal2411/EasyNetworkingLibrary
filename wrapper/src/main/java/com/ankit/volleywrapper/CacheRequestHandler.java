@@ -90,10 +90,10 @@ public class CacheRequestHandler implements ICacheRequest {
     }
 
     private void sendJsonRequest(final Context context, RequestManager requestManager, int method, String url, JSONObject jsonObject, HashMap<String, String> header, final IRequestListener<JSONObject> jsonRequestFinishedListener, RetryPolicy retryPolicy, final String reqTAG, final int memoryPolicy, final int networkPolicy, final long cachetime, final GsonModelListener<?> gsonModelListener) {
-        //     RequestHandler.getInstance(context)
-        requestManager.makeJsonRequest(method, url, jsonObject, new IRequest<JSONObject>() {
+        requestManager.makeJsonRequest(method, url, jsonObject, new
+                IRequest<Response<JSONObject>>() {
             @Override
-            public void onRequestSuccess(final JSONObject response) {
+            public void onRequestSuccess(final Response<JSONObject> response) {
                 if (response == null) {
                     jsonRequestFinishedListener.onRequestErrorCode(ErrorCode.RESPONSE_NULL);
                     return;
@@ -122,8 +122,8 @@ public class CacheRequestHandler implements ICacheRequest {
                         if(gsonModelListener!=null){
                             gsonModelListener.getModel();
                         }
-                        return jsonRequestFinishedListener.onRequestSuccess(new Response<JSONObject>
-                                (response, Response.LoadedFrom.NETWORK));
+                        return jsonRequestFinishedListener.onRequestSuccess(new Response<>
+                                (response.response, Response.LoadedFrom.NETWORK));
                     }
                 });
                 if (Utils.hasHoneycomb()) {
@@ -216,9 +216,10 @@ public class CacheRequestHandler implements ICacheRequest {
     }
     private void sendStringRequest(final Context context, RequestManager requestManager, int method, String url, String jsonObject, HashMap<String, String> header, final IRequestListener<String> jsonRequestFinishedListener, RetryPolicy retryPolicy, final String reqTAG, final int memoryPolicy, final int networkPolicy, final long cacheTime) {
 
-        requestManager.makeStringRequest(method, url, jsonObject, new IRequest<String>() {
+        requestManager.makeStringRequest(method, url, jsonObject, new IRequest<Response<String>>
+                () {
             @Override
-            public void onRequestSuccess(final String response) {
+            public void onRequestSuccess(final Response<String> response) {
                 if (response == null) {
                     jsonRequestFinishedListener.onRequestErrorCode(ErrorCode.RESPONSE_NULL);
                     return;
@@ -238,15 +239,15 @@ public class CacheRequestHandler implements ICacheRequest {
                     public Object onParse(String requestTag) {
                         if (MemoryPolicy.shouldWriteToMemoryCache(memoryPolicy)) {
                             getMemoryCache().put(reqTAG, new
-                                    ICache.CacheEntry(response, cacheTime, reqTAG, SystemClock.elapsedRealtime()));
+                                    ICache.CacheEntry(response.response, cacheTime, reqTAG, SystemClock.elapsedRealtime()));
                         }
                         if (NetworkPolicy.shouldWriteToDiskCache(networkPolicy)) {
                             BaseCacheRequestManager.getInstance(context).cacheResponse(new
-                                    ICache.CacheEntry(response, cacheTime, reqTAG, SystemClock.elapsedRealtime()));
+                                    ICache.CacheEntry(response.response, cacheTime, reqTAG, SystemClock.elapsedRealtime()));
 
                         }
                         return jsonRequestFinishedListener.onRequestSuccess(new Response<String>
-                                (response, Response.LoadedFrom.NETWORK));
+                                (response.response, Response.LoadedFrom.NETWORK));
                     }
                 });
                 // this is useless too so return null from it as we are returning data from

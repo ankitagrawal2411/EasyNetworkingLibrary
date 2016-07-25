@@ -11,7 +11,7 @@ import java.util.Map;
 public class Response<T> {
 
     /**  data from this response. */
-    private final T response;
+    public final T response;
 
     /** The HTTP status code. */
     public final int statusCode;
@@ -33,6 +33,14 @@ public class Response<T> {
         this.networkTimeMs = networkTimeMs;
         this.loadedFrom = loadedFrom;
     }
+    public Response(T response,  Map<String, String> headers,int loadedFrom) {
+        this.response = response;
+        this.headers = headers;
+        this.statusCode = 200;
+        this.networkTimeMs = 0;
+        this.loadedFrom = loadedFrom;
+    }
+
     public Response(T response, int loadedFrom) {
         this.response = response;
         this.headers = new HashMap<>();
@@ -42,9 +50,7 @@ public class Response<T> {
     }
 
 
-
-
-    protected class LoadedFrom {
+    public class LoadedFrom {
         public static final int MEMORY=0;
         public static final int DISK=1;
         public static final int NETWORK=2;

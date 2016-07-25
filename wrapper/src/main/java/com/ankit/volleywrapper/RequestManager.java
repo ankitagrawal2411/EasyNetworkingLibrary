@@ -20,11 +20,11 @@ public abstract class RequestManager {
 
     public abstract boolean canHandleRequest(String url, int method);
     protected abstract void  makeJsonRequest(int method, String requestUrl, JSONObject jsonObject,
-                                             IRequest<JSONObject> onJsonRequestFinishedListener,
+                                             IRequest<com.ankit.volleywrapper.Response<JSONObject>> onJsonRequestFinishedListener,
                                              HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
 
 
     protected abstract void makeStringRequest(int method, String url, String stringParams,
-                                              IRequest<String> onStringRequestFinishedListener,
+                                              IRequest<com.ankit.volleywrapper.Response<String>> onStringRequestFinishedListener,
                            HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
 }
