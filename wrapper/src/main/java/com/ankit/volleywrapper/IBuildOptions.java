@@ -22,9 +22,9 @@ public interface IBuildOptions {
 
         void send(@NonNull Context context);
 
-        IBuildOptions headers(HashMap<String, String> val);
+        IBuildOptions callback(@NonNull IRequestListener val);
 
-        IBuildOptions callback(IRequestListener val);
+        IBuildOptions headers(HashMap<String, String> val);
 
         IBuildOptions asJsonObject(@NonNull IRequestListener<JSONObject> val);
 

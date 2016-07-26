@@ -70,7 +70,7 @@ public class RequestCaller {
         private int method;
         private String requestUrl;
         private JSONObject jsonObject;
-        private IRequestListener<JSONObject> iRequestListener;
+        private IRequestListener iRequestListener;
         private String reqTAG;
         private RetryPolicy retryPolicy;
         private int memoryPolicy;
@@ -194,7 +194,12 @@ public class RequestCaller {
                 }
                 CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
                         jsonObject, mHeaders, iRequestListener, retryPolicy, reqTAG, memoryPolicy,
-                        networkPolicy,cacheTime, gsonModelListener);
+                        networkPolicy,cacheTime, null);
+            }
+
+            @Override
+            public IBuildOptions callback(@NonNull IRequestListener val) {
+                return null;
             }
 
             /**
@@ -209,17 +214,23 @@ public class RequestCaller {
                 return this;
             }
 
-            /**
-             * Sets the {@code iFcRequestListener} and returns a reference to {@code IRequestHeader}
-             *
-             * @param val the {@code iFcRequestListener} to set
-             * @return a reference to this Builder
-             */
             @Override
-            public IBuildOptions callback(@NonNull IRequestListener<JSONObject> val) {
+            public IBuildOptions asJsonObject(@NonNull IRequestListener<JSONObject> val) {
                 iRequestListener = val;
                 return this;
             }
+
+            @Override
+            public IBuildOptions asGsonObject(@NonNull GsonModelListener<?> val) {
+                return null;
+            }
+
+            @Override
+            public IBuildOptions asString(@NonNull IRequestListener<String> val) {
+                iRequestListener = val;
+                return this;
+            }
+
 
             /**
              * Sets the {@code jsonObject} and returns a reference to {@code IIFcRequestListener}
