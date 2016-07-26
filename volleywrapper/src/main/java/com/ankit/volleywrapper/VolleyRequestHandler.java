@@ -16,6 +16,10 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.Volley;
+import com.ankit.wrapper.ErrorCode;
+import com.ankit.wrapper.IRequest;
+import com.ankit.wrapper.RequestManager;
+import com.ankit.wrapper.RetryPolicy;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,7 +64,7 @@ public class VolleyRequestHandler extends RequestManager {
 
     @Override
     public void makeJsonRequest(int method, String requestUrl, final JSONObject jsonObject,
-                                final IRequest<com.ankit.volleywrapper.Response<JSONObject>> iRequestListener,
+                                final IRequest<com.ankit.wrapper.Response<JSONObject>> iRequestListener,
                                 final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
         com.android.volley.RetryPolicy volleyRetryPolicy;
         if (retryPolicy == null) {
@@ -77,14 +81,14 @@ public class VolleyRequestHandler extends RequestManager {
         Log.d(TAG, reqTAG + " request Json Params: " + jsonObject);
         Log.d(TAG, reqTAG + " request Header: " + requestHeader);
 
-        GsonRequest jsonObjectRequest = new GsonRequest<com.ankit.volleywrapper.Response<JSONObject>>(method,
-                requestUrl,requestHeader, jsonObject, new Response.Listener<com.ankit.volleywrapper.Response<JSONObject>>() {
+        GsonRequest jsonObjectRequest = new GsonRequest<com.ankit.wrapper.Response<JSONObject>>(method,
+                requestUrl,requestHeader, jsonObject, new Response.Listener<com.ankit.wrapper.Response<JSONObject>>() {
 
             @Override
-            public void onResponse(com.ankit.volleywrapper.Response<JSONObject> jsonObject) {
+            public void onResponse(com.ankit.wrapper.Response<JSONObject> jsonObject) {
 
                 Log.d(TAG, "onResponse jsonObject: "
-                        + jsonObject);
+                        + jsonObject.response.toString());
 
                 if (jsonObject != null) {
                     iRequestListener.onRequestSuccess(jsonObject);
@@ -107,16 +111,14 @@ public class VolleyRequestHandler extends RequestManager {
             }
         }) {
                  @Override
-            protected Response<com.ankit.volleywrapper.Response<JSONObject>> parseNetworkResponse(NetworkResponse response) {
+            protected Response<com.ankit.wrapper.Response<JSONObject>> parseNetworkResponse(NetworkResponse response) {
                 try {
                     String jsonString = new String(response.data,
                             HttpHeaderParser.parseCharset(response.headers, PROTOCOL_CHARSET));
                     JSONObject json = new JSONObject(jsonString);
 
-                    return Response.success(new com.ankit.volleywrapper.Response<>(json,response.headers,response.statusCode,response.networkTimeMs, com.ankit.volleywrapper.Response.LoadedFrom
-                            .NETWORK), HttpHeaderParser
-                            .parseCacheHeaders
-                                    (response));
+                    return Response.success(new com.ankit.wrapper.Response<>(json,response.headers,response.statusCode,response.networkTimeMs, com.ankit.wrapper.Response.LoadedFrom
+                            .NETWORK), HttpHeaderParser.parseCacheHeaders(response));
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                     return Response.error(new ParseError(e));
@@ -144,7 +146,7 @@ public class VolleyRequestHandler extends RequestManager {
 
     @Override
     public void makeStringRequest(int method, String url, final String stringParams, final
-    IRequest<com.ankit.volleywrapper.Response<String>> iRequestListener, final HashMap<String, String> requestHeader, RetryPolicy
+    IRequest<com.ankit.wrapper.Response<String>> iRequestListener, final HashMap<String, String> requestHeader, RetryPolicy
             retryPolicy, final String reqTAG) {
         com.android.volley.RetryPolicy volleyRetryPolicy;
         if (retryPolicy == null) {
@@ -161,12 +163,12 @@ public class VolleyRequestHandler extends RequestManager {
         Log.d(TAG, reqTAG + " request String Params: " + stringParams);
         Log.d(TAG, reqTAG + " request Header: " + requestHeader);
 
-        GsonRequest objStringRequest = new GsonRequest<com.ankit.volleywrapper.Response<String>>
+        GsonRequest objStringRequest = new GsonRequest<com.ankit.wrapper.Response<String>>
                 (method, url,requestHeader,stringParams,
-                new Response.Listener<com.ankit.volleywrapper.Response<String>>() {
+                new Response.Listener<com.ankit.wrapper.Response<String>>() {
 
                     @Override
-                    public void onResponse(com.ankit.volleywrapper.Response<String> response) {
+                    public void onResponse(com.ankit.wrapper.Response<String> response) {
 
                         Log.d(TAG, "onResponse String response: " + response);
 
@@ -214,12 +216,12 @@ public class VolleyRequestHandler extends RequestManager {
             }
 
             @Override
-            protected Response<com.ankit.volleywrapper.Response<String>> parseNetworkResponse(NetworkResponse response) {
+            protected Response<com.ankit.wrapper.Response<String>> parseNetworkResponse(NetworkResponse response) {
                 try {
                     String jsonString = new String(response.data,
                             HttpHeaderParser.parseCharset(response.headers, PROTOCOL_CHARSET));
 
-                    return Response.success(new com.ankit.volleywrapper.Response<>(jsonString,response.headers,response.statusCode,response.networkTimeMs, com.ankit.volleywrapper.Response.LoadedFrom
+                    return Response.success(new com.ankit.wrapper.Response<>(jsonString,response.headers,response.statusCode,response.networkTimeMs, com.ankit.wrapper.Response.LoadedFrom
                                     .NETWORK),
                             HttpHeaderParser
                             .parseCacheHeaders
@@ -246,10 +248,7 @@ public class VolleyRequestHandler extends RequestManager {
         }
     }
 
-    private com.ankit.volleywrapper.NetworkResponse createNetworkResponse(NetworkResponse response) {
-        return new com.ankit.volleywrapper.NetworkResponse(response.statusCode, response.data,
-                response.headers, response.notModified, response.networkTimeMs);
-    }
+
 
     /**
      * @param volleyError - error encountered while executing request with

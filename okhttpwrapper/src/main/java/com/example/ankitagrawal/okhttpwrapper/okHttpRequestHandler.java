@@ -3,12 +3,10 @@ package com.example.ankitagrawal.okhttpwrapper;
 import android.content.Context;
 import android.util.Log;
 
-import com.ankit.volleywrapper.ErrorCode;
-import com.ankit.volleywrapper.IRequest;
-import com.ankit.volleywrapper.IRequestListener;
-import com.ankit.volleywrapper.NetworkResponse;
-import com.ankit.volleywrapper.RequestManager;
-import com.ankit.volleywrapper.RetryPolicy;
+import com.ankit.wrapper.ErrorCode;
+import com.ankit.wrapper.IRequest;
+import com.ankit.wrapper.RequestManager;
+import com.ankit.wrapper.RetryPolicy;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -82,11 +80,11 @@ public class okHttpRequestHandler extends RequestManager {
 
     @Override
     public boolean canHandleRequest(String url, int method) {
-        return method != com.ankit.volleywrapper.Request.Method.OPTIONS && method != com.ankit.volleywrapper.Request.Method.TRACE;
+        return method != com.ankit.wrapper.Request.Method.OPTIONS && method != com.ankit.wrapper.Request.Method.TRACE;
     }
 
     @Override
-    public void makeJsonRequest(int method, String requestUrl, JSONObject jsonObject, final IRequest<com.ankit.volleywrapper.Response<JSONObject>> onJsonRequestFinishedListener, HashMap<String, String> requestHeader, final RetryPolicy retryPolicy, String reqTAG) {
+    public void makeJsonRequest(int method, String requestUrl, JSONObject jsonObject, final IRequest<com.ankit.wrapper.Response<JSONObject>> onJsonRequestFinishedListener, HashMap<String, String> requestHeader, final RetryPolicy retryPolicy, String reqTAG) {
 
         Request.Builder builder = new Request.Builder()
                 .url(requestUrl)
@@ -104,33 +102,33 @@ public class okHttpRequestHandler extends RequestManager {
             }
         }
         switch (method){
-            case com.ankit.volleywrapper.Request.Method.GET:
+            case com.ankit.wrapper.Request.Method.GET:
                 builder.get();
                 break;
-            case com.ankit.volleywrapper.Request.Method.POST:
+            case com.ankit.wrapper.Request.Method.POST:
                 builder.post(RequestBody.create(JSON, jsonObject.toString()));
 
                 break;
-            case com.ankit.volleywrapper.Request.Method.DELETE:
+            case com.ankit.wrapper.Request.Method.DELETE:
                 builder.delete(RequestBody.create(JSON, jsonObject.toString()));
 
                 break;
-            case com.ankit.volleywrapper.Request.Method.HEAD:
+            case com.ankit.wrapper.Request.Method.HEAD:
                 builder.head();
                 break;
-            case com.ankit.volleywrapper.Request.Method.PATCH:
+            case com.ankit.wrapper.Request.Method.PATCH:
                 builder.patch(RequestBody.create(JSON, jsonObject.toString()));
 
                 break;
-            case com.ankit.volleywrapper.Request.Method.PUT:
+            case com.ankit.wrapper.Request.Method.PUT:
                 builder.put(RequestBody.create(JSON, jsonObject.toString()));
                 break;
-            case com.ankit.volleywrapper.Request.Method.OPTIONS: {
+            case com.ankit.wrapper.Request.Method.OPTIONS: {
                 throw new IllegalArgumentException("okhttp does not support Options request type," +
                         " Use " +
                         "volley request Manager for this type of request");
             }
-            case com.ankit.volleywrapper.Request.Method.TRACE:
+            case com.ankit.wrapper.Request.Method.TRACE:
                 throw new IllegalArgumentException("okhttp does not support trace request type, " +
                         "Use " +
                         "volley request Manager for this type of request");
@@ -167,8 +165,8 @@ public class okHttpRequestHandler extends RequestManager {
                 String jsonData = response.body().string();
                 try {
                     JSONObject jObject = new JSONObject(jsonData);
-                    onJsonRequestFinishedListener.onRequestSuccess(new com.ankit.volleywrapper.Response<>(jObject,headers,response.code(), response.receivedResponseAtMillis()-response
-                            .sentRequestAtMillis(),com.ankit.volleywrapper.Response.LoadedFrom
+                    onJsonRequestFinishedListener.onRequestSuccess(new com.ankit.wrapper.Response<>(jObject,headers,response.code(), response.receivedResponseAtMillis()-response
+                            .sentRequestAtMillis(), com.ankit.wrapper.Response.LoadedFrom
                             .NETWORK));
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -213,7 +211,7 @@ public class okHttpRequestHandler extends RequestManager {
         };
     }
     @Override
-    public void makeStringRequest(int method, String requestUrl, String jsonObject, final IRequest<com.ankit.volleywrapper.Response<String>> onRequestFinishedListener, final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG) {
+    public void makeStringRequest(int method, String requestUrl, String jsonObject, final IRequest<com.ankit.wrapper.Response<String>> onRequestFinishedListener, final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG) {
         Request.Builder builder = new Request.Builder()
                 .url(requestUrl)
                 .tag(reqTAG);
@@ -230,30 +228,30 @@ public class okHttpRequestHandler extends RequestManager {
             }
         }
         switch (method){
-            case com.ankit.volleywrapper.Request.Method.GET:
+            case com.ankit.wrapper.Request.Method.GET:
                 builder.get();
                 break;
-            case com.ankit.volleywrapper.Request.Method.POST:
+            case com.ankit.wrapper.Request.Method.POST:
                 builder.post(RequestBody.create(STRING, jsonObject));
                 break;
-            case com.ankit.volleywrapper.Request.Method.DELETE:
+            case com.ankit.wrapper.Request.Method.DELETE:
                 builder.delete(RequestBody.create(STRING, jsonObject));
                 break;
-            case com.ankit.volleywrapper.Request.Method.HEAD:
+            case com.ankit.wrapper.Request.Method.HEAD:
                 builder.head();
                 break;
-            case com.ankit.volleywrapper.Request.Method.PATCH:
+            case com.ankit.wrapper.Request.Method.PATCH:
                 builder.patch(RequestBody.create(STRING, jsonObject));
                 break;
-            case com.ankit.volleywrapper.Request.Method.PUT:
+            case com.ankit.wrapper.Request.Method.PUT:
                 builder.put(RequestBody.create(STRING, jsonObject));
                 break;
-            case com.ankit.volleywrapper.Request.Method.OPTIONS: {
+            case com.ankit.wrapper.Request.Method.OPTIONS: {
                 throw new IllegalArgumentException("okhttp does not support Options request type," +
                         " Use " +
                         "volley request Manager for this type of request");
             }
-            case com.ankit.volleywrapper.Request.Method.TRACE:
+            case com.ankit.wrapper.Request.Method.TRACE:
                 throw new IllegalArgumentException("okhttp does not support trace request type, " +
                         "Use " +
                         "volley request Manager for this type of request");
@@ -287,8 +285,8 @@ public class okHttpRequestHandler extends RequestManager {
                     headers.put(responseHeaders.name(i),responseHeaders.value(i));
                     System.out.println(responseHeaders.name(i) + ": " + responseHeaders.value(i));
                 }
-                onRequestFinishedListener.onRequestSuccess(new com.ankit.volleywrapper.Response<String>(response.body().string(),headers,response.code(), response.receivedResponseAtMillis()-response
-                        .sentRequestAtMillis(),com.ankit.volleywrapper.Response.LoadedFrom
+                onRequestFinishedListener.onRequestSuccess(new com.ankit.wrapper.Response<String>(response.body().string(),headers,response.code(), response.receivedResponseAtMillis()-response
+                        .sentRequestAtMillis(), com.ankit.wrapper.Response.LoadedFrom
                         .NETWORK));
                 System.out.println(response.body().string());
             }
