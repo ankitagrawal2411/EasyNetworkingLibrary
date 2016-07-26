@@ -41,31 +41,7 @@ public class Main2ActivityFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         GlobalRequest.newBuilder().setRequestManager(new VolleyRequestHandler(getActivity()))
                 .setConverter(new GsonConverter()).build();
-        new RequestBuilder().get().url("http://stage.firstcry.com/svcs/MyAccountService.svc/getorderdetail/oid=3128726PMH8299707").tag("tag").asGsonObject(new GsonModelListener<Data>
-                () {
-            @Override
-            public Class<Data> getModel() {
-                return Data.class;
-            }
-        }).asJsonObject(new
-                                IRequestListener<JSONObject>() {
-                                    @Override
-                                    public Object onRequestSuccess(Response<JSONObject> response) {
-                                        return null;
-                                    }
 
-                                    @Override
-                                    public void onParseSuccess(Object response) {
-                                        @SuppressWarnings("unchecked")
-                                        Data beanPostArrayList = (Data) response;
-                                        Log.e("response",beanPostArrayList.getRestrictedBrand());
-                                    }
-
-                                    @Override
-                                    public void onRequestErrorCode(int errorCode) {
-
-                                    }
-                                }).send(getContext());
 
     }
 }
