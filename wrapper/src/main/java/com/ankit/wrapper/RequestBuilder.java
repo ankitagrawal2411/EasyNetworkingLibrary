@@ -28,7 +28,6 @@ public class RequestBuilder implements IBuildRequestType {
     private int mRequestType;
     private GsonModelListener<?> gsonModelListener;
     private static final int JSON = 1;
-    private static final int GSON = 2;
     private static final int STRING = 0;
     private HashMap<String, String> mHeaders;
     private Map<String, String> mParams = new HashMap<>();
@@ -187,10 +186,6 @@ public class RequestBuilder implements IBuildRequestType {
               CacheRequestHandler.getInstance().makeStringRequest(context, method, requestUrl,
                       jsonObject.toString(), mHeaders, iRequestListener, retryPolicy, reqTAG, memoryPolicy,
                       networkPolicy, cacheTime);
-          }else if(mRequestType==GSON){
-              CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
-                      jsonObject, mHeaders, iRequestListener, retryPolicy, reqTAG, memoryPolicy,
-                      networkPolicy, cacheTime,gsonModelListener);
           }
       }
 
@@ -228,7 +223,6 @@ public class RequestBuilder implements IBuildRequestType {
 
       @Override
       public IBuildOptions asGsonObject(@NonNull GsonModelListener<?> val) {
-          mRequestType = GSON;
           gsonModelListener =val;
           return this;
       }

@@ -87,12 +87,13 @@ public class VolleyRequestHandler extends RequestManager {
             @Override
             public void onResponse(com.ankit.wrapper.Response<JSONObject> jsonObject) {
 
-                Log.d(TAG, "onResponse jsonObject: "
-                        + jsonObject.response.toString());
 
                 if (jsonObject != null) {
+                    Log.d(TAG, "onResponse jsonObject: "
+                            + jsonObject.response.toString());
                     iRequestListener.onRequestSuccess(jsonObject);
                 } else {
+                    Log.d(TAG, "onResponse jsonObject: null");
                     iRequestListener.onRequestErrorCode(ErrorCode.RESPONSE_NULL);
 
                 }
