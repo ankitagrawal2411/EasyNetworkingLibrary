@@ -153,7 +153,7 @@ public class okHttpRequestHandler extends RequestManager {
             public void onResponse(Call call, Response response) throws IOException {
                 if (!response.isSuccessful()) {
                     onJsonRequestFinishedListener.onRequestErrorCode(response.code());
-                    throw new IOException("Unexpected code " + response);
+                    //throw new IOException("Unexpected code " + response);
 
                 }
                 Headers responseHeaders = response.headers();

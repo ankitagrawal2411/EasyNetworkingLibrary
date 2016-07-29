@@ -26,4 +26,5 @@ dependencies {
     compile 'com.android.support:design:23.3.0'
     compile project(':wrapper')
     compile project(':volleywrapper')
+    compile project(':gsonconverter')
 }
