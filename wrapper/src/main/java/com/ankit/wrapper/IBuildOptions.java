@@ -26,11 +26,13 @@ public interface IBuildOptions {
 
         IBuildOptions headers(HashMap<String, String> val);
 
-        IBuildOptions asJsonObject(@NonNull IRequestListener<JSONObject> val);
+        IBuildOptions asJsonObject(@NonNull IRequestListener<JSONObject,?> val);
 
-        IBuildOptions asGsonObject(@NonNull GsonModelListener<?> val);
+        IBuildOptions asGsonObject(@NonNull ResponseListener<?,?> val);
 
-        IBuildOptions asString(@NonNull IRequestListener<String> val);
+        IBuildOptions modelClass(@NonNull Class mClass,@NonNull IRequestListener<?,?> val);
+
+        IBuildOptions asString(@NonNull IRequestListener<String,?> val);
 
         IBuildOptions params(@Nullable JSONObject val);
 

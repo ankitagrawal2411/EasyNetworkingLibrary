@@ -26,11 +26,11 @@ public class RequestBuilder implements IBuildRequestType {
     private int networkPolicy;
     private long cacheTime;
     private int mRequestType;
-    private GsonModelListener<?> gsonModelListener;
     private static final int JSON = 1;
     private static final int STRING = 0;
     private HashMap<String, String> mHeaders;
     private Map<String, String> mParams = new HashMap<>();
+    private  Class<?> mClass;
     public RequestBuilder(String requestUrl, String reqTAG) {
         this.requestUrl = requestUrl;
         this.reqTAG = reqTAG;
@@ -180,12 +180,12 @@ public class RequestBuilder implements IBuildRequestType {
           }
           if(mRequestType==JSON) {
               CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
-                      jsonObject, mHeaders, iRequestListener, retryPolicy, reqTAG, memoryPolicy,
-                      networkPolicy, cacheTime, gsonModelListener);
+                      jsonObject, mHeaders,retryPolicy, reqTAG, memoryPolicy,
+                      networkPolicy, cacheTime,iRequestListener, mClass);
           }else if(mRequestType==STRING){
               CacheRequestHandler.getInstance().makeStringRequest(context, method, requestUrl,
-                      jsonObject.toString(), mHeaders, iRequestListener, retryPolicy, reqTAG, memoryPolicy,
-                      networkPolicy, cacheTime);
+                      jsonObject.toString(), mHeaders, retryPolicy, reqTAG, memoryPolicy,
+                      networkPolicy, cacheTime,iRequestListener,mClass);
           }
       }
 
@@ -215,20 +215,29 @@ public class RequestBuilder implements IBuildRequestType {
       }
 
       @Override
-      public IBuildOptions asJsonObject(@NonNull IRequestListener<JSONObject> val) {
+      public IBuildOptions asJsonObject(@NonNull IRequestListener<JSONObject,?> val) {
           mRequestType = JSON;
           iRequestListener =val;
           return this;
       }
 
       @Override
-      public IBuildOptions asGsonObject(@NonNull GsonModelListener<?> val) {
-          gsonModelListener =val;
+      public IBuildOptions asGsonObject(@NonNull ResponseListener<?,?> val) {
+          mRequestType = JSON;
+          iRequestListener =val;
           return this;
       }
 
       @Override
-      public IBuildOptions asString(@NonNull IRequestListener<String> val) {
+      public IBuildOptions modelClass(@NonNull Class aClass, @NonNull IRequestListener<?,?> val) {
+          iRequestListener =val;
+          mRequestType = JSON;
+          mClass = aClass;
+          return this;
+      }
+
+      @Override
+      public IBuildOptions asString(@NonNull IRequestListener<String,?> val) {
           mRequestType = STRING;
           iRequestListener =val;
           return this;

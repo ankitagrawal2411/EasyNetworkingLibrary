@@ -6,14 +6,14 @@ import android.os.AsyncTask;
 /**
  * Created by ankitagrawal on 6/7/16. yay
  */
-public class ParserTask extends AsyncTask<Object, Integer, Object> {
+public class ParserTask<F> extends AsyncTask<Object, Integer, Response<F>> {
 
     private static final String LOG_TAG = ParserTask.class.getSimpleName();
 
     private String mRequestTag;
-    private IParserListener mListener;
+    private IParserListener<F> mListener;
 
-    public ParserTask(String requestTag, IParserListener listener) {
+    public ParserTask(String requestTag, IParserListener<F> listener) {
         this.mRequestTag = requestTag;
         this.mListener = listener;
     }
@@ -24,13 +24,13 @@ public class ParserTask extends AsyncTask<Object, Integer, Object> {
     }
 
     @Override
-    protected Object doInBackground(Object... params) {
+    protected Response<F> doInBackground(Object... params) {
        return mListener.onParse(mRequestTag);
 
     }
 
     @Override
-    protected void onPostExecute(Object o) {
+    protected void onPostExecute(Response<F> o) {
         super.onPostExecute(o);
 
         if(o!=null)

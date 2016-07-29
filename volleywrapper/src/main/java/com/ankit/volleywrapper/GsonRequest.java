@@ -2,23 +2,17 @@ package com.ankit.volleywrapper;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
-import com.android.volley.ParseError;
 import com.android.volley.Response;
-import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 /**
  * Created by ankitagrawal on 20/7/16.
  */
 public abstract class GsonRequest<T> extends JsonRequest<T> {
-    private final Gson gson = new Gson();
     private final Map<String, String> headers;
     private final Response.Listener<T> listener;
 

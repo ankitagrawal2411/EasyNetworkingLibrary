@@ -49,7 +49,13 @@ public class Response<T> {
         this.loadedFrom = loadedFrom;
     }
 
-
+    public Response(int loadedFrom) {
+        this.response = null;
+        this.headers = new HashMap<>();
+        this.statusCode = 200;
+        this.networkTimeMs = 0;
+        this.loadedFrom = loadedFrom;
+    }
     public class LoadedFrom {
         public static final int MEMORY=0;
         public static final int DISK=1;

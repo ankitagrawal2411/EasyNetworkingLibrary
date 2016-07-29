@@ -12,8 +12,6 @@ public interface IRequest<T> {
 
 	void onRequestSuccess(T response);
 
-	void onNetworkResponse(NetworkResponse response);
-
 	void onRequestErrorCode(int errorCode);
 
 

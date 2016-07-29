@@ -16,6 +16,7 @@ import java.util.ArrayList;
  * Created by ankitagrawal on 21/7/16.
  */
 public class GsonConverter implements Converter {
+    Gson gson = new Gson();
     @Override
     public <J> J convert(Object value, final Class<J> aClass) throws IOException {
       /*  Gson gson = new Gson();
@@ -23,11 +24,11 @@ public class GsonConverter implements Converter {
         Type listType = new TypeToken<ArrayList<J>>(){}.getType();
         return gson.fromJson(jsonOutput, listType);*/
         if(value instanceof  JSONObject){
-            return new Gson().fromJson( value.toString(), aClass);
+            return gson.fromJson(value.toString(), aClass);
         }else  if(value instanceof  String){
-            return new Gson().fromJson((String)value, aClass);
+            return gson.fromJson((String) value, aClass);
         }else{
-            return new Gson().fromJson((String)value, aClass);
+            return gson.fromJson((String)value, aClass);
         }
 
     }
