@@ -10,17 +10,14 @@ import android.view.ViewGroup;
 
 
 import com.ankit.volleywrapper.GsonConverter;
-import com.ankit.example.R;
 import com.ankit.volleywrapper.VolleyRequestHandler;
 import com.ankit.wrapper.GlobalRequest;
-import com.ankit.wrapper.GsonModelListener;
+import com.ankit.wrapper.ResponseListener;
 import com.ankit.wrapper.IRequestListener;
 import com.ankit.wrapper.RequestBuilder;
 import com.ankit.wrapper.Response;
 
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -41,7 +38,17 @@ public class Main2ActivityFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         GlobalRequest.newBuilder().setRequestManager(new VolleyRequestHandler(getActivity()))
                 .setConverter(new GsonConverter()).build();
+        new RequestBuilder().get().url("http://stage.firstcry.com/svcs/MyAccountService.svc/getorderdetail/oid=3128726PMH8299707").tag("tag").modelClass(Data.class, new IRequestListener<JSONObject, Data>() {
+            @Override
+            public void onParseSuccess(Response<Data> response) {
+                Log.e("response",response.response.getRestrictedBrand());
+            }
 
+            @Override
+            public void onRequestErrorCode(int errorCode) {
+
+            }
+        }).send(getContext());
 
     }
 }

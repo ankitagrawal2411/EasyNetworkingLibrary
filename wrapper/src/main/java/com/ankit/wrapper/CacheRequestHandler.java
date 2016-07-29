@@ -268,7 +268,7 @@ public class CacheRequestHandler implements ICacheRequest {
         }
 
     }
-    private <T,F> void sendStringRequest(final Context context, RequestManager requestManager, int method, String url, String jsonObject, HashMap<String, String> header, final IRequestListener<T,F> jsonRequestFinishedListener, RetryPolicy retryPolicy, final String reqTAG, final int memoryPolicy, final int networkPolicy, final long cacheTime, Class<F> aClass) {
+    private <T,F> void sendStringRequest(final Context context, RequestManager requestManager, int method, String url, String jsonObject, HashMap<String, String> header, final IRequestListener<T,F> jsonRequestFinishedListener, RetryPolicy retryPolicy, final String reqTAG, final int memoryPolicy, final int networkPolicy, final long cacheTime, final Class<F> aClass) {
 
         requestManager.makeStringRequest(method, url, jsonObject, new IRequest<Response<String>>
                 () {
@@ -304,9 +304,18 @@ public class CacheRequestHandler implements ICacheRequest {
                         if (NetworkPolicy.shouldWriteToDiskCache(networkPolicy)) {
                             BaseCacheRequestManager.getInstance(context).cacheResponse(new
                                     ICache.CacheEntry(response.response, cacheTime, reqTAG, SystemClock.elapsedRealtime()));
-
                         }
-                        return new Response<>(((ResponseListener<String,F>)jsonRequestFinishedListener).onRequestSuccess(response.response), Response.LoadedFrom.NETWORK);
+                        if (jsonRequestFinishedListener != null) {
+                            if (jsonRequestFinishedListener instanceof ResponseListener) {
+                                return new Response<>
+                                        ((((ResponseListener<String,F>) jsonRequestFinishedListener).onRequestSuccess(response.response)), Response.LoadedFrom.NETWORK);
+                            } else {
+                                return new Response<>
+                                        (parseDataToModel(response.response, aClass), Response
+                                                .LoadedFrom.NETWORK);
+                            }
+                        }
+                        return new Response<>(Response.LoadedFrom.NETWORK);
                     }
                 });
                 if (Utils.hasHoneycomb()) {
