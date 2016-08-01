@@ -28,8 +28,6 @@ public class CacheRequestHandler implements ICacheRequest {
     private RetryPolicy retryPolicy;
     private int memoryPolicy;
     private int networkPolicy;
-    private long cacheTime;
-    private int mRequestType;
     private HashMap<String, String> mHeaders;
      static CacheRequestHandler getInstance() {
         if(mInstance==null) {
