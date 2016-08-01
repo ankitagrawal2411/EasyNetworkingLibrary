@@ -20,12 +20,12 @@ public class GlobalRequest {
         CacheRequestHandler.getInstance().setHeaders(builder.mHeaders);
         CacheRequestHandler.getInstance().setRequestHandlers(mRequestHandler);
         CacheRequestHandler.getInstance().setConverters(mConverters);
+        CacheRequestHandler.getInstance().setBaseUrl(builder.baseUrl);
     }
 
     public static Builder newBuilder() {
         return new Builder();
     }
-
 
 
     /**
@@ -39,8 +39,10 @@ public class GlobalRequest {
         private RetryPolicy retryPolicy;
         private int memoryPolicy;
         private int networkPolicy;
+
         private Builder() {
         }
+
         /**
          * Specifies the {@link MemoryPolicy} to use for this request. You may specify additional policy
          * options using the varargs parameter.
@@ -57,23 +59,22 @@ public class GlobalRequest {
             }
             return this;
         }
-        public Builder addHeader(@NonNull String key,@NonNull String value) {
-            if(mHeaders==null){
+
+        public Builder baseUrl(@NonNull String url) {
+            baseUrl = url;
+            return this;
+        }
+
+        public Builder addHeader(@NonNull String key, @NonNull String value) {
+            if (mHeaders == null) {
                 mHeaders = new HashMap<>();
             }
             mHeaders.put(key, value);
             return this;
         }
-        /**
-         * Sets the {@code requestUrl} and returns a reference to {@code IJsonObject}
-         *
-         * @param val the {@code requestUrl} to set
-         * @return a reference to this Builder
-         */
-        public Builder url(@NonNull String val) {
-            baseUrl = val;
-            return this;
-        }
+
+
+
         /**
          * Sets the {@code requestHeader} and returns a reference to {@code IRetryPolicy}
          *
@@ -84,6 +85,7 @@ public class GlobalRequest {
             mHeaders = val;
             return this;
         }
+
         /**
          * Sets the {@code retryPolicy} and returns a reference to {@code IReqTAG}
          *
@@ -94,11 +96,12 @@ public class GlobalRequest {
             retryPolicy = val;
             return this;
         }
+
         /**
          * Specifies the {@link NetworkPolicy} to use for this request. You may specify additional policy
          * options using the varargs parameter.
          */
-        public Builder networkPolicy(@NonNull NetworkPolicy policy,@NonNull NetworkPolicy... additional) {
+        public Builder networkPolicy(@NonNull NetworkPolicy policy, @NonNull NetworkPolicy... additional) {
             networkPolicy |= policy.index;
             if (additional.length > 0) {
                 for (NetworkPolicy networkPolicy1 : additional) {
@@ -110,6 +113,7 @@ public class GlobalRequest {
             }
             return this;
         }
+
         /**
          * Sets the {@code mRequestManager} and returns a reference to this Builder so that the methods can be chained together.
          *
@@ -117,50 +121,56 @@ public class GlobalRequest {
          * @return a reference to this Builder
          */
         public Builder setRequestManager(RequestHandler val) {
-            if(mRequestHandler ==null){
+            if (mRequestHandler == null) {
                 mRequestHandler = new ArrayList<>(2);
             }
             mRequestHandler.clear();
             mRequestHandler.add(val);
             return this;
         }
+
         public Builder setConverters(ArrayList<Converter> converters) {
-            if(mConverters==null){
+            if (mConverters == null) {
                 mConverters = new ArrayList<>(2);
             }
             mConverters.clear();
-            this.mConverters=converters;
+            this.mConverters = converters;
             return this;
         }
+
         public Builder setConverter(Converter converters) {
-            if(mConverters==null){
+            if (mConverters == null) {
                 mConverters = new ArrayList<>(2);
             }
             mConverters.clear();
             this.mConverters.add(converters);
             return this;
         }
+
         public Builder addConverter(Converter converters) {
-            if(mConverters==null){
+            if (mConverters == null) {
                 mConverters = new ArrayList<>(2);
             }
             this.mConverters.add(converters);
             return this;
         }
+
         public Builder addRequestManager(RequestHandler requestHandler) {
-            if(mRequestHandler ==null){
+            if (mRequestHandler == null) {
                 mRequestHandler = new ArrayList<>(2);
             }
             this.mRequestHandler.add(requestHandler);
             return this;
         }
+
         public Builder setRequestManagers(ArrayList<RequestHandler> requestHandler) {
-            if(mRequestHandler ==null){
+            if (mRequestHandler == null) {
                 mRequestHandler = new ArrayList<>(2);
             }
             this.mRequestHandler = requestHandler;
             return this;
         }
+
         /**
          * Returns a {@code GlobalRequestBuilder} built from the parameters previously set.
          *

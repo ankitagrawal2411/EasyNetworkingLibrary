@@ -28,6 +28,7 @@ public class CacheRequestHandler implements ICacheRequest {
     private RetryPolicy retryPolicy;
     private int memoryPolicy;
     private int networkPolicy;
+    private String mBaseUrl;
     private HashMap<String, String> mHeaders;
      static CacheRequestHandler getInstance() {
         if(mInstance==null) {
@@ -279,7 +280,7 @@ public class CacheRequestHandler implements ICacheRequest {
             return;
         }
         if(requestHandlers ==null || requestHandlers.size()==0){
-            throw new NullPointerException("no request manager set, please set one atleast " +
+            throw new NullPointerException("no request manager set, please set one at least " +
                     "through GlobalBuilder class");
         }
         boolean requestHandled = false;
@@ -292,7 +293,7 @@ public class CacheRequestHandler implements ICacheRequest {
         }
         if(!requestHandled){
             throw new IllegalArgumentException("no request manager found that can handle " +
-                    "this type of request, please set one atleast request manager that can " +
+                    "this type of request, please set one at least request manager that can " +
                     "handle this type of request" +
                     " " +
                     "through GlobalBuilder class");
@@ -389,5 +390,9 @@ public class CacheRequestHandler implements ICacheRequest {
 
     public void setHeaders(HashMap<String, String> mHeaders) {
         this.mHeaders = mHeaders;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.mBaseUrl = baseUrl;
     }
 }
