@@ -17,8 +17,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.Volley;
 import com.ankit.wrapper.ErrorCode;
-import com.ankit.wrapper.IRequest;
-import com.ankit.wrapper.RequestManager;
+import com.ankit.wrapper.RequestHandler;
 import com.ankit.wrapper.RetryPolicy;
 
 import org.json.JSONException;
@@ -43,7 +42,7 @@ import java.util.Map;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class VolleyRequestHandler extends RequestManager {
+public class VolleyRequestHandler extends RequestHandler {
     private RequestQueue mRequestQueue;
 
     public static final int timeout = 20000;

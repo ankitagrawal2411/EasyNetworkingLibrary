@@ -20,7 +20,7 @@ public class RequestCaller {
     private int method = Request.Method.POST;
     private String requestUrl;
     private JSONObject jsonObject;
-    private IRequestListener<JSONObject,?> iRequestListener;
+    private IParsedResponseListener<JSONObject,?> iParsedResponseListener;
     private RetryPolicy retryPolicy;
     private String reqTAG;
     private int memoryPolicy;
@@ -33,7 +33,7 @@ public class RequestCaller {
         method = builder.method;
         requestUrl = builder.requestUrl;
         jsonObject = builder.jsonObject;
-        iRequestListener = builder.iRequestListener;
+        iParsedResponseListener = builder.iParsedResponseListener;
         reqTAG = builder.reqTAG;
         retryPolicy = builder.retryPolicy;
         memoryPolicy = builder.memoryPolicy;
@@ -52,7 +52,7 @@ public class RequestCaller {
         builder.method = copy.method;
         builder.requestUrl = copy.requestUrl;
         builder.jsonObject = copy.jsonObject;
-        builder.iRequestListener = copy.iRequestListener;
+        builder.iParsedResponseListener = copy.iParsedResponseListener;
         builder.reqTAG = copy.reqTAG;
         builder.memoryPolicy = copy.memoryPolicy;
         builder.networkPolicy = copy.networkPolicy;
@@ -70,7 +70,7 @@ public class RequestCaller {
         private int method;
         private String requestUrl;
         private JSONObject jsonObject;
-        private IRequestListener iRequestListener;
+        private IParsedResponseListener iParsedResponseListener;
         private String reqTAG;
         private RetryPolicy retryPolicy;
         private int memoryPolicy;
@@ -194,11 +194,11 @@ public class RequestCaller {
                 }
                 CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
                         jsonObject, mHeaders, retryPolicy, reqTAG, memoryPolicy,
-                        networkPolicy,cacheTime,  iRequestListener,null);
+                        networkPolicy,cacheTime, iParsedResponseListener,null);
             }
 
             @Override
-            public IBuildOptions callback(@NonNull IRequestListener val) {
+            public IBuildOptions callback(@NonNull IParsedResponseListener val) {
                 return null;
             }
 
@@ -215,24 +215,24 @@ public class RequestCaller {
             }
 
             @Override
-            public IBuildOptions asJsonObject(@NonNull IRequestListener<JSONObject,?> val) {
-                iRequestListener = val;
+            public IBuildOptions asJsonObject(@NonNull IParsedResponseListener<JSONObject,?> val) {
+                iParsedResponseListener = val;
                 return this;
             }
 
             @Override
-            public IBuildOptions asGsonObject(@NonNull ResponseListener<?,?> val) {
+            public IBuildOptions asGsonObject(@NonNull IResponseListener<?,?> val) {
                 return null;
             }
 
             @Override
-            public IBuildOptions modelClass(@NonNull Class mClass, @NonNull IRequestListener<?, ?> val) {
+            public IBuildOptions modelClass(@NonNull Class mClass, @NonNull IParsedResponseListener<?, ?> val) {
                 return null;
             }
 
             @Override
-            public IBuildOptions asString(@NonNull IRequestListener<String,?> val) {
-                iRequestListener = val;
+            public IBuildOptions asString(@NonNull IParsedResponseListener<String,?> val) {
+                iParsedResponseListener = val;
                 return this;
             }
 

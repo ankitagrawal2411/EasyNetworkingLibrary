@@ -20,7 +20,6 @@ public abstract class GsonRequest<T> extends JsonRequest<T> {
      * Make a GET request and return a parsed object from JSON.
      *
      * @param url URL of the request to make
-     * @param clazz Relevant class object, for Gson's reflection
      * @param headers Map of request headers
      */
     public GsonRequest(int method,String url,Map<String, String> headers,
@@ -34,7 +33,6 @@ public abstract class GsonRequest<T> extends JsonRequest<T> {
      * Make a GET request and return a parsed object from JSON.
      *
      * @param url URL of the request to make
-     * @param clazz Relevant class object, for Gson's reflection
      * @param headers Map of request headers
      */
     public GsonRequest(int method,String url,Map<String, String> headers,

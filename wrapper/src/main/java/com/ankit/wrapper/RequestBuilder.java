@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 
+import com.ankit.wrapper.interfaces.Builder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,11 +16,11 @@ import java.util.Map;
 /**
  * Created by ankitagrawal on 6/7/16. yay
  */
-public class RequestBuilder implements IBuildRequestType {
+public class RequestBuilder implements Builder.IBuildRequestType {
     private int method = Request.Method.POST;
     private String requestUrl;
     private JSONObject jsonObject;
-    private IRequestListener iRequestListener;
+    private IParsedResponseListener iParsedResponseListener;
     private RetryPolicy retryPolicy;
     private String reqTAG;
     private int memoryPolicy;
@@ -46,7 +47,7 @@ public class RequestBuilder implements IBuildRequestType {
         method = builder.method;
         requestUrl = builder.requestUrl;
         jsonObject = builder.jsonObject;
-        iRequestListener = builder.iRequestListener;
+        iParsedResponseListener = builder.iParsedResponseListener;
         mHeaders = builder.mHeaders;
         retryPolicy = builder.retryPolicy;
         reqTAG = builder.reqTAG;
@@ -61,20 +62,20 @@ public class RequestBuilder implements IBuildRequestType {
         builder.reqTAG = copy.reqTAG;
         builder.retryPolicy = copy.retryPolicy;
         builder.mHeaders = copy.mHeaders;
-        builder.iRequestListener = copy.iRequestListener;
+        builder.iParsedResponseListener = copy.iParsedResponseListener;
         builder.jsonObject = copy.jsonObject;
         builder.requestUrl = copy.requestUrl;
         builder.method = copy.method;
         return builder;
     }
 
-  private IBuildOptions iBuildOptions = new IBuildOptions() {
+  private Builder.IBuildOptions iBuildOptions = new Builder.IBuildOptions() {
       /**
        * Specifies the {@link MemoryPolicy} to use for this request. You may specify additional policy
        * options using the varargs parameter.
        */
       @Override
-      public IBuildOptions memoryPolicy(@NonNull MemoryPolicy policy, @NonNull MemoryPolicy... additional) {
+      public Builder.IBuildOptions memoryPolicy(@NonNull MemoryPolicy policy, @NonNull MemoryPolicy... additional) {
           memoryPolicy |= policy.index;
           if (additional.length > 0) {
               for (MemoryPolicy memoryPolicy1 : additional) {
@@ -92,7 +93,7 @@ public class RequestBuilder implements IBuildRequestType {
        * options using the varargs parameter.
        */
       @Override
-      public IBuildOptions networkPolicy(@NonNull NetworkPolicy policy,@NonNull NetworkPolicy... additional) {
+      public Builder.IBuildOptions networkPolicy(@NonNull NetworkPolicy policy,@NonNull NetworkPolicy... additional) {
          networkPolicy |= policy.index;
           if (additional.length > 0) {
               for (NetworkPolicy networkPolicy1 : additional) {
@@ -111,14 +112,14 @@ public class RequestBuilder implements IBuildRequestType {
        * @return a reference to this Builder
        */
       @Override
-      public IBuildOptions cache(boolean val) {
+      public Builder.IBuildOptions cache(boolean val) {
           if(val) {
               networkPolicy(NetworkPolicy.CACHE, NetworkPolicy.STORE);
           }
           return this;
       }
       @Override
-      public IBuildOptions addHeader(@NonNull String key,@NonNull String value) {
+      public Builder.IBuildOptions addHeader(@NonNull String key,@NonNull String value) {
           if(mHeaders==null){
               mHeaders = new HashMap<>();
           }
@@ -126,7 +127,7 @@ public class RequestBuilder implements IBuildRequestType {
           return this;
       }
 
-      public IBuildOptions addParam(@NonNull String key,@NonNull String value) {
+      public Builder.IBuildOptions addParam(@NonNull String key,@NonNull String value) {
           if(mParams==null){
               mParams = new HashMap<>();
           }
@@ -141,7 +142,7 @@ public class RequestBuilder implements IBuildRequestType {
        * @return a reference to this Builder
        */
       @Override
-      public IBuildOptions retryPolicy(@Nullable RetryPolicy val) {
+      public Builder.IBuildOptions retryPolicy(@Nullable RetryPolicy val) {
           retryPolicy = val;
           return this;
       }
@@ -181,11 +182,11 @@ public class RequestBuilder implements IBuildRequestType {
           if(mRequestType==JSON) {
               CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
                       jsonObject, mHeaders,retryPolicy, reqTAG, memoryPolicy,
-                      networkPolicy, cacheTime,iRequestListener, mClass);
+                      networkPolicy, cacheTime, iParsedResponseListener, mClass);
           }else if(mRequestType==STRING){
               CacheRequestHandler.getInstance().makeStringRequest(context, method, requestUrl,
                       jsonObject.toString(), mHeaders, retryPolicy, reqTAG, memoryPolicy,
-                      networkPolicy, cacheTime,iRequestListener,mClass);
+                      networkPolicy, cacheTime, iParsedResponseListener,mClass);
           }
       }
 
@@ -196,7 +197,7 @@ public class RequestBuilder implements IBuildRequestType {
        * @return a reference to this Builder
        */
       @Override
-      public IBuildOptions headers(@Nullable HashMap<String, String> val) {
+      public Builder.IBuildOptions headers(@Nullable HashMap<String, String> val) {
           mHeaders = val;
           return this;
       }
@@ -209,37 +210,37 @@ public class RequestBuilder implements IBuildRequestType {
        */
       @Deprecated
       @Override
-      public IBuildOptions callback(@NonNull IRequestListener val) {
-          iRequestListener = val;
+      public Builder.IBuildOptions callback(@NonNull IParsedResponseListener val) {
+          iParsedResponseListener = val;
           return this;
       }
 
       @Override
-      public IBuildOptions asJsonObject(@NonNull IRequestListener<JSONObject,?> val) {
+      public Builder.IBuildOptions asJsonObject(@NonNull IParsedResponseListener<JSONObject,?> val) {
           mRequestType = JSON;
-          iRequestListener =val;
+          iParsedResponseListener =val;
           return this;
       }
 
       @Override
-      public IBuildOptions asGsonObject(@NonNull ResponseListener<?,?> val) {
+      public Builder.IBuildOptions asGsonObject(@NonNull IResponseListener<?,?> val) {
           mRequestType = JSON;
-          iRequestListener =val;
+          iParsedResponseListener =val;
           return this;
       }
 
       @Override
-      public IBuildOptions modelClass(@NonNull Class aClass, @NonNull IRequestListener<?,?> val) {
-          iRequestListener =val;
+      public Builder.IBuildOptions modelClass(@NonNull Class aClass, @NonNull IParsedResponseListener<?,?> val) {
+          iParsedResponseListener =val;
           mRequestType = JSON;
           mClass = aClass;
           return this;
       }
 
       @Override
-      public IBuildOptions asString(@NonNull IRequestListener<String,?> val) {
+      public Builder.IBuildOptions asString(@NonNull IParsedResponseListener<String,?> val) {
           mRequestType = STRING;
-          iRequestListener =val;
+          iParsedResponseListener =val;
           return this;
       }
 
@@ -250,13 +251,13 @@ public class RequestBuilder implements IBuildRequestType {
        * @return a reference to this Builder
        */
       @Override
-      public IBuildOptions params(@Nullable JSONObject val) {
+      public Builder.IBuildOptions params(@Nullable JSONObject val) {
           jsonObject = val;
           return this;
       }
 
       @Override
-      public IBuildOptions cacheTime(long time) {
+      public Builder.IBuildOptions cacheTime(long time) {
           cache(true);
           cacheTime = time;
           return this;
@@ -268,11 +269,11 @@ public class RequestBuilder implements IBuildRequestType {
        * @return a {@code RequestBuilder} built with parameters of this {@code RequestBuilder.Builder}
        */
       @Override
-      public IBuildOptions build() {
+      public Builder.IBuildOptions build() {
           return this;
       }
     };
-    private IBuildUrl iBuildUrl= new IBuildUrl() {
+    private Builder.IBuildUrl iBuildUrl= new Builder.IBuildUrl() {
         /**
          * Sets the {@code requestUrl} and returns a reference to {@code IJsonObject}
          *
@@ -280,12 +281,12 @@ public class RequestBuilder implements IBuildRequestType {
          * @return a reference to this Builder
          */
         @Override
-        public IBuildTag url(@NonNull String val) {
+        public Builder.IBuildTag url(@NonNull String val) {
             requestUrl = val;
             return iBuildTag;
         }
     };
-    private IBuildTag iBuildTag= new IBuildTag() {
+    private Builder.IBuildTag iBuildTag= new Builder.IBuildTag() {
         /**
          * Sets the {@code reqTAG} and returns a reference to {@code IShouldCache}
          *
@@ -293,21 +294,21 @@ public class RequestBuilder implements IBuildRequestType {
          * @return a reference to this Builder
          */
         @Override
-        public IBuildOptions tag(@NonNull String val) {
+        public Builder.IBuildOptions tag(@NonNull String val) {
             reqTAG = val;
             return iBuildOptions;
         }
     } ;
 
     @Override
-    public IBuildUrl post(@Nullable JSONObject val) {
+    public Builder.IBuildUrl post(@Nullable JSONObject val) {
         jsonObject = val;
         method(Request.Method.POST);
         return iBuildUrl;
     }
 
     @Override
-    public IBuildUrl get() {
+    public Builder.IBuildUrl get() {
         method(Request.Method.GET);
         return iBuildUrl;
     }
@@ -319,16 +320,16 @@ public class RequestBuilder implements IBuildRequestType {
      * @return a reference to this Builder
      */
     @Override
-    public IBuildUrl method(int val) {
+    public Builder.IBuildUrl method(int val) {
         method = val;
         return iBuildUrl;
     }
 
 
 
-
-
 }
+
+
 
 
 

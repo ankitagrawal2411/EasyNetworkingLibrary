@@ -16,7 +16,7 @@ import java.util.HashMap;
  */
 public interface ICacheRequest {
     <F> void makeJsonRequest(Context context, int method, String URL, JSONObject jsonObject,
-                          HashMap<String, String> header, RetryPolicy retryPolicy, String reqTAG, final int memoryPolicy, final int networkPolicy, long cachetime, IRequestListener<JSONObject,F> jsonRequestFinishedListener, Class<F> mClass);
-    <F>  void makeStringRequest(final Context context, int method, final String URL, String jsonObject, final HashMap<String, String> header, final RetryPolicy retryPolicy, final String reqTAG, final int memoryPolicy, final int networkPolicy,long cacheTime, IRequestListener<String,F> jsonRequestFinishedListener,final Class<F> aClass);
+                          HashMap<String, String> header, RetryPolicy retryPolicy, String reqTAG, final int memoryPolicy, final int networkPolicy, long cachetime, IParsedResponseListener<JSONObject,F> jsonRequestFinishedListener, Class<F> mClass);
+    <F>  void makeStringRequest(final Context context, int method, final String URL, String jsonObject, final HashMap<String, String> header, final RetryPolicy retryPolicy, final String reqTAG, final int memoryPolicy, final int networkPolicy,long cacheTime, IParsedResponseListener<String,F> jsonRequestFinishedListener,final Class<F> aClass);
 
 }

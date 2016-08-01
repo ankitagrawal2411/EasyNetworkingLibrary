@@ -4,8 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.ankit.wrapper.ErrorCode;
-import com.ankit.wrapper.IRequest;
-import com.ankit.wrapper.RequestManager;
+import com.ankit.wrapper.RequestHandler;
 import com.ankit.wrapper.RetryPolicy;
 
 import org.json.JSONException;
@@ -42,7 +41,7 @@ import okhttp3.Response;
  * limitations under the License.
  */
 
-public class okHttpRequestHandler extends RequestManager {
+public class okHttpRequestHandler extends RequestHandler {
     private static final long CONNECT_TIMEOUT_MILLIS = 10000;
     private static final long READ_TIMEOUT_MILLIS = 10000;
     private  OkHttpClient client ;

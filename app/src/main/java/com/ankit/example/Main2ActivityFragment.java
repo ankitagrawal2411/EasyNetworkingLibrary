@@ -9,13 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-import com.ankit.volleywrapper.GsonConverter;
+
 import com.ankit.volleywrapper.VolleyRequestHandler;
 import com.ankit.wrapper.GlobalRequest;
-import com.ankit.wrapper.ResponseListener;
-import com.ankit.wrapper.IRequestListener;
 import com.ankit.wrapper.RequestBuilder;
 import com.ankit.wrapper.Response;
+import com.ankit.wrapper.IResponseListener;
+import com.example.ankitagrawal.converters.GsonConverter;
+import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
@@ -38,17 +39,34 @@ public class Main2ActivityFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         GlobalRequest.newBuilder().setRequestManager(new VolleyRequestHandler(getActivity()))
                 .setConverter(new GsonConverter()).build();
-        new RequestBuilder().get().url("http://stage.firstcry.com/svcs/MyAccountService.svc/getorderdetail/oid=3128726PMH8299707").tag("tag").modelClass(Data.class, new IRequestListener<JSONObject, Data>() {
-            @Override
-            public void onParseSuccess(Response<Data> response) {
-                Log.e("response",response.response.getRestrictedBrand());
-            }
+        new RequestBuilder().get().url("http://stage.firstcry.com/svcs/MyAccountService.svc/getorderdetail/oid=3128726PMH8299707").tag("tag")
+                .asJsonObject(new IResponseListener<JSONObject, Data>() {
+                    @Override
+                    public Data onRequestSuccess(JSONObject response) {
+                        return new Gson().fromJson(response.toString(),Data.class);
+                    }
 
-            @Override
-            public void onRequestErrorCode(int errorCode) {
+                    @Override
+                    public void onParseSuccess(Response<Data> response) {
+                        Log.e("response", response.response.getRestrictedBrand());
+                    }
 
-            }
-        }).send(getContext());
+                    @Override
+                    public void onRequestErrorCode(int errorCode) {
+
+                    }
+                })
+              /*  .modelClass(Data.class, new IRequestListener<JSONObject, Data>() {
+                    @Override
+                    public void onParseSuccess(Response<Data> response) {
+                        Log.e("response", response.response.getRestrictedBrand());
+                    }
+
+                    @Override
+                    public void onRequestErrorCode(int errorCode) {
+
+                    }
+                })*/.send(getContext());
 
     }
 }
