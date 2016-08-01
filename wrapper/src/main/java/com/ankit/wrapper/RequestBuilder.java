@@ -202,35 +202,18 @@ public class RequestBuilder implements Builder.IBuildRequestType {
           return this;
       }
 
-      /**
-       * Sets the {@code iFcRequestListener} and returns a reference to {@code IRequestHeader}
-       *
-       * @param val the {@code iFcRequestListener} to set
-       * @return a reference to this Builder
-       */
-      @Deprecated
-      @Override
-      public Builder.IBuildOptions callback(@NonNull IParsedResponseListener val) {
-          iParsedResponseListener = val;
-          return this;
-      }
+
 
       @Override
-      public Builder.IBuildOptions asJsonObject(@NonNull IParsedResponseListener<JSONObject,?> val) {
+      public Builder.IBuildOptions asJsonObject(@NonNull IResponseListener<JSONObject,?> val) {
           mRequestType = JSON;
           iParsedResponseListener =val;
           return this;
       }
 
-      @Override
-      public Builder.IBuildOptions asGsonObject(@NonNull IResponseListener<?,?> val) {
-          mRequestType = JSON;
-          iParsedResponseListener =val;
-          return this;
-      }
 
       @Override
-      public Builder.IBuildOptions modelClass(@NonNull Class aClass, @NonNull IParsedResponseListener<?,?> val) {
+      public Builder.IBuildOptions asClass(@NonNull Class aClass, @NonNull IParsedResponseListener<?,?> val) {
           iParsedResponseListener =val;
           mRequestType = JSON;
           mClass = aClass;
@@ -238,7 +221,7 @@ public class RequestBuilder implements Builder.IBuildRequestType {
       }
 
       @Override
-      public Builder.IBuildOptions asString(@NonNull IParsedResponseListener<String,?> val) {
+      public Builder.IBuildOptions asString(@NonNull IResponseListener<String,?> val) {
           mRequestType = STRING;
           iParsedResponseListener =val;
           return this;

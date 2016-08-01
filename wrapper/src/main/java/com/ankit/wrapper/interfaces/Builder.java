@@ -17,6 +17,7 @@ import java.util.HashMap;
 /**
  * Created by ankitagrawal on 1/8/16.
  */
+
 public class Builder {
     public interface IBuildUrl {
 
@@ -31,17 +32,13 @@ public class Builder {
 
         void send(@NonNull Context context);
 
-        IBuildOptions callback(@NonNull IParsedResponseListener val);
-
         IBuildOptions headers(HashMap<String, String> val);
 
-        IBuildOptions asJsonObject(@NonNull IParsedResponseListener<JSONObject,?> val);
+        IBuildOptions asJsonObject(@NonNull IResponseListener<JSONObject,?> val);
 
-        IBuildOptions asGsonObject(@NonNull IResponseListener<?,?> val);
+        IBuildOptions asClass(@NonNull Class mClass,@NonNull IParsedResponseListener<?,?> val);
 
-        IBuildOptions modelClass(@NonNull Class mClass,@NonNull IParsedResponseListener<?,?> val);
-
-        IBuildOptions asString(@NonNull IParsedResponseListener<String,?> val);
+        IBuildOptions asString(@NonNull IResponseListener<String,?> val);
 
         IBuildOptions params(@Nullable JSONObject val);
 
