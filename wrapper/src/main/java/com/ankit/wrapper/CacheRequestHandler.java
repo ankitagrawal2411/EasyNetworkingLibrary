@@ -160,7 +160,14 @@ public class CacheRequestHandler implements ICacheRequest {
         if(retryPolicy==null){
             retryPolicy = this.retryPolicy;
         }
-
+        if(mBaseUrl!=null){
+            if(!url.contains("://")){
+                url = mBaseUrl+url;
+            }
+        }else if(url.contains("://")){
+            throw new NullPointerException("baseUrl is not set, either pass full url or set base " +
+                    "url");
+        }
         requestHandler.makeJsonRequest(method, url, jsonObject, new
                 RequestHandler.IRequest<Response<JSONObject>>() {
             @Override
@@ -306,6 +313,14 @@ public class CacheRequestHandler implements ICacheRequest {
         }
         if(retryPolicy==null){
             retryPolicy = this.retryPolicy;
+        }
+        if(mBaseUrl!=null){
+            if(!url.contains("://")){
+             url = mBaseUrl+url;
+            }
+        }else if(url.contains("://")){
+            throw new NullPointerException("baseUrl is not set, either pass full url or set base " +
+                    "url");
         }
         requestHandler.makeStringRequest(method, url, jsonObject, new RequestHandler.IRequest<Response<String>>
                 () {

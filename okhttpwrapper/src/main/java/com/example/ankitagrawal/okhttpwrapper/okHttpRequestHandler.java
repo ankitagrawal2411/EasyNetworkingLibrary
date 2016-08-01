@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Headers;
+import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -49,6 +50,7 @@ public class okHttpRequestHandler extends RequestHandler {
     public static final MediaType STRING = MediaType.parse("text/plain; charset=utf-8");
     public okHttpRequestHandler(Context context) {
         super();
+
         client = new OkHttpClient.Builder()
                 .connectTimeout(CONNECT_TIMEOUT_MILLIS,TimeUnit.MILLISECONDS)
                 .readTimeout(READ_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
