@@ -8,7 +8,6 @@ public class Request {
      * Supported request methods.
      */
     public interface Method {
-        int DEPRECATED_GET_OR_POST = -1;
         int GET = 0;
         int POST = 1;
         int PUT = 2;

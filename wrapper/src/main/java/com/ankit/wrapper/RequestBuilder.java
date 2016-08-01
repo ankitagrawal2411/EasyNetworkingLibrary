@@ -23,8 +23,8 @@ public class RequestBuilder implements Builder.IBuildRequestType {
     private IParsedResponseListener iParsedResponseListener;
     private RetryPolicy retryPolicy;
     private String reqTAG;
-    private int memoryPolicy;
-    private int networkPolicy;
+    private int memoryPolicy=0;
+    private int networkPolicy=0;
     private long cacheTime;
     private int mRequestType;
     private static final int JSON = 1;

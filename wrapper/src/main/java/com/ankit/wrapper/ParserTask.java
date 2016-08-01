@@ -40,4 +40,13 @@ public class ParserTask<F> extends AsyncTask<Object, Integer, Response<F>> {
             this.mListener.onParseError(this.mRequestTag, ErrorCode.PARSE_ERROR);
         }
     }
+    /**
+     * Created by ankitagrawal on 6/7/16. yay
+     */
+    protected interface IParserListener<T> {
+
+        void onParseSuccess(String requestTag, Response<T> object);
+        void onParseError(String requestTag, int errorCode);
+        Response<T> onParse(String requestTag);
+    }
 }

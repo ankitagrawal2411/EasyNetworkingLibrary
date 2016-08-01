@@ -25,6 +25,12 @@ public class CacheRequestHandler implements ICacheRequest {
     private static CacheRequestHandler mInstance;
     private ArrayList<RequestHandler> requestHandlers;
     private ArrayList<Converter> converters;
+    private RetryPolicy retryPolicy;
+    private int memoryPolicy;
+    private int networkPolicy;
+    private long cacheTime;
+    private int mRequestType;
+    private HashMap<String, String> mHeaders;
      static CacheRequestHandler getInstance() {
         if(mInstance==null) {
             mInstance = new CacheRequestHandler();
@@ -41,8 +47,14 @@ public class CacheRequestHandler implements ICacheRequest {
   @Override
     public <F>  void makeJsonRequest(Context context, int method, String URL, JSONObject
           jsonObject,
-                                          HashMap<String, String> header, RetryPolicy retryPolicy, String reqTAG, final int memoryPolicy, final int networkPolicy, long cacheTime, IParsedResponseListener<JSONObject,F> responseListener, Class<F> mClass)
+                                          HashMap<String, String> header, RetryPolicy retryPolicy, String reqTAG,  int memoryPolicy,  int networkPolicy, long cacheTime, IParsedResponseListener<JSONObject,F> responseListener, Class<F> mClass)
     {
+        if(memoryPolicy==0){
+            memoryPolicy = this.memoryPolicy;
+        }
+        if(networkPolicy==0){
+            networkPolicy = this.networkPolicy;
+        }
         boolean offlineOnly =NetworkPolicy.isOfflineOnly(networkPolicy);
         if(MemoryPolicy.shouldReadFromMemoryCache(memoryPolicy) || offlineOnly){
             ICache.CacheEntry entry =   mMemoryCache.get(reqTAG);
@@ -90,7 +102,7 @@ public class CacheRequestHandler implements ICacheRequest {
             return;
         }
         if(requestHandlers ==null || requestHandlers.size()==0){
-            throw new NullPointerException("no request manager set, please set one atleast " +
+            throw new NullPointerException("no request handler set, please set one at least " +
                     "through GlobalBuilder class");
         }
         boolean requestHandled = false;
@@ -102,7 +114,7 @@ public class CacheRequestHandler implements ICacheRequest {
             }
         }
             if(!requestHandled){
-                throw new IllegalArgumentException("no request manager found that can handle " +
+                throw new IllegalArgumentException("no request handler found that can handle " +
                         "this type of request, please set one at least request manager that can " +
                         "handle this type of request" +
                         " " + "through GlobalBuilder class");
@@ -113,6 +125,7 @@ public class CacheRequestHandler implements ICacheRequest {
                                     Class<T> mClass) {
 
         if (converters != null && converters.size() > 0) {
+            boolean converted=false;
             for (int i = 0; i < converters.size(); i++) {
                 Log.e("converter", "called");
                 if (converters.get(i).canConvert(jsonObject1)) {
@@ -122,15 +135,33 @@ public class CacheRequestHandler implements ICacheRequest {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    converted =true;
                     break;
                 }
             }
+            if(!converted){
+                throw new IllegalArgumentException("no request handler found that can handle " +
+                        "this type of request, please set one at least request manager that can " +
+                        "handle this type of request" +
+                        " " + "through GlobalBuilder class");
+            }
+        }else{
+                throw new NullPointerException("no converter set, please set one at least " +
+                        "through GlobalBuilder class");
+
         }
         return null;
     }
 
 
-    private <F> void sendJsonRequest(final Context context, RequestHandler requestHandler, int method, String url, JSONObject jsonObject, HashMap<String, String> header, final IParsedResponseListener<JSONObject,F> jsonRequestFinishedListener, final RetryPolicy retryPolicy, final String reqTAG, final int memoryPolicy, final int networkPolicy, final long cacheTime, final Class<F> aClass) {
+    private <F> void sendJsonRequest(final Context context, RequestHandler requestHandler, int method, String url, JSONObject jsonObject, HashMap<String, String> header, final IParsedResponseListener<JSONObject,F> jsonRequestFinishedListener,  RetryPolicy retryPolicy, final String reqTAG, final int memoryPolicy, final int networkPolicy, final long cacheTime, final Class<F> aClass) {
+        if(header==null){
+            header = mHeaders;
+        }
+        if(retryPolicy==null){
+            retryPolicy = this.retryPolicy;
+        }
+
         requestHandler.makeJsonRequest(method, url, jsonObject, new
                 RequestHandler.IRequest<Response<JSONObject>>() {
             @Override
@@ -139,7 +170,7 @@ public class CacheRequestHandler implements ICacheRequest {
                     jsonRequestFinishedListener.onRequestErrorCode(ErrorCode.RESPONSE_NULL);
                     return;
                 }
-                ParserTask<F> parserTask = new ParserTask<>(reqTAG, new IParserListener<F>() {
+                ParserTask<F> parserTask = new ParserTask<>(reqTAG, new ParserTask.IParserListener<F>() {
                     @Override
                     public void onParseSuccess(String requestTag, Response<F> parseData) {
                         if(jsonRequestFinishedListener!=null) {
@@ -206,8 +237,14 @@ public class CacheRequestHandler implements ICacheRequest {
 
     }
     @Override
-    public <F> void makeStringRequest(final Context context, int method, final String URL, String jsonObject, final HashMap<String, String> header, final RetryPolicy retryPolicy, final String reqTAG, final int memoryPolicy, final int networkPolicy,long cacheTime, IParsedResponseListener<String,F> jsonRequestFinishedListener,final Class<F> aClass)
+    public <F> void makeStringRequest(final Context context, int method, final String URL, String jsonObject, final HashMap<String, String> header, final RetryPolicy retryPolicy, final String reqTAG,  int memoryPolicy,  int networkPolicy,long cacheTime, IParsedResponseListener<String,F> jsonRequestFinishedListener,final Class<F> aClass)
     {
+        if(memoryPolicy==0){
+            memoryPolicy = this.memoryPolicy;
+        }
+        if(networkPolicy==0){
+            networkPolicy = this.networkPolicy;
+        }
         boolean offlineOnly =NetworkPolicy.isOfflineOnly(networkPolicy);
         if(MemoryPolicy.shouldReadFromMemoryCache(memoryPolicy) || offlineOnly){
             ICache.CacheEntry response =   mMemoryCache.get(reqTAG);
@@ -265,7 +302,12 @@ public class CacheRequestHandler implements ICacheRequest {
 
     }
     private <T,F> void sendStringRequest(final Context context, RequestHandler requestHandler, int method, String url, String jsonObject, HashMap<String, String> header, final IParsedResponseListener<T,F> jsonRequestFinishedListener, RetryPolicy retryPolicy, final String reqTAG, final int memoryPolicy, final int networkPolicy, final long cacheTime, final Class<F> aClass) {
-
+        if(header==null){
+            header = mHeaders;
+        }
+        if(retryPolicy==null){
+            retryPolicy = this.retryPolicy;
+        }
         requestHandler.makeStringRequest(method, url, jsonObject, new RequestHandler.IRequest<Response<String>>
                 () {
             @Override
@@ -276,7 +318,7 @@ public class CacheRequestHandler implements ICacheRequest {
                     }
                     return;
                 }
-                ParserTask<F> parserTask = new ParserTask<>(reqTAG, new IParserListener<F>() {
+                ParserTask<F> parserTask = new ParserTask<>(reqTAG, new ParserTask.IParserListener<F>() {
                     @Override
                     public void onParseSuccess(String requestTag, Response<F> parseData) {
                         if(jsonRequestFinishedListener!=null) {
@@ -333,5 +375,21 @@ public class CacheRequestHandler implements ICacheRequest {
     }
     public void setRequestHandlers(ArrayList<RequestHandler> requestHandler) {
         this.requestHandlers = requestHandler;
+    }
+
+    public void setNetworkPolicy(int networkPolicy) {
+        this.networkPolicy = networkPolicy;
+    }
+
+    public void setMemoryPolicy(int memoryPolicy) {
+        this.memoryPolicy = memoryPolicy;
+    }
+
+    public void setRetryPolicy(RetryPolicy retryPolicy) {
+        this.retryPolicy = retryPolicy;
+    }
+
+    public void setHeaders(HashMap<String, String> mHeaders) {
+        this.mHeaders = mHeaders;
     }
 }

@@ -14,6 +14,10 @@ public class GlobalRequest {
     private GlobalRequest(Builder builder) {
         ArrayList<RequestHandler> mRequestHandler = builder.mRequestHandler;
         ArrayList<Converter> mConverters = builder.mConverters;
+        CacheRequestHandler.getInstance().setRetryPolicy(builder.retryPolicy);
+        CacheRequestHandler.getInstance().setNetworkPolicy(builder.networkPolicy);
+        CacheRequestHandler.getInstance().setMemoryPolicy(builder.memoryPolicy);
+        CacheRequestHandler.getInstance().setHeaders(builder.mHeaders);
         CacheRequestHandler.getInstance().setRequestHandlers(mRequestHandler);
         CacheRequestHandler.getInstance().setConverters(mConverters);
     }
