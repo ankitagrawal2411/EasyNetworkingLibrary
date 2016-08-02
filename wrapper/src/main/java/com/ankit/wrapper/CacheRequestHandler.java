@@ -7,7 +7,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -110,7 +109,6 @@ public class CacheRequestHandler implements ICacheRequest {
         if (converters != null && converters.size() > 0) {
             boolean converted=false;
             for (int i = 0; i < converters.size(); i++) {
-                Log.e("converter", "called");
                 if (converters.get(i).canConvert(jsonObject1)) {
                     try {
                         return converters.get(i).convert(jsonObject1,
