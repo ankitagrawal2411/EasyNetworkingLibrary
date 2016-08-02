@@ -48,7 +48,13 @@ public class Response<T> {
         this.networkTimeMs = 0;
         this.loadedFrom = loadedFrom;
     }
-
+    public Response(T response, int loadedFrom,int statusCode,long networkTimeMs) {
+        this.response = response;
+        this.headers = new HashMap<>();
+        this.statusCode = statusCode;
+        this.networkTimeMs = networkTimeMs;
+        this.loadedFrom = loadedFrom;
+    }
     public Response(int loadedFrom) {
         this.response = null;
         this.headers = new HashMap<>();
@@ -56,6 +62,9 @@ public class Response<T> {
         this.networkTimeMs = 0;
         this.loadedFrom = loadedFrom;
     }
+
+
+
     public class LoadedFrom {
         public static final int MEMORY=0;
         public static final int DISK=1;

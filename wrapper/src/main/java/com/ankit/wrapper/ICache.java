@@ -1,5 +1,9 @@
 package com.ankit.wrapper;
 
+import org.json.JSONObject;
+
+import java.util.Map;
+
 /**
  * Created by asifmujteba on 07/08/15.
  */
@@ -16,20 +20,41 @@ public interface ICache {
     class CacheEntry {
         private static final String TAG = CacheEntry.class.getName();
 
-        private String mData;
+
         private long mTtl;
         private String mKey;
         private long timeStampMillis;
+        /**  data from this response. */
+        public final String response;
 
-        public CacheEntry(String data, long time, String url, long timeStampMillis) {
-            this.mData = data;
-            this.mTtl = time;
-            this.mKey = url;
+        /** The HTTP status code. */
+        public final int statusCode;
+
+        /** Response headers. */
+        public final Map<String, String> headers;
+
+        /** Network roundtrip time in milliseconds. */
+        public final long networkTimeMs;
+
+
+        /** Network roundtrip time in milliseconds. */
+        public final int loadedFrom;
+
+
+
+        public CacheEntry(Response<String> response, long cacheTime, String reqTAG, long timeStampMillis) {
+            this.response = response.response;
+            this.headers=response.headers;
+            this.networkTimeMs= response.networkTimeMs;
+            this.loadedFrom= response.loadedFrom;
+            this.statusCode=response.statusCode;
+            this.mTtl = cacheTime;
+            this.mKey = reqTAG;
             this.timeStampMillis = timeStampMillis;
         }
 
         public String getData() {
-            return mData;
+            return this.response;
         }
 
         public long getCacheDuration() {

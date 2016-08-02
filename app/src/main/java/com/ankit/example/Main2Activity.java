@@ -17,9 +17,6 @@ public class Main2Activity extends AppCompatActivity {
         setContentView(R.layout.activity_main2);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if(create(true)){
-            create(true);
-        }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -31,13 +28,6 @@ public class Main2Activity extends AppCompatActivity {
         });
     }
 
-    private boolean create(boolean b) {
-        int  i = 0;
-        if(b){
-         i =i+1;
-        }
-        return true;
-    }
 
 
 }

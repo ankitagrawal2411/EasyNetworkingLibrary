@@ -27,4 +27,5 @@ dependencies {
     compile project(':wrapper')
     compile project(':volleywrapper')
     compile project(':gsonconverter')
+    compile project(':okhttpwrapper')
 }

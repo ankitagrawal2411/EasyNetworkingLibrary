@@ -26,7 +26,9 @@ public class Builder {
     public interface IBuildOptions {
         IBuildOptions build();
 
-        IBuildOptions cache(boolean val);
+        IBuildOptions memoryCache(boolean val);
+
+        IBuildOptions diskCache(boolean val);
 
         IBuildOptions retryPolicy(@Nullable RetryPolicy val);
 

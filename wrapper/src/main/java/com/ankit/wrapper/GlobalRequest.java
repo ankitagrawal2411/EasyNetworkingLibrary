@@ -120,7 +120,7 @@ public class GlobalRequest {
          * @param val the {@code mRequestManager} to set
          * @return a reference to this Builder
          */
-        public Builder setRequestManager(RequestHandler val) {
+        public Builder setClient(RequestHandler val) {
             if (mRequestHandler == null) {
                 mRequestHandler = new ArrayList<>(2);
             }
@@ -155,7 +155,7 @@ public class GlobalRequest {
             return this;
         }
 
-        public Builder addRequestManager(RequestHandler requestHandler) {
+        public Builder addClient(RequestHandler requestHandler) {
             if (mRequestHandler == null) {
                 mRequestHandler = new ArrayList<>(2);
             }
@@ -163,7 +163,7 @@ public class GlobalRequest {
             return this;
         }
 
-        public Builder setRequestManagers(ArrayList<RequestHandler> requestHandler) {
+        public Builder setClient(ArrayList<RequestHandler> requestHandler) {
             if (mRequestHandler == null) {
                 mRequestHandler = new ArrayList<>(2);
             }

@@ -27,8 +27,8 @@ public class RequestBuilder implements Builder.IBuildRequestType {
     private int networkPolicy=0;
     private long cacheTime;
     private int mRequestType=-1;
-    private static final int JSON = 1;
-    private static final int STRING = 0;
+    private static final int JSON = 2;
+    private static final int STRING = 1;
     private HashMap<String, String> mHeaders;
     private  Class<?> mClass;
     public RequestBuilder(String requestUrl, String reqTAG) {
@@ -111,12 +111,25 @@ public class RequestBuilder implements Builder.IBuildRequestType {
        * @return a reference to this Builder
        */
       @Override
-      public Builder.IBuildOptions cache(boolean val) {
+      public Builder.IBuildOptions memoryCache(boolean val) {
           if(val) {
-              networkPolicy(NetworkPolicy.CACHE, NetworkPolicy.STORE);
+              memoryPolicy(MemoryPolicy.CACHE, MemoryPolicy.STORE);
+          }else{
+              memoryPolicy=0;
           }
           return this;
       }
+
+      @Override
+      public Builder.IBuildOptions diskCache(boolean val) {
+          if(val) {
+              networkPolicy(NetworkPolicy.CACHE, NetworkPolicy.STORE);
+          }else{
+              networkPolicy=0;
+          }
+          return this;
+      }
+
       @Override
       public Builder.IBuildOptions addHeader(@NonNull String key,@NonNull String value) {
           if(mHeaders==null){
@@ -184,6 +197,10 @@ public class RequestBuilder implements Builder.IBuildRequestType {
 
       @Override
       public Builder.IBuildOptions asJsonObject(@NonNull IResponseListener<JSONObject,?> val) {
+          if(mRequestType!=-1){
+              throw new IllegalArgumentException("only one of asJsonObject() asString() or " +
+                      "asClass() method is allowed ");
+          }
           mRequestType = JSON;
           iParsedResponseListener =val;
           return this;
@@ -192,6 +209,10 @@ public class RequestBuilder implements Builder.IBuildRequestType {
 
       @Override
       public Builder.IBuildOptions asClass(@NonNull Class aClass, @NonNull IParsedResponseListener<?,?> val) {
+          if(mRequestType!=-1){
+              throw new IllegalArgumentException("only one of asJsonObject() asString() or " +
+                      "asClass() method is allowed ");
+          }
           iParsedResponseListener =val;
           mRequestType = JSON;
           mClass = aClass;
@@ -200,6 +221,10 @@ public class RequestBuilder implements Builder.IBuildRequestType {
 
       @Override
       public Builder.IBuildOptions asString(@NonNull IResponseListener<String,?> val) {
+          if(mRequestType!=-1){
+              throw new IllegalArgumentException("only one of asJsonObject() asString() or " +
+                      "asClass() method is allowed ");
+          }
           mRequestType = STRING;
           iParsedResponseListener =val;
           return this;
@@ -219,7 +244,6 @@ public class RequestBuilder implements Builder.IBuildRequestType {
 
       @Override
       public Builder.IBuildOptions cacheTime(long time) {
-          cache(true);
           cacheTime = time;
           return this;
       }

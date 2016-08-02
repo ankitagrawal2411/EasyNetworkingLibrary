@@ -148,7 +148,7 @@ public class CacheRequestHandler implements ICacheRequest {
             if(!url.contains("://")){
                 url = mBaseUrl+url;
             }
-        }else if(url.contains("://")){
+        }else if(!url.contains("://")){
             throw new NullPointerException("baseUrl is not set, either pass full url or set base " +
                     "url");
         }
@@ -169,8 +169,8 @@ public class CacheRequestHandler implements ICacheRequest {
     }
 
 
-    private <T,F> void onResponse(final Context context,final Response<T> response, final String
-            reqTAG, final long cacheTime, final Class<F> aClass, final int memoryPolicy, final int networkPolicy,final IParsedResponseListener<T, F> jsonRequestFinishedListener) {
+    private <F> void onResponse(final Context context,final Response<JSONObject> response, final String
+            reqTAG, final long cacheTime, final Class<F> aClass, final int memoryPolicy, final int networkPolicy,final IParsedResponseListener<JSONObject, F> jsonRequestFinishedListener) {
         if (response.response == null) {
             jsonRequestFinishedListener.onRequestErrorCode(ErrorCode.RESPONSE_NULL);
             return;
@@ -194,19 +194,20 @@ public class CacheRequestHandler implements ICacheRequest {
                         response.loadedFrom!= Response.LoadedFrom.MEMORY) {
                     if (MemoryPolicy.shouldWriteToMemoryCache(memoryPolicy)) {
                         getMemoryCache().put(reqTAG, new
-                                ICache.CacheEntry(response.toString(), cacheTime, reqTAG, SystemClock.elapsedRealtime()));
+                                ICache.CacheEntry(new Response<>(response.response.toString(),response.headers,response.statusCode,response.networkTimeMs,response.loadedFrom), cacheTime, reqTAG, SystemClock.elapsedRealtime()));
                     }
                     if (NetworkPolicy.shouldWriteToDiskCache(networkPolicy)) {
                         CacheRequestManager.getInstance(context).cacheResponse(new
-                                ICache.CacheEntry(response.toString(), cacheTime, reqTAG, SystemClock.elapsedRealtime()));
+                                ICache.CacheEntry(new Response<>(response.response.toString(),response.headers,response.statusCode,response.networkTimeMs,response.loadedFrom), cacheTime, reqTAG, SystemClock
+                                .elapsedRealtime()));
                     }
                 }
                 if (jsonRequestFinishedListener != null) {
                     if (jsonRequestFinishedListener instanceof IResponseListener) {
-                        return new Response<>((((IResponseListener<T,F>) jsonRequestFinishedListener).onRequestSuccess(response.response)),response.loadedFrom);
+                        return new Response<>((((IResponseListener<JSONObject,F>) jsonRequestFinishedListener).onRequestSuccess(response.response)),response.headers,response.statusCode,response.networkTimeMs,response.loadedFrom);
                     } else {
                         return new Response<>
-                                (parseDataToModel(response.response.toString(), aClass),response.loadedFrom);
+                                (parseDataToModel(response.response.toString(), aClass),response.headers,response.statusCode,response.networkTimeMs,response.loadedFrom);
                     }
                 }
                 return new Response<>(response.loadedFrom);
@@ -243,19 +244,19 @@ public class CacheRequestHandler implements ICacheRequest {
                         response.loadedFrom!= Response.LoadedFrom.MEMORY) {
                     if (MemoryPolicy.shouldWriteToMemoryCache(memoryPolicy)) {
                         getMemoryCache().put(reqTAG, new
-                                ICache.CacheEntry(response.toString(), cacheTime, reqTAG, SystemClock.elapsedRealtime()));
+                                ICache.CacheEntry(response, cacheTime, reqTAG, SystemClock.elapsedRealtime()));
                     }
                     if (NetworkPolicy.shouldWriteToDiskCache(networkPolicy)) {
                         CacheRequestManager.getInstance(context).cacheResponse(new
-                                ICache.CacheEntry(response.toString(), cacheTime, reqTAG, SystemClock.elapsedRealtime()));
+                                ICache.CacheEntry(response, cacheTime, reqTAG, SystemClock.elapsedRealtime()));
                     }
                 }
                 if (jsonRequestFinishedListener != null) {
                     if (jsonRequestFinishedListener instanceof IResponseListener) {
-                        return new Response<>((((IResponseListener<String,F>) jsonRequestFinishedListener).onRequestSuccess(response.response)),response.loadedFrom);
+                        return new Response<>((((IResponseListener<String,F>) jsonRequestFinishedListener).onRequestSuccess(response.response)),response.headers,response.statusCode,response.networkTimeMs,response.loadedFrom);
                     } else {
                         return new Response<>
-                                (parseDataToModel(response.response, aClass),response.loadedFrom);
+                                (parseDataToModel(response.response, aClass),response.headers,response.statusCode,response.networkTimeMs,response.loadedFrom);
                     }
                 }
                 return new Response<>(response.loadedFrom);
@@ -353,7 +354,7 @@ public class CacheRequestHandler implements ICacheRequest {
             if(!url.contains("://")){
              url = mBaseUrl+url;
             }
-        }else if(url.contains("://")){
+        }else if(!url.contains("://")){
             throw new NullPointerException("baseUrl is not set, either pass full url or set base " +
                     "url");
         }
