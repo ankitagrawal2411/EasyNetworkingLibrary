@@ -7,7 +7,7 @@ import java.util.HashMap;
 /** caching class
  * Created by ankit.agrawal on 11/07/16.
  */
-public class MemoryCache implements ICache {
+  class MemoryCache implements ICache {
     private static final String TAG = MemoryCache.class.getName();
 
     /*

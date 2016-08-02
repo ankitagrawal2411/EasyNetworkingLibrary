@@ -37,4 +37,7 @@ public abstract class RequestHandler {
     protected abstract void makeStringRequest(int method, String url, String stringParams,
                                               IRequest<Response<String>> onStringRequestFinishedListener,
                                               HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
+/*    protected abstract <T> void makeRequest(int method, String url, String stringParams,
+                                              IRequest<Response<T>> onStringRequestFinishedListener,
+                                              HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);*/
 }

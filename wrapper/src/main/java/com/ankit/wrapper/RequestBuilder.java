@@ -26,11 +26,10 @@ public class RequestBuilder implements Builder.IBuildRequestType {
     private int memoryPolicy=0;
     private int networkPolicy=0;
     private long cacheTime;
-    private int mRequestType;
+    private int mRequestType=-1;
     private static final int JSON = 1;
     private static final int STRING = 0;
     private HashMap<String, String> mHeaders;
-    private Map<String, String> mParams = new HashMap<>();
     private  Class<?> mClass;
     public RequestBuilder(String requestUrl, String reqTAG) {
         this.requestUrl = requestUrl;
@@ -127,14 +126,6 @@ public class RequestBuilder implements Builder.IBuildRequestType {
           return this;
       }
 
-      public Builder.IBuildOptions addParam(@NonNull String key,@NonNull String value) {
-          if(mParams==null){
-              mParams = new HashMap<>();
-          }
-          mParams.put(key, value);
-          return this;
-      }
-
       /**
        * Sets the {@code retryPolicy} and returns a reference to {@code IReqTAG}
        *
@@ -160,33 +151,20 @@ public class RequestBuilder implements Builder.IBuildRequestType {
           if(reqTAG==null){
               throw new NullPointerException("reqTag cannot be null");
           }
-
-          if(mParams!=null){
-              Map<?, ?> contentsTyped = (Map<?, ?>) mParams;
-              for (Map.Entry<?, ?> entry : contentsTyped.entrySet()) {
-            /*
-             * Deviate from the original by checking that keys are non-null and
-             * of the proper type. (We still defer validating the values).
-             */
-                  String key = (String) entry.getKey();
-                  if (key == null) {
-                      throw new NullPointerException("key == null");
-                  }
-                  try {
-                      jsonObject.put(key, entry.getValue());
-                  } catch (JSONException e) {
-                      e.printStackTrace();
-                  }
-              }
+          if(mClass!=null && iParsedResponseListener instanceof IResponseListener){
+              throw new IllegalArgumentException("wrong interface registered, should be IParsedResponseListener and not IResponseListener");
           }
           if(mRequestType==JSON) {
               CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
-                      jsonObject, mHeaders,retryPolicy, reqTAG, memoryPolicy,
+                      jsonObject, mHeaders, retryPolicy, reqTAG, memoryPolicy,
                       networkPolicy, cacheTime, iParsedResponseListener, mClass);
           }else if(mRequestType==STRING){
               CacheRequestHandler.getInstance().makeStringRequest(context, method, requestUrl,
                       jsonObject.toString(), mHeaders, retryPolicy, reqTAG, memoryPolicy,
                       networkPolicy, cacheTime, iParsedResponseListener,mClass);
+          }else{
+              throw new IllegalArgumentException("no request type set please set it using as...()" +
+                      "method of Request Builder");
           }
       }
 
@@ -308,6 +286,17 @@ public class RequestBuilder implements Builder.IBuildRequestType {
         return iBuildUrl;
     }
 
+    @Override
+    public Builder.IBuildUrl invalidate(Context context,String tag) {
+        CacheRequestManager.getInstance(context).invalidateCacheResponse(tag);
+        return iBuildUrl;
+    }
+
+    @Override
+    public Builder.IBuildUrl clearCache(Context context) {
+        CacheRequestManager.getInstance(context).clearCache();
+        return iBuildUrl;
+    }
 
 
 }

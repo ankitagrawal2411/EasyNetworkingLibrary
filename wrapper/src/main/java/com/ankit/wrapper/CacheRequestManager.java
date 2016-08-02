@@ -16,18 +16,18 @@ import org.json.JSONObject;
 /**
  * Created by ankitagrawal on 6/7/16. yay
  */
-public class BaseCacheRequestManager {
+  class CacheRequestManager {
     public SharedPreferences mSharedPreferences;
-    private static BaseCacheRequestManager mInstance;
+    private static CacheRequestManager mInstance;
 
-    public BaseCacheRequestManager(Context context) {
+    public CacheRequestManager(Context context) {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
 
-    public static BaseCacheRequestManager getInstance(Context context){
+    public static CacheRequestManager getInstance(Context context){
         if(mInstance==null){
-            mInstance = new BaseCacheRequestManager(context);
+            mInstance = new CacheRequestManager(context);
         }
         return mInstance;
     }

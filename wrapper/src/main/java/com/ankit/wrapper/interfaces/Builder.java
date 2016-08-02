@@ -46,8 +46,6 @@ public class Builder {
 
         IBuildOptions addHeader(@NonNull String key,@NonNull String value);
 
-        IBuildOptions addParam(@NonNull String key,@NonNull String value);
-
         IBuildOptions memoryPolicy(@NonNull MemoryPolicy policy, @NonNull MemoryPolicy... additional);
 
         IBuildOptions networkPolicy(@NonNull NetworkPolicy policy, @NonNull NetworkPolicy... additional);
@@ -62,7 +60,9 @@ public class Builder {
 
         IBuildUrl method(int val);
 
+        IBuildUrl invalidate(Context context,String tag);
 
+        IBuildUrl clearCache(Context context);
     }
     public interface IBuildTag {
 
