@@ -45,8 +45,9 @@ public class CacheRequestHandler implements ICacheRequest {
   @Override
     public <F>  void makeJsonRequest(Context context, int method, String URL, JSONObject
           jsonObject,
-                                          HashMap<String, String> header, RetryPolicy retryPolicy, String reqTAG,  int memoryPolicy,  int networkPolicy, long cacheTime, IParsedResponseListener<JSONObject,F> responseListener, Class<F> aClass)
+                                     HashMap<String, String> header, RetryPolicy retryPolicy, String reqTAG, int memoryPolicy, int networkPolicy, long cacheTime, IParsedResponseListener<JSONObject, F> responseListener, int logLevel, Class<F> aClass)
     {
+        Logger.getInstance().setLevel(logLevel);
         if(memoryPolicy==0){
             memoryPolicy = this.memoryPolicy;
         }
@@ -283,8 +284,9 @@ public class CacheRequestHandler implements ICacheRequest {
 
     }
     @Override
-    public <F> void makeStringRequest(final Context context, int method, final String URL, String jsonObject, final HashMap<String, String> header, final RetryPolicy retryPolicy, final String reqTAG,  int memoryPolicy,  int networkPolicy,long cacheTime, IParsedResponseListener<String,F> jsonRequestFinishedListener,final Class<F> aClass)
+    public <F> void makeStringRequest(final Context context, int method, final String URL, String jsonObject, final HashMap<String, String> header, final RetryPolicy retryPolicy, final String reqTAG, int memoryPolicy, int networkPolicy, long cacheTime, IParsedResponseListener<String, F> jsonRequestFinishedListener, int logLevel, final Class<F> aClass)
     {
+        Logger.getInstance().setLevel(logLevel);
         if(memoryPolicy==0){
             memoryPolicy = this.memoryPolicy;
         }

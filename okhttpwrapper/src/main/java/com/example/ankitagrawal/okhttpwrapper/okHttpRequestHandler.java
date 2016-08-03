@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -48,6 +49,7 @@ public class okHttpRequestHandler extends RequestHandler {
     private  OkHttpClient client ;
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     public static final MediaType STRING = MediaType.parse("text/plain; charset=utf-8");
+    private HashMap<String,Call> RequestQueue;
     public okHttpRequestHandler(Context context) {
         super();
 
@@ -292,5 +294,21 @@ public class okHttpRequestHandler extends RequestHandler {
                 System.out.println(response.body().string());
             }
         });
+    }
+
+    @Override
+    protected void cancelPendingRequests(String tag) {
+        List<Call> calls = client.dispatcher().queuedCalls();
+        for (Call call:calls){
+            if(call.request().tag().equals(tag) && !call.isCanceled()){
+                call.cancel();
+            }
+        }
+    }
+
+    @Override
+    protected void cancelAllRequests() {
+        client.dispatcher().cancelAll();
+
     }
 }

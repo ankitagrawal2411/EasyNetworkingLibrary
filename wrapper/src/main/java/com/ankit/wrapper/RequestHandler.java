@@ -27,7 +27,7 @@ public abstract class RequestHandler {
 
     }
 
-    public abstract boolean canHandleRequest(String url, int method);
+    protected abstract boolean canHandleRequest(String url, int method);
 
     protected abstract void makeJsonRequest(int method, String requestUrl, JSONObject jsonObject,
                                             IRequest<Response<JSONObject>> onJsonRequestFinishedListener,
@@ -40,4 +40,7 @@ public abstract class RequestHandler {
 /*    protected abstract <T> void makeRequest(int method, String url, String stringParams,
                                               IRequest<Response<T>> onStringRequestFinishedListener,
                                               HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);*/
+    protected abstract void cancelPendingRequests(String tag) ;
+
+    protected abstract void cancelAllRequests() ;
 }

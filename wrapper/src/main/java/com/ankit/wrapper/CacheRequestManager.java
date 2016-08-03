@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,6 +18,7 @@ import org.json.JSONObject;
   class CacheRequestManager {
     public SharedPreferences mSharedPreferences;
     private static CacheRequestManager mInstance;
+    private static final String TAG="cache";
 
     public CacheRequestManager(Context context) {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -44,7 +44,7 @@ import org.json.JSONObject;
     }
     @SuppressLint("CommitPrefEdits")
     public  void invalidateCacheResponse(String url) {
-        Log.e("preference", "remove " + url + " ");
+        Logger.getInstance().d(TAG, "remove " + url + " ");
         if(mSharedPreferences.contains(url)) {
             mSharedPreferences.edit().remove(url).commit();
         }
@@ -52,16 +52,17 @@ import org.json.JSONObject;
 
     private  void savePreference(String url, String response) {
         if(response!=null) {
-            Log.e("preference", "save " + url + " " + response);
+            Logger.getInstance().d(TAG, "save " + url + " " + response);
             mSharedPreferences.edit().putString(url, response).apply();
         }else{
-            Log.e("preference", "save " + url + " " + null);
+            Logger.getInstance().d(TAG, "save " + url + " " + null);
             mSharedPreferences.edit().putString(url, null).apply();
         }
 
     }
     private String loadPreference(String url) {
-        Log.e("preference","load "+url + " "+mSharedPreferences.getString(url, null));
+        Logger.getInstance().d(TAG, "load " + url + " " + mSharedPreferences.getString
+                (url, null));
        return mSharedPreferences.getString(url, null);
     }
     public String getCacheResponse(String url) {

@@ -6,12 +6,8 @@ import android.support.annotation.Nullable;
 
 
 import com.ankit.wrapper.interfaces.Builder;
-
-import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by ankitagrawal on 6/7/16. yay
@@ -31,6 +27,7 @@ public class RequestBuilder implements Builder.IBuildRequestType {
     private static final int STRING = 1;
     private HashMap<String, String> mHeaders;
     private  Class<?> mClass;
+    private int mLogLevel= LogLevel.NO_LEVEL;
     public RequestBuilder(String requestUrl, String reqTAG) {
         this.requestUrl = requestUrl;
         this.reqTAG = reqTAG;
@@ -170,11 +167,11 @@ public class RequestBuilder implements Builder.IBuildRequestType {
           if(mRequestType==JSON) {
               CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
                       jsonObject, mHeaders, retryPolicy, reqTAG, memoryPolicy,
-                      networkPolicy, cacheTime, iParsedResponseListener, mClass);
+                      networkPolicy, cacheTime, iParsedResponseListener,mLogLevel, mClass);
           }else if(mRequestType==STRING){
               CacheRequestHandler.getInstance().makeStringRequest(context, method, requestUrl,
                       jsonObject.toString(), mHeaders, retryPolicy, reqTAG, memoryPolicy,
-                      networkPolicy, cacheTime, iParsedResponseListener,mClass);
+                      networkPolicy, cacheTime, iParsedResponseListener,mLogLevel,mClass);
           }else{
               throw new IllegalArgumentException("no request type set please set it using as...()" +
                       "method of Request Builder");
@@ -245,6 +242,12 @@ public class RequestBuilder implements Builder.IBuildRequestType {
       @Override
       public Builder.IBuildOptions cacheTime(long time) {
           cacheTime = time;
+          return this;
+      }
+
+      @Override
+      public Builder.IBuildOptions logLevel(int level) {
+          mLogLevel = level;
           return this;
       }
 

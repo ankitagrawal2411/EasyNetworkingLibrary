@@ -21,6 +21,8 @@ public class GlobalRequest {
         CacheRequestHandler.getInstance().setRequestHandlers(mRequestHandler);
         CacheRequestHandler.getInstance().setConverters(mConverters);
         CacheRequestHandler.getInstance().setBaseUrl(builder.baseUrl);
+        Logger.getInstance().setLevel(builder.mLogLevel);
+        Logger.getInstance().setDisabledLogs(builder.disableAllLogs);
     }
 
     public static Builder newBuilder() {
@@ -39,7 +41,8 @@ public class GlobalRequest {
         private RetryPolicy retryPolicy;
         private int memoryPolicy;
         private int networkPolicy;
-
+        private int mLogLevel=LogLevel.NO_LEVEL;
+        private boolean disableAllLogs=false;
         private Builder() {
         }
 
@@ -47,7 +50,8 @@ public class GlobalRequest {
          * Specifies the {@link MemoryPolicy} to use for this request. You may specify additional policy
          * options using the varargs parameter.
          */
-        public Builder memoryPolicy(@NonNull MemoryPolicy policy, @NonNull MemoryPolicy... additional) {
+        public Builder memoryPolicy(@NonNull MemoryPolicy policy, @NonNull MemoryPolicy...
+                additional) {
             memoryPolicy |= policy.index;
             if (additional.length > 0) {
                 for (MemoryPolicy memoryPolicy1 : additional) {
@@ -85,7 +89,14 @@ public class GlobalRequest {
             mHeaders = val;
             return this;
         }
-
+        public Builder logLevel(int level) {
+            mLogLevel = level;
+            return this;
+        }
+        public Builder disableAllLogs(boolean disableAllLogs) {
+            this.disableAllLogs = disableAllLogs;
+            return this;
+        }
         /**
          * Sets the {@code retryPolicy} and returns a reference to {@code IReqTAG}
          *
@@ -120,7 +131,7 @@ public class GlobalRequest {
          * @param val the {@code mRequestManager} to set
          * @return a reference to this Builder
          */
-        public Builder setClient(RequestHandler val) {
+        public Builder client(RequestHandler val) {
             if (mRequestHandler == null) {
                 mRequestHandler = new ArrayList<>(2);
             }
@@ -129,7 +140,7 @@ public class GlobalRequest {
             return this;
         }
 
-        public Builder setConverters(ArrayList<Converter> converters) {
+        public Builder converters(ArrayList<Converter> converters) {
             if (mConverters == null) {
                 mConverters = new ArrayList<>(2);
             }
@@ -138,7 +149,7 @@ public class GlobalRequest {
             return this;
         }
 
-        public Builder setConverter(Converter converters) {
+        public Builder converter(Converter converters) {
             if (mConverters == null) {
                 mConverters = new ArrayList<>(2);
             }
@@ -163,7 +174,7 @@ public class GlobalRequest {
             return this;
         }
 
-        public Builder setClient(ArrayList<RequestHandler> requestHandler) {
+        public Builder client(ArrayList<RequestHandler> requestHandler) {
             if (mRequestHandler == null) {
                 mRequestHandler = new ArrayList<>(2);
             }

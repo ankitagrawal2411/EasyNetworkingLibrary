@@ -1,6 +1,5 @@
 package com.ankit.wrapper;
 
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,26 +32,11 @@ public class Response<T> {
         this.networkTimeMs = networkTimeMs;
         this.loadedFrom = loadedFrom;
     }
-    public Response(T response,  Map<String, String> headers,int loadedFrom) {
-        this.response = response;
-        this.headers = headers;
-        this.statusCode = 200;
-        this.networkTimeMs = 0;
-        this.loadedFrom = loadedFrom;
-    }
-
     public Response(T response, int loadedFrom) {
         this.response = response;
         this.headers = new HashMap<>();
         this.statusCode = 200;
         this.networkTimeMs = 0;
-        this.loadedFrom = loadedFrom;
-    }
-    public Response(T response, int loadedFrom,int statusCode,long networkTimeMs) {
-        this.response = response;
-        this.headers = new HashMap<>();
-        this.statusCode = statusCode;
-        this.networkTimeMs = networkTimeMs;
         this.loadedFrom = loadedFrom;
     }
     public Response(int loadedFrom) {

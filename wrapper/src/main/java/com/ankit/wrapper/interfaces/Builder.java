@@ -46,6 +46,8 @@ public class Builder {
 
         IBuildOptions cacheTime( long time);
 
+        IBuildOptions logLevel( int level);
+
         IBuildOptions addHeader(@NonNull String key,@NonNull String value);
 
         IBuildOptions memoryPolicy(@NonNull MemoryPolicy policy, @NonNull MemoryPolicy... additional);

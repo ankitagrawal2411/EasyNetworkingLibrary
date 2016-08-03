@@ -12,9 +12,9 @@ import java.util.HashMap;
 
     /*
     * Get max available VM memory, exceeding this amount will throw an OutOfMemory exception.
-    * and use 1/8th of the available memory for this memory cache.
+    * and use 1/30th of the available memory for this memory cache.
     */
-    public static final int DEFAULT_CACHE_SIZE = (int) (Runtime.getRuntime().maxMemory() / 8);
+    public static final int DEFAULT_CACHE_SIZE = (int) (Runtime.getRuntime().maxMemory() / 30);
 
     private int maxSize = DEFAULT_CACHE_SIZE;
     private HashMap<String, CacheEntry> mEntries;
