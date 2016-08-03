@@ -2,6 +2,8 @@ package com.ankit.wrapper;
 
 
 
+import android.os.SystemClock;
+
 import java.util.Map;
 
 /**
@@ -56,7 +58,6 @@ public interface ICache {
         public String getData() {
             return this.response;
         }
-
         public long getCacheDuration() {
             return mTtl;
         }

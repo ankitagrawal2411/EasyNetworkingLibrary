@@ -47,7 +47,7 @@ public class CacheRequestHandler implements ICacheRequest {
           jsonObject,
                                      HashMap<String, String> header, RetryPolicy retryPolicy, String reqTAG, int memoryPolicy, int networkPolicy, long cacheTime, IParsedResponseListener<JSONObject, F> responseListener, int logLevel, Class<F> aClass)
     {
-        Logger.getInstance().setLevel(logLevel);
+        Logger.getInstance().setLocalLevel(logLevel);
         if(memoryPolicy==0){
             memoryPolicy = this.memoryPolicy;
         }
@@ -174,10 +174,24 @@ public class CacheRequestHandler implements ICacheRequest {
             jsonRequestFinishedListener.onRequestErrorCode(ErrorCode.RESPONSE_NULL);
             return;
         }
-        ParserTask<F> parserTask = new ParserTask<>(reqTAG, new ParserTask.IParserListener<F>() {
+        final long time = SystemClock.elapsedRealtime();
+/*        if (jsonRequestFinishedListener != null) {
+            if (jsonRequestFinishedListener instanceof IResponseListener) {
+                Response<F> response1 = new Response<>((((IResponseListener<JSONObject,F>) jsonRequestFinishedListener).onRequestSuccess(response.response)),response.headers,response.statusCode,response.networkTimeMs,response.loadedFrom);
+                response1.parseTime =  SystemClock.elapsedRealtime()-time;
+                jsonRequestFinishedListener.onParseSuccess(response1);
+            } else {
+                Response<F> response1 = new Response<>
+                        (parseDataToModel(response.response.toString(), aClass), response.headers, response.statusCode, response.networkTimeMs, response.loadedFrom);
+                response1.parseTime =  SystemClock.elapsedRealtime()-time;
+                jsonRequestFinishedListener.onParseSuccess(response1);
+            }
+        }*/
+       ParserTask<F> parserTask = new ParserTask<>(reqTAG, new ParserTask.IParserListener<F>() {
             @Override
             public void onParseSuccess(String requestTag, Response<F> parseData) {
                 if(jsonRequestFinishedListener!=null) {
+                    parseData.parseTime =  SystemClock.elapsedRealtime()-time;
                     jsonRequestFinishedListener.onParseSuccess(parseData);
                 }
             }
@@ -224,10 +238,12 @@ public class CacheRequestHandler implements ICacheRequest {
             jsonRequestFinishedListener.onRequestErrorCode(ErrorCode.RESPONSE_NULL);
             return;
         }
+        final long time = SystemClock.elapsedRealtime();
         ParserTask<F> parserTask = new ParserTask<>(reqTAG, new ParserTask.IParserListener<F>() {
             @Override
             public void onParseSuccess(String requestTag, Response<F> parseData) {
                 if(jsonRequestFinishedListener!=null) {
+                    parseData.parseTime =  SystemClock.elapsedRealtime()-time;
                     jsonRequestFinishedListener.onParseSuccess(parseData);
                 }
             }
@@ -286,7 +302,7 @@ public class CacheRequestHandler implements ICacheRequest {
     @Override
     public <F> void makeStringRequest(final Context context, int method, final String URL, String jsonObject, final HashMap<String, String> header, final RetryPolicy retryPolicy, final String reqTAG, int memoryPolicy, int networkPolicy, long cacheTime, IParsedResponseListener<String, F> jsonRequestFinishedListener, int logLevel, final Class<F> aClass)
     {
-        Logger.getInstance().setLevel(logLevel);
+        Logger.getInstance().setLocalLevel(logLevel);
         if(memoryPolicy==0){
             memoryPolicy = this.memoryPolicy;
         }
@@ -295,17 +311,19 @@ public class CacheRequestHandler implements ICacheRequest {
         }
         boolean offlineOnly =NetworkPolicy.isOfflineOnly(networkPolicy);
         if(MemoryPolicy.shouldReadFromMemoryCache(memoryPolicy) || offlineOnly){
-            ICache.CacheEntry response =   mMemoryCache.get(reqTAG);
-            String data = response.getData();
-            if (!TextUtils.isEmpty(data)) {
-                onResponseString(context, new Response<>(data, Response.LoadedFrom.MEMORY), reqTAG, cacheTime, aClass, memoryPolicy, networkPolicy, jsonRequestFinishedListener);
+            ICache.CacheEntry response = mMemoryCache.get(reqTAG);
+            if(response!=null) {
+                String data = response.getData();
+                if (!TextUtils.isEmpty(data)) {
+                    onResponseString(context, new Response<>(data, Response.LoadedFrom.MEMORY), reqTAG, cacheTime, aClass, memoryPolicy, networkPolicy, jsonRequestFinishedListener);
                     return;
+                }
             }
         }
         if(NetworkPolicy.shouldReadFromDiskCache(networkPolicy) || offlineOnly){
             String response = CacheRequestManager.getInstance(context).getCacheResponse(reqTAG);
             if (!TextUtils.isEmpty(response)) {
-                onResponseString(context, new Response<>(response, Response.LoadedFrom.MEMORY), reqTAG, cacheTime, aClass, memoryPolicy, networkPolicy, jsonRequestFinishedListener);
+                onResponseString(context, new Response<>(response, Response.LoadedFrom.DISK), reqTAG, cacheTime, aClass, memoryPolicy, networkPolicy, jsonRequestFinishedListener);
                     return;
             }
         }
@@ -397,5 +415,13 @@ public class CacheRequestHandler implements ICacheRequest {
 
     public void setBaseUrl(String baseUrl) {
         this.mBaseUrl = baseUrl;
+    }
+
+    public void invalidateCacheResponse(String tag) {
+        getMemoryCache().remove(tag);
+    }
+
+    public void clearCache() {
+        getMemoryCache().clear();
     }
 }

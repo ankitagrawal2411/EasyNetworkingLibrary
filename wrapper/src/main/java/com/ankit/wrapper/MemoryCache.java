@@ -2,6 +2,8 @@ package com.ankit.wrapper;
 
 
 
+import android.os.SystemClock;
+
 import java.util.HashMap;
 
 /** caching class
@@ -26,7 +28,14 @@ import java.util.HashMap;
     @Override
     public CacheEntry get(String key) {
         if (mEntries.containsKey(key)) {
-            return mEntries.get(key);
+            CacheEntry entry = mEntries.get(key);
+            Logger.getInstance().d("cache valid",(entry.getCacheDuration() + entry.getTimeStampMillis() > SystemClock.elapsedRealtime())+" time");
+            if (entry.getCacheDuration() + entry.getTimeStampMillis() > SystemClock.elapsedRealtime() || entry.getCacheDuration() == 0) {
+                return entry;
+            } else {
+                remove(key);
+                return null;
+            }
         }
         return null;
     }

@@ -170,7 +170,8 @@ public class RequestBuilder implements Builder.IBuildRequestType {
                       networkPolicy, cacheTime, iParsedResponseListener,mLogLevel, mClass);
           }else if(mRequestType==STRING){
               CacheRequestHandler.getInstance().makeStringRequest(context, method, requestUrl,
-                      jsonObject.toString(), mHeaders, retryPolicy, reqTAG, memoryPolicy,
+                      jsonObject!=null?jsonObject.toString():null, mHeaders, retryPolicy, reqTAG,
+                      memoryPolicy,
                       networkPolicy, cacheTime, iParsedResponseListener,mLogLevel,mClass);
           }else{
               throw new IllegalArgumentException("no request type set please set it using as...()" +
@@ -316,12 +317,14 @@ public class RequestBuilder implements Builder.IBuildRequestType {
     @Override
     public Builder.IBuildUrl invalidate(Context context,String tag) {
         CacheRequestManager.getInstance(context).invalidateCacheResponse(tag);
+        CacheRequestHandler.getInstance().invalidateCacheResponse(tag);
         return iBuildUrl;
     }
 
     @Override
     public Builder.IBuildUrl clearCache(Context context) {
         CacheRequestManager.getInstance(context).clearCache();
+        CacheRequestHandler.getInstance().clearCache();
         return iBuildUrl;
     }
 

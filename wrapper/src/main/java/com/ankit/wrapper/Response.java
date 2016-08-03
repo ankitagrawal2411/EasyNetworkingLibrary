@@ -24,6 +24,8 @@ public class Response<T> {
 
     /** Network roundtrip time in milliseconds. */
     public final int loadedFrom;
+    public long parseTime;
+
     public Response(T response, Map<String, String> headers, int statusCode, long networkTimeMs,
                     int loadedFrom) {
         this.response = response;
@@ -31,6 +33,7 @@ public class Response<T> {
         this.statusCode = statusCode;
         this.networkTimeMs = networkTimeMs;
         this.loadedFrom = loadedFrom;
+        this.parseTime = 0;
     }
     public Response(T response, int loadedFrom) {
         this.response = response;
@@ -38,6 +41,7 @@ public class Response<T> {
         this.statusCode = 200;
         this.networkTimeMs = 0;
         this.loadedFrom = loadedFrom;
+        this.parseTime = 0;
     }
     public Response(int loadedFrom) {
         this.response = null;
@@ -45,6 +49,7 @@ public class Response<T> {
         this.statusCode = 200;
         this.networkTimeMs = 0;
         this.loadedFrom = loadedFrom;
+        this.parseTime = 0;
     }
 
 

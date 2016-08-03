@@ -15,11 +15,16 @@ public abstract class RequestHandler {
     protected static final String TAG="RequestHandler" ;
     protected RetryPolicy mRetryPolicy;
     public RequestHandler() {
-        mRetryPolicy = new DefaultRetryPolicy(CONNECT_TIMEOUT_MILLIS,MAX_RETRIES,
-                DEFAULT_BACKOFF_MULT);
+        this(new DefaultRetryPolicy(CONNECT_TIMEOUT_MILLIS,MAX_RETRIES,
+                DEFAULT_BACKOFF_MULT));
     }
     public RequestHandler(RetryPolicy retryPolicy) {
-        mRetryPolicy = retryPolicy;
+        if(mRetryPolicy!=null) {
+            mRetryPolicy = retryPolicy;
+        }else{
+            mRetryPolicy = new DefaultRetryPolicy(CONNECT_TIMEOUT_MILLIS,MAX_RETRIES,
+                    DEFAULT_BACKOFF_MULT);
+        }
     }
     /**
      * Created by ankitagrawal on 6/7/16. yay

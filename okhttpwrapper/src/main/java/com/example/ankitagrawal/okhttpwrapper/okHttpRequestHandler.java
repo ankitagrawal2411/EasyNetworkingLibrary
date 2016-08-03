@@ -48,19 +48,25 @@ public class okHttpRequestHandler extends RequestHandler {
     private OkHttpClient client;
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     public static final MediaType STRING = MediaType.parse("text/plain; charset=utf-8");
+
     public okHttpRequestHandler(final RetryPolicy retryPolicy) {
         super(retryPolicy);
         createClient();
     }
+
     public okHttpRequestHandler() {
         super();
         createClient();
     }
 
     private void createClient() {
+        createClient(mRetryPolicy);
+    }
+
+    private void createClient(final RetryPolicy retryPolicy) {
         client = new OkHttpClient.Builder()
-                .connectTimeout(mRetryPolicy.getCurrentTimeout(), TimeUnit.MILLISECONDS)
-                .readTimeout(mRetryPolicy.getCurrentTimeout(), TimeUnit.MILLISECONDS)
+                .connectTimeout(retryPolicy.getCurrentTimeout(), TimeUnit.MILLISECONDS)
+                .readTimeout(retryPolicy.getCurrentTimeout(), TimeUnit.MILLISECONDS)
                 .addInterceptor(new Interceptor() {
                     @Override
                     public Response intercept(Interceptor.Chain chain) throws IOException {
@@ -68,13 +74,20 @@ public class okHttpRequestHandler extends RequestHandler {
                         // try the request
                         Response response = chain.proceed(request);
                         int tryCount = 0;
-                        while (!response.isSuccessful() && tryCount < mRetryPolicy.getRetryCount()) {
+                        // Request customization: add request headers
+                        Request.Builder requestBuilder = request.newBuilder()
+                                .headers(request.headers())
+                                .method(request.method(), request.body());
+                      /*  retryPolicy.setCurrentTimeout((int) (retryPolicy.getCurrentTimeout() * retryPolicy
+                                .getBackoffMultiplier()));*/
+                        Request newRequest = requestBuilder.build();
+                        while (!response.isSuccessful() && tryCount < retryPolicy.getRetryCount()) {
                             Logger.getInstance().w("intercept", "Request is not successful - " +
                                     tryCount);
                             tryCount++;
 
                             // retry the request
-                            response = chain.proceed(request);
+                            response = chain.proceed(newRequest);
                         }
 
                         // otherwise just pass the original response on
@@ -82,8 +95,6 @@ public class okHttpRequestHandler extends RequestHandler {
                     }
                 }).build();
     }
-
-
 
     @Override
     public boolean canHandleRequest(String url, int method) {
@@ -147,12 +158,7 @@ public class okHttpRequestHandler extends RequestHandler {
 
         Request request = builder.build();
         if (retryPolicy != null) {
-            if (client.interceptors().size() > 0) {
-                client.interceptors().clear();
-            }
-            createInterceptor(client, retryPolicy);
-        }else{
-            createInterceptor(client, mRetryPolicy);
+            createClient(retryPolicy);
         }
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -202,10 +208,6 @@ public class okHttpRequestHandler extends RequestHandler {
 
     }
 
-
-    private void createInterceptor(OkHttpClient client, final RetryPolicy retryPolicy) {
-        client.interceptors().add(getInterceptor(retryPolicy));
-    }
 
     private Interceptor getInterceptor(final RetryPolicy retryPolicy) {
         return new Interceptor() {
@@ -287,11 +289,9 @@ public class okHttpRequestHandler extends RequestHandler {
 
 
         Request request = builder.build();
-
-        if (client.interceptors().size() > 0) {
-            client.interceptors().clear();
+        if (retryPolicy != null) {
+            createClient(retryPolicy);
         }
-        createInterceptor(client, retryPolicy);
 
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -328,7 +328,6 @@ public class okHttpRequestHandler extends RequestHandler {
                 onRequestFinishedListener.onRequestSuccess(new com.ankit.wrapper.Response<>(response.body().string(), headers, response.code(), response.receivedResponseAtMillis() - response
                         .sentRequestAtMillis(), com.ankit.wrapper.Response.LoadedFrom
                         .NETWORK));
-                System.out.println(response.body().string());
             }
         });
     }

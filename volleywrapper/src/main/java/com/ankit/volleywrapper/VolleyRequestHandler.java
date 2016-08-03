@@ -51,10 +51,12 @@ public class VolleyRequestHandler extends RequestHandler {
     private static final String TAG = "RequestHandler";
 
     public VolleyRequestHandler(Context context) {
-        super();
+        this(context,null);
+    }
+    public VolleyRequestHandler(Context context,RetryPolicy retryPolicy) {
+        super(retryPolicy);
         mRequestQueue = Volley.newRequestQueue(context);
     }
-
 
     @Override
     public boolean canHandleRequest(String url, int method) {

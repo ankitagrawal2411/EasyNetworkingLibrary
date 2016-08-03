@@ -73,8 +73,9 @@ import org.json.JSONObject;
         try {
             JSONObject jsonObject1 = new JSONObject(obj);
             long cacheTime =jsonObject1.optLong("timestamp");
-            long hours =jsonObject1.optLong("hours");
-            if(cacheTime+hours< SystemClock.elapsedRealtime() || hours==0) {
+            long hours =jsonObject1.optLong("hours");  Logger.getInstance().d("cache valid",(cacheTime+hours> SystemClock.elapsedRealtime())+" time");
+
+            if(cacheTime+hours> SystemClock.elapsedRealtime() || hours==0) {
                 return jsonObject1.optString("response");
             }else{
                 invalidateCacheResponse(url);
