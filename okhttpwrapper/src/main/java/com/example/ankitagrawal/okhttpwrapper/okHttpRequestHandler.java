@@ -49,7 +49,7 @@ public class okHttpRequestHandler extends RequestHandler {
     private  OkHttpClient client ;
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     public static final MediaType STRING = MediaType.parse("text/plain; charset=utf-8");
-    private HashMap<String,Call> RequestQueue;
+
     public okHttpRequestHandler(Context context) {
         super();
 
