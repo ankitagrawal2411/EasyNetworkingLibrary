@@ -9,7 +9,7 @@ import android.util.Log;
     private int level=LogLevel.NO_LOGS;
     private static Logger mInstance;
     private boolean disabledLogs=false;
-
+    private int localLevel=LogLevel.NO_LOGS;
 
     private Logger() {
 
@@ -26,17 +26,21 @@ import android.util.Log;
             this.level = level;
         }
     }
-
+    public void setLocalLevel(int level){
+        if(level!=LogLevel.NO_LEVEL) {
+            this.localLevel = level;
+        }
+    }
 
 
     public  void e(String tag, String message) {
-        if (LogLevel.isError(level)&& !disabledLogs) {
+        if (LogLevel.isError(level,localLevel)&& !disabledLogs) {
             Log.e(tag, message);
         }
     }
 
     public void v(String tag, String message) {
-        if (LogLevel.isVerbose(level)&& !disabledLogs) {
+        if (LogLevel.isVerbose(level,localLevel)&& !disabledLogs) {
             Log.v(tag, message);
         }
     }
@@ -48,19 +52,19 @@ import android.util.Log;
     }
 
     public void d(String tag, String message) {
-        if (LogLevel.isDebug(level) && !disabledLogs) {
+        if (LogLevel.isDebug(level,localLevel) && !disabledLogs) {
             Log.d(tag, message);
         }
     }
 
     public void i(String tag, String message) {
-        if (LogLevel.isInfo(level) && !disabledLogs) {
+        if (LogLevel.isInfo(level,localLevel) && !disabledLogs) {
             Log.i(tag, message);
         }
     }
 
     public void w(String tag, String message) {
-        if (LogLevel.isWarning(level) && !disabledLogs) {
+        if (LogLevel.isWarning(level,localLevel) && !disabledLogs) {
             Log.w(tag, message);
         }
     }

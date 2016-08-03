@@ -20,7 +20,7 @@ package com.ankit.wrapper;
 /**
  * Default retry policy for requests.
  */
- class DefaultRetryPolicy implements RetryPolicy {
+public class DefaultRetryPolicy implements RetryPolicy {
     /** The current timeout in milliseconds. */
     private int mCurrentTimeoutMs;
 

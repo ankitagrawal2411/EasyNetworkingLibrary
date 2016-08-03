@@ -11,23 +11,39 @@ public  class LogLevel {
     public static final int DEBUG = 2;
     public static final int WARNING = 3;
     public static final int ERROR = 4;
-    public static boolean isVerbose(int logLevel) {
-        return logLevel >= VERBOSE;
+    public static boolean isVerbose(int logLevel,int localLevel) {
+        if(localLevel==NO_LEVEL){
+            return logLevel >= VERBOSE;
+        }
+        return localLevel>=VERBOSE;
+
     }
 
-    public static boolean isInfo(int logLevel) {
-        return logLevel>=INFO;
+    public static boolean isInfo(int logLevel,int localLevel) {
+        if(localLevel==NO_LEVEL){
+            return logLevel >= INFO;
+        }
+        return localLevel>=INFO;
     }
 
-    public static boolean isDebug(int logLevel) {
-        return logLevel>=DEBUG;
+    public static boolean isDebug(int logLevel,int localLevel) {
+        if(localLevel==NO_LEVEL){
+            return logLevel >= DEBUG;
+        }
+        return localLevel>=DEBUG;
     }
 
-    public static boolean isWarning(int logLevel) {
-        return logLevel>=WARNING;
+    public static boolean isWarning(int logLevel,int localLevel) {
+        if(localLevel==NO_LEVEL){
+            return logLevel >= WARNING;
+        }
+        return localLevel>=WARNING;
     }
 
-    public static boolean isError(int logLevel) {
-        return logLevel>=ERROR;
+    public static boolean isError(int logLevel,int localLevel) {
+        if(localLevel==NO_LEVEL){
+            return logLevel >= ERROR;
+        }
+        return localLevel>=ERROR;
     }
 }

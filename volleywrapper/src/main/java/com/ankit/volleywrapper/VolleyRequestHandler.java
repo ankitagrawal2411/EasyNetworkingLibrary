@@ -46,8 +46,7 @@ import java.util.Map;
 public class VolleyRequestHandler extends RequestHandler {
     private RequestQueue mRequestQueue;
 
-    public static final int timeout = 20000;
-    public static final int RETRY = 1;
+
 
     private static final String TAG = "RequestHandler";
 
@@ -68,9 +67,8 @@ public class VolleyRequestHandler extends RequestHandler {
                                 final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
         com.android.volley.RetryPolicy volleyRetryPolicy;
         if (retryPolicy == null) {
-            volleyRetryPolicy = new com.android.volley.DefaultRetryPolicy(timeout,
-                    RETRY,
-                    com.android.volley.DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+            volleyRetryPolicy = new com.android.volley.DefaultRetryPolicy(CONNECT_TIMEOUT_MILLIS,
+                    MAX_RETRIES, DEFAULT_BACKOFF_MULT);
         } else {
             volleyRetryPolicy = new com.android.volley.DefaultRetryPolicy(retryPolicy.getCurrentTimeout(),
                     retryPolicy.getRetryCount(),
@@ -146,9 +144,8 @@ public class VolleyRequestHandler extends RequestHandler {
                                           retryPolicy, final String reqTAG) {
         com.android.volley.RetryPolicy volleyRetryPolicy;
         if (retryPolicy == null) {
-            volleyRetryPolicy = new com.android.volley.DefaultRetryPolicy(timeout,
-                    RETRY,
-                    com.android.volley.DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+            volleyRetryPolicy = new com.android.volley.DefaultRetryPolicy(CONNECT_TIMEOUT_MILLIS,
+                    MAX_RETRIES, DEFAULT_BACKOFF_MULT);
         } else {
             volleyRetryPolicy = new DefaultRetryPolicy(retryPolicy.getCurrentTimeout(),
                     retryPolicy.getRetryCount(),
