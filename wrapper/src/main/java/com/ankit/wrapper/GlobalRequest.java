@@ -21,6 +21,7 @@ public class GlobalRequest {
         CacheRequestHandler.getInstance().setRequestHandlers(mRequestHandler);
         CacheRequestHandler.getInstance().setConverters(mConverters);
         CacheRequestHandler.getInstance().setBaseUrl(builder.baseUrl);
+        CacheRequestHandler.getInstance().setSingleRequestMode(builder.singleMode);
         Logger.getInstance().setLevel(builder.mLogLevel);
         Logger.getInstance().setDisabledLogs(builder.disableAllLogs);
     }
@@ -41,9 +42,11 @@ public class GlobalRequest {
         private RetryPolicy retryPolicy;
         private int memoryPolicy;
         private int networkPolicy;
+        private boolean singleMode;
         private int mLogLevel=LogLevel.NO_LEVEL;
         private boolean disableAllLogs=false;
         private Builder() {
+            singleMode=true;
         }
 
         /**
@@ -91,6 +94,10 @@ public class GlobalRequest {
         }
         public Builder logLevel(int level) {
             mLogLevel = level;
+            return this;
+        }
+        public Builder singleRequest(boolean mode) {
+            singleMode = mode;
             return this;
         }
         public Builder disableAllLogs(boolean disableAllLogs) {

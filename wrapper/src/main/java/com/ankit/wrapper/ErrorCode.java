@@ -55,5 +55,5 @@ public class ErrorCode {
     public static final int TIMEOUT_ERROR = 118;
 
 
-
+    public static int REQUEST_ALREADY_QUEUED=119;
 }

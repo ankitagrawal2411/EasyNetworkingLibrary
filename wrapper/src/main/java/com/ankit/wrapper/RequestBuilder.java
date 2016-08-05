@@ -16,7 +16,7 @@ public class RequestBuilder implements Builder.IBuildRequestType {
     private int method = Request.Method.POST;
     private String requestUrl;
     private JSONObject jsonObject;
-    private IParsedResponseListener iParsedResponseListener;
+    private IParsedResponseListener<?,?> iParsedResponseListener;
     private RetryPolicy retryPolicy;
     private String reqTAG;
     private int memoryPolicy=0;
@@ -26,7 +26,8 @@ public class RequestBuilder implements Builder.IBuildRequestType {
     private static final int JSON = 2;
     private static final int STRING = 1;
     private HashMap<String, String> mHeaders;
-    private  Class<?> mClass;
+    private  Class mClass;
+    private  boolean mCancel=false;
     private int mLogLevel= LogLevel.NO_LEVEL;
     public RequestBuilder(String requestUrl, String reqTAG) {
         this.requestUrl = requestUrl;
@@ -51,20 +52,19 @@ public class RequestBuilder implements Builder.IBuildRequestType {
         networkPolicy = builder.networkPolicy;
     }
 
-    public static RequestBuilder newBuilder(RequestBuilder copy) {
+    public  RequestBuilder cloneRequest() {
         RequestBuilder builder = new RequestBuilder();
-        builder.memoryPolicy = copy.memoryPolicy;
-        builder.networkPolicy = copy.networkPolicy;
-        builder.reqTAG = copy.reqTAG;
-        builder.retryPolicy = copy.retryPolicy;
-        builder.mHeaders = copy.mHeaders;
-        builder.iParsedResponseListener = copy.iParsedResponseListener;
-        builder.jsonObject = copy.jsonObject;
-        builder.requestUrl = copy.requestUrl;
-        builder.method = copy.method;
+        builder.memoryPolicy = this.memoryPolicy;
+        builder.networkPolicy = this.networkPolicy;
+        builder.reqTAG = this.reqTAG;
+        builder.retryPolicy = this.retryPolicy;
+        builder.mHeaders = this.mHeaders;
+        builder.iParsedResponseListener = this.iParsedResponseListener;
+        builder.jsonObject = this.jsonObject;
+        builder.requestUrl = this.requestUrl;
+        builder.method = this.method;
         return builder;
     }
-
   private Builder.IBuildOptions iBuildOptions = new Builder.IBuildOptions() {
       /**
        * Specifies the {@link MemoryPolicy} to use for this request. You may specify additional policy
@@ -151,7 +151,6 @@ public class RequestBuilder implements Builder.IBuildRequestType {
       /**
        * Returns a {@code RequestBuilder} built from the parameters previously set.
        *
-       * @return a {@code RequestBuilder} built with parameters of this {@code RequestBuilder.Builder}
        */
       @Override
       public void send(@NonNull Context context) {
@@ -167,12 +166,12 @@ public class RequestBuilder implements Builder.IBuildRequestType {
           if(mRequestType==JSON) {
               CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
                       jsonObject, mHeaders, retryPolicy, reqTAG, memoryPolicy,
-                      networkPolicy, cacheTime, iParsedResponseListener,mLogLevel, mClass);
+                      networkPolicy, cacheTime, iParsedResponseListener,mLogLevel,mCancel, mClass);
           }else if(mRequestType==STRING){
               CacheRequestHandler.getInstance().makeStringRequest(context, method, requestUrl,
                       jsonObject!=null?jsonObject.toString():null, mHeaders, retryPolicy, reqTAG,
                       memoryPolicy,
-                      networkPolicy, cacheTime, iParsedResponseListener,mLogLevel,mClass);
+                      networkPolicy, cacheTime, iParsedResponseListener,mLogLevel,mCancel,mClass);
           }else{
               throw new IllegalArgumentException("no request type set please set it using as...()" +
                       "method of Request Builder");
@@ -206,7 +205,8 @@ public class RequestBuilder implements Builder.IBuildRequestType {
 
 
       @Override
-      public Builder.IBuildOptions asClass(@NonNull Class aClass, @NonNull IParsedResponseListener<?,?> val) {
+      public <F> Builder.IBuildOptions asClass(@NonNull Class<F> aClass, @NonNull
+      IParsedResponseListener<JSONObject,F> val) {
           if(mRequestType!=-1){
               throw new IllegalArgumentException("only one of asJsonObject() asString() or " +
                       "asClass() method is allowed ");
@@ -243,6 +243,12 @@ public class RequestBuilder implements Builder.IBuildRequestType {
       @Override
       public Builder.IBuildOptions cacheTime(long time) {
           cacheTime = time;
+          return this;
+      }
+
+      @Override
+      public Builder.IBuildOptions cancel() {
+          mCancel = true;
           return this;
       }
 
@@ -315,17 +321,15 @@ public class RequestBuilder implements Builder.IBuildRequestType {
     }
 
     @Override
-    public Builder.IBuildUrl invalidate(Context context,String tag) {
+    public void invalidate(Context context,String tag) {
         CacheRequestManager.getInstance(context).invalidateCacheResponse(tag);
         CacheRequestHandler.getInstance().invalidateCacheResponse(tag);
-        return iBuildUrl;
     }
 
     @Override
-    public Builder.IBuildUrl clearCache(Context context) {
+    public void clearCache(Context context) {
         CacheRequestManager.getInstance(context).clearCache();
         CacheRequestHandler.getInstance().clearCache();
-        return iBuildUrl;
     }
 
 

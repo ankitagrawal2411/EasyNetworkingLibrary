@@ -88,7 +88,7 @@ public class VolleyRequestHandler extends RequestHandler {
             public void onResponse(com.ankit.wrapper.Response<JSONObject> jsonObject) {
 
 
-                if (jsonObject != null) {
+                if (jsonObject!=null && jsonObject.response != null) {
                     Logger.getInstance().d(TAG, "onResponse jsonObject: "
                             + jsonObject.response.toString());
                     iRequestListener.onRequestSuccess(jsonObject);

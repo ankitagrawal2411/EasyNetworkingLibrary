@@ -38,13 +38,15 @@ public class Builder {
 
         IBuildOptions asJsonObject(@NonNull IResponseListener<JSONObject,?> val);
 
-        IBuildOptions asClass(@NonNull Class mClass,@NonNull IParsedResponseListener<?,?> val);
+        <F> IBuildOptions asClass(@NonNull Class<F> mClass,@NonNull IParsedResponseListener<JSONObject,F> val);
 
         IBuildOptions asString(@NonNull IResponseListener<String,?> val);
 
         IBuildOptions params(@Nullable JSONObject val);
 
         IBuildOptions cacheTime( long time);
+
+        IBuildOptions cancel();
 
         IBuildOptions logLevel( int level);
 
@@ -64,9 +66,9 @@ public class Builder {
 
         IBuildUrl method(int val);
 
-        IBuildUrl invalidate(Context context,String tag);
+        void invalidate(Context context,String tag);
 
-        IBuildUrl clearCache(Context context);
+        void clearCache(Context context);
     }
     public interface IBuildTag {
 
