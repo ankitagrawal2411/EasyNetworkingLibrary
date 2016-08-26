@@ -42,6 +42,8 @@ Request Send Usage:
                                     }
                                 }).send(getContext());
                                 
+ 
+  
   Using Gson:-
   
      new RequestBuilder().get().url("your url here").tag("your request tag here")
@@ -63,4 +65,18 @@ Request Send Usage:
                                     }
                                 }).send(getContext());
                       
+                      
+               
+   Explanations of Methods:
+ 
+ get() :- This method indicates request is of GET type
+ 
+ 
+ asClass():- This method specifies that the response is to be autoparsed into a class with the converter specified in the global request builder the library only includes a GsonCOnverter() you have to make your own if you want to use any other auto parsing lib other than Gson
+ 
+ 
+  asJsonObject():- This method specifies that the response is jsonObject and you are doing the parsing yourself       
+                      
+                      
+                     
 
