@@ -163,9 +163,11 @@ public class CacheRequestHandler implements ICacheRequest {
             if(!url.contains("://")){
                 url = mBaseUrl+url;
             }
-        }else if(!url.contains("://")){
-            throw new NullPointerException("baseUrl is not set, either pass full url or set base " +
-                    "url");
+        }else if(TextUtils.isEmpty(url)) {
+            throw new NullPointerException(" url is empty or null");
+        } else if(!url.contains("://")){
+                throw new NullPointerException("baseUrl is not set, either pass full url or set base " +
+                        "url");
         }
 
 

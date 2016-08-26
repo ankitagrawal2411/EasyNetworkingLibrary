@@ -166,7 +166,7 @@ public class Request  {
      * {@code Request} builder static inner class.
      */
     public static final class Builder implements IBuildRequestType{
-        private int method;
+        private int method= Method.GET;
         private String requestUrl;
         private JSONObject jsonObject;
         private IParsedResponseListener<?, ?> iParsedResponseListener;
@@ -175,12 +175,11 @@ public class Request  {
         private int memoryPolicy;
         private int networkPolicy;
         private long cacheTime;
-        private int mRequestType;
+        private int mRequestType=-1;
         private HashMap<String, String> mHeaders;
         private Class mClass;
-        private boolean mCancel;
-        private int mLogLevel;
-
+        private  boolean mCancel=false;
+        private int mLogLevel= LogLevel.NO_LEVEL;
         public Builder() {
         }
 
