@@ -42,11 +42,11 @@ public class GlobalRequest {
         private RetryPolicy retryPolicy;
         private int memoryPolicy;
         private int networkPolicy;
-        private boolean singleMode;
+        private boolean singleMode=true;
         private int mLogLevel=LogLevel.NO_LEVEL;
         private boolean disableAllLogs=false;
-        private Builder() {
-            singleMode=true;
+        public Builder() {
+
         }
 
         /**

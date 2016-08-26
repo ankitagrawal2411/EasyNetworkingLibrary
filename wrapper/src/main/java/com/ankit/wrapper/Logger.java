@@ -9,7 +9,7 @@ import android.util.Log;
     private int level=LogLevel.NO_LOGS;
     private static Logger mInstance;
     private boolean disabledLogs=false;
-    private int localLevel=LogLevel.NO_LOGS;
+    private int localLevel=LogLevel.NO_LEVEL;
 
     private Logger() {
 

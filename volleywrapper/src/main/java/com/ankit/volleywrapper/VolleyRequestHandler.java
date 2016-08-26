@@ -76,10 +76,10 @@ public class VolleyRequestHandler extends RequestHandler {
                     retryPolicy.getRetryCount(),
                     retryPolicy.getBackoffMultiplier());
         }
-        Logger.getInstance().d(TAG, "Tag:" + reqTAG);
-        Logger.getInstance().d(TAG, reqTAG + " request Url: " + requestUrl);
-        Logger.getInstance().d(TAG, reqTAG + " request Json Params: " + jsonObject);
-        Logger.getInstance().d(TAG, reqTAG + " request Header: " + requestHeader);
+        Logger.getInstance().d(reqTAG, "Tag:" + reqTAG);
+        Logger.getInstance().d(reqTAG, reqTAG + " request Url: " + requestUrl);
+        Logger.getInstance().d(reqTAG, reqTAG + " request Json Params: " + jsonObject);
+        Logger.getInstance().d(reqTAG, reqTAG + " request Header: " + requestHeader);
 
         GsonRequest jsonObjectRequest = new GsonRequest<com.ankit.wrapper.Response<JSONObject>>(method,
                 requestUrl, requestHeader, jsonObject, new Response.Listener<com.ankit.wrapper.Response<JSONObject>>() {
