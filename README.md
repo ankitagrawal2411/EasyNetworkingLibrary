@@ -22,7 +22,8 @@ Note: converter are only required when you dont do the parsing yourself , if you
 singleRequest(): This method allow you to make sure that at a time only one request is in queue of a particular tag , that 2 request of same tag cannot be in queue when singleRequest is set to true , instead a onResponseError will be called with errorCode REQUEST_ALREADY_QUEUED
 
 Request Send Usage:
-
+ Using JSon Request:-
+ 
     new Request.Builder().get().url("your url here").tag("your request tag here")
                                 .asJsonObject(new IResponseListener<JSONObject, Data>() {
                                     @Override
@@ -40,4 +41,26 @@ Request Send Usage:
 
                                     }
                                 }).send(getContext());
+                                
+  Using Gson:-
+  
+     new RequestBuilder().get().url("your url here").tag("your request tag here")
+                                .asClass(Data.class, new IParsedResponseListener<JSONObject, Data>
+                                        () {
+                                    @Override
+                                    public void onParseSuccess(Response<Data> response) {
+                                        Log.e("response", response.response.getRestrictedBrand());
+                                        Log.e("response", response.networkTimeMs + " " + response.loadedFrom);
+                                        textView.setText("time:"+ response.networkTimeMs+"\n"+
+                                                "parse time:"+response.parseTime);
+                                    }
+
+                                    @Override
+                                    public void onRequestErrorCode(int errorCode) {
+                                          if(errorCode== ErrorCode.REQUEST_ALREADY_QUEUED){
+                                              Log.e("response", "true");
+                                          }
+                                    }
+                                }).send(getContext());
+                      
 
