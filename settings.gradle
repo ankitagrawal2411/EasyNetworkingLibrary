@@ -1,1 +1,1 @@
-include ':app', ':volley', ':wrapper', ':volleywrapper', ':okhttpwrapper'
+include ':app', ':volley', ':wrapper', ':volleywrapper', ':okhttpwrapper', ':gsonconverter'

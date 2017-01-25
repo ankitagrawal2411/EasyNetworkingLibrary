@@ -1,13 +1,11 @@
 package com.example.ankitagrawal.okhttpwrapper;
 
-import android.content.Context;
-
-import com.ankit.wrapper.DefaultRetryPolicy;
 import com.ankit.wrapper.ErrorCode;
 import com.ankit.wrapper.Logger;
 import com.ankit.wrapper.RequestHandler;
 import com.ankit.wrapper.RetryPolicy;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -328,6 +326,108 @@ public class okHttpRequestHandler extends RequestHandler {
                 onRequestFinishedListener.onRequestSuccess(new com.ankit.wrapper.Response<>(response.body().string(), headers, response.code(), response.receivedResponseAtMillis() - response
                         .sentRequestAtMillis(), com.ankit.wrapper.Response.LoadedFrom
                         .NETWORK));
+            }
+        });
+    }
+
+    @Override
+    protected void makeJsonArrayRequest(int method, String requestUrl, JSONObject jsonObject, final IRequest<com.ankit.wrapper.Response<JSONArray>> onJsonRequestFinishedListener , HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
+        Request.Builder builder = new Request.Builder()
+                .url(requestUrl)
+                .tag(reqTAG);
+        if (jsonObject == null) {
+            jsonObject = new JSONObject();
+        }
+        if (requestHeader != null) {
+            for (Map.Entry<String, String> entry : requestHeader.entrySet()) {
+                String key = entry.getKey();
+                if (key == null) {
+                    throw new NullPointerException("key == null");
+                }
+                builder.addHeader(key, entry.getValue());
+            }
+        }
+        switch (method) {
+            case com.ankit.wrapper.Request.Method.GET:
+                builder.get();
+                break;
+            case com.ankit.wrapper.Request.Method.POST:
+                builder.post(RequestBody.create(JSON, jsonObject.toString()));
+
+                break;
+            case com.ankit.wrapper.Request.Method.DELETE:
+                builder.delete(RequestBody.create(JSON, jsonObject.toString()));
+
+                break;
+            case com.ankit.wrapper.Request.Method.HEAD:
+                builder.head();
+                break;
+            case com.ankit.wrapper.Request.Method.PATCH:
+                builder.patch(RequestBody.create(JSON, jsonObject.toString()));
+
+                break;
+            case com.ankit.wrapper.Request.Method.PUT:
+                builder.put(RequestBody.create(JSON, jsonObject.toString()));
+                break;
+            case com.ankit.wrapper.Request.Method.OPTIONS: {
+                throw new IllegalArgumentException("okhttp does not support Options request type," +
+                        " Use " +
+                        "volley request Manager for this type of request");
+            }
+            case com.ankit.wrapper.Request.Method.TRACE:
+                throw new IllegalArgumentException("okhttp does not support trace request type, " +
+                        "Use " +
+                        "volley request Manager for this type of request");
+        }
+
+
+        Request request = builder.build();
+        if (retryPolicy != null) {
+            createClient(retryPolicy);
+        }
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                Logger.getInstance().e(TAG, reqTAG + " onErrorResponse >> errorCode: " + ErrorCode.UNKNOWN_ERROR);
+                onJsonRequestFinishedListener.onRequestErrorCode(ErrorCode.UNKNOWN_ERROR);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    Logger.getInstance().e(TAG, reqTAG + " onErrorResponse >> errorCode: " + response.code());
+                    onJsonRequestFinishedListener.onRequestErrorCode(response.code());
+                    return;
+                }
+                if (response.body() == null) {
+                    Logger.getInstance().e(TAG, "onResponse jsonObject: null");
+                    onJsonRequestFinishedListener.onRequestErrorCode(ErrorCode.RESPONSE_NULL);
+                    return;
+                }
+                Logger.getInstance().d(TAG, "onResponse jsonObject: " + response.body().toString());
+                Headers responseHeaders = response.headers();
+                HashMap<String, String> headers;
+                if (responseHeaders != null) {
+                    headers = new HashMap<>(responseHeaders.size());
+                    for (int i = 0, size = responseHeaders.size(); i < size; i++) {
+                        headers.put(responseHeaders.name(i), responseHeaders.value(i));
+                    }
+                } else {
+                    headers = new HashMap<>(0);
+                }
+                String jsonData = response.body().string();
+                try {
+                    JSONArray jObject = new JSONArray(jsonData);
+                    onJsonRequestFinishedListener.onRequestSuccess(new com.ankit.wrapper.Response<>(jObject, headers, response.code(), response.receivedResponseAtMillis() - response
+                            .sentRequestAtMillis(), com.ankit.wrapper.Response.LoadedFrom
+                            .NETWORK));
+                } catch (JSONException e) {
+                    Logger.getInstance().e(TAG, reqTAG + " onErrorResponse >> errorCode: " + ErrorCode.PARSE_ERROR);
+                    e.printStackTrace();
+                    onJsonRequestFinishedListener.onRequestErrorCode(ErrorCode.PARSE_ERROR);
+                }
+
             }
         });
     }

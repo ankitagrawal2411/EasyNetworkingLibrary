@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Created by ankitagrawal on 20/7/16.
  */
-public abstract class GsonRequest<T> extends JsonRequest<T> {
+public abstract class CustomJsonRequest<T> extends JsonRequest<T> {
     private final Map<String, String> headers;
     private final Response.Listener<T> listener;
 
@@ -22,9 +22,9 @@ public abstract class GsonRequest<T> extends JsonRequest<T> {
      * @param url URL of the request to make
      * @param headers Map of request headers
      */
-    public GsonRequest(int method,String url,Map<String, String> headers,
-                       JSONObject jsonObject,
-                       Response.Listener<T> listener, Response.ErrorListener errorListener) {
+    public CustomJsonRequest(int method, String url, Map<String, String> headers,
+                             JSONObject jsonObject,
+                             Response.Listener<T> listener, Response.ErrorListener errorListener) {
         super(method, url,(jsonObject == null) ? null : jsonObject.toString(),listener, errorListener);
         this.headers = headers;
         this.listener = listener;
@@ -35,9 +35,9 @@ public abstract class GsonRequest<T> extends JsonRequest<T> {
      * @param url URL of the request to make
      * @param headers Map of request headers
      */
-    public GsonRequest(int method,String url,Map<String, String> headers,
-                       String jsonObject,
-                       Response.Listener<T> listener, Response.ErrorListener errorListener) {
+    public CustomJsonRequest(int method, String url, Map<String, String> headers,
+                             String jsonObject,
+                             Response.Listener<T> listener, Response.ErrorListener errorListener) {
         super(method, url,jsonObject,listener, errorListener);
         this.headers = headers;
         this.listener = listener;
@@ -47,7 +47,7 @@ public abstract class GsonRequest<T> extends JsonRequest<T> {
      * <code>null</code>, <code>POST</code> otherwise.
      *
      */
-    public GsonRequest(String url, Map<String, String> headers,JSONObject jsonObject, Response.Listener<T> listener,
+    public CustomJsonRequest(String url, Map<String, String> headers, JSONObject jsonObject, Response.Listener<T> listener,
                              Response.ErrorListener errorListener) {
         this(jsonObject == null ? Method.GET : Method.POST, url,headers,jsonObject,
                 listener, errorListener);

@@ -2,7 +2,6 @@ package com.ankit.volleywrapper;
 
 import android.content.Context;
 
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkError;
@@ -21,6 +20,7 @@ import com.ankit.wrapper.Logger;
 import com.ankit.wrapper.RequestHandler;
 import com.ankit.wrapper.RetryPolicy;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -81,7 +81,7 @@ public class VolleyRequestHandler extends RequestHandler {
         Logger.getInstance().d(reqTAG, reqTAG + " request Json Params: " + jsonObject);
         Logger.getInstance().d(reqTAG, reqTAG + " request Header: " + requestHeader);
 
-        GsonRequest jsonObjectRequest = new GsonRequest<com.ankit.wrapper.Response<JSONObject>>(method,
+        CustomJsonRequest jsonObjectRequest = new CustomJsonRequest<com.ankit.wrapper.Response<JSONObject>>(method,
                 requestUrl, requestHeader, jsonObject, new Response.Listener<com.ankit.wrapper.Response<JSONObject>>() {
 
             @Override
@@ -158,7 +158,7 @@ public class VolleyRequestHandler extends RequestHandler {
         Logger.getInstance().d(TAG, reqTAG + " request String Params: " + stringParams);
         Logger.getInstance().d(TAG, reqTAG + " request Header: " + requestHeader);
 
-        GsonRequest objStringRequest = new GsonRequest<com.ankit.wrapper.Response<String>>
+        CustomStringRequest objStringRequest = new CustomStringRequest<com.ankit.wrapper.Response<String>>
                 (method, url, requestHeader, stringParams,
                         new Response.Listener<com.ankit.wrapper.Response<String>>() {
 
@@ -189,17 +189,6 @@ public class VolleyRequestHandler extends RequestHandler {
                                 error);
                     }
                 }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-
-                if (stringParams != null) {
-                    HashMap<String, String> mParams = new HashMap<>();
-                    mParams.put("key", stringParams);
-                    return mParams;
-                } else {
-                    return super.getParams();
-                }
-            }
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
@@ -232,6 +221,80 @@ public class VolleyRequestHandler extends RequestHandler {
         objStringRequest.setRetryPolicy(volleyRetryPolicy);
         objStringRequest.setShouldCache(false);
         addToRequestQueue(objStringRequest, reqTAG);
+    }
+
+    @Override
+    protected void makeJsonArrayRequest(int method, String requestUrl, JSONObject jsonObject, final IRequest<com.ankit.wrapper.Response<JSONArray>> iRequestListener, HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
+        com.android.volley.RetryPolicy volleyRetryPolicy;
+        if (retryPolicy == null) {
+            volleyRetryPolicy = new com.android.volley.DefaultRetryPolicy(CONNECT_TIMEOUT_MILLIS,
+                    MAX_RETRIES, DEFAULT_BACKOFF_MULT);
+        } else {
+            volleyRetryPolicy = new com.android.volley.DefaultRetryPolicy(retryPolicy.getCurrentTimeout(),
+                    retryPolicy.getRetryCount(),
+                    retryPolicy.getBackoffMultiplier());
+        }
+        Logger.getInstance().d(reqTAG, "Tag:" + reqTAG);
+        Logger.getInstance().d(reqTAG, reqTAG + " request Url: " + requestUrl);
+        Logger.getInstance().d(reqTAG, reqTAG + " request Json Params: " + jsonObject);
+        Logger.getInstance().d(reqTAG, reqTAG + " request Header: " + requestHeader);
+
+        CustomJsonArrayRequest jsonObjectRequest = new CustomJsonArrayRequest<com.ankit.wrapper.Response<JSONArray>>(method,
+                requestUrl, requestHeader, jsonObject, new Response.Listener<com.ankit.wrapper.Response<JSONArray>>() {
+
+            @Override
+            public void onResponse(com.ankit.wrapper.Response<JSONArray> jsonObject) {
+
+
+                if (jsonObject!=null && jsonObject.response != null) {
+                    Logger.getInstance().d(TAG, "onResponse jsonObject: "
+                            + jsonObject.response.toString());
+                    iRequestListener.onRequestSuccess(jsonObject);
+                } else {
+                    Logger.getInstance().e(TAG, "onResponse jsonObject: null");
+                    iRequestListener.onRequestErrorCode(ErrorCode.RESPONSE_NULL);
+
+                }
+            }
+
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                String error = "";
+                if (volleyError != null) {
+                    error = volleyError.getMessage();
+                }
+                Logger.getInstance().e(TAG, reqTAG + " onErrorResponse >> errorCode: " + error);
+                iRequestListener.onRequestErrorCode(getErrorCode(volleyError));
+            }
+        }) {
+            @Override
+            protected Response<com.ankit.wrapper.Response<JSONArray>> parseNetworkResponse(NetworkResponse response) {
+                try {
+                    String jsonString = new String(response.data,
+                            HttpHeaderParser.parseCharset(response.headers, PROTOCOL_CHARSET));
+                    JSONArray json = new JSONArray(jsonString);
+
+                    return Response.success(new com.ankit.wrapper.Response<>(json, response.headers, response.statusCode, response.networkTimeMs, com.ankit.wrapper.Response.LoadedFrom
+                            .NETWORK), HttpHeaderParser.parseCacheHeaders(response));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    Logger.getInstance().e(TAG, reqTAG + " onErrorResponse >> errorCode: " +
+                            ErrorCode.PARSE_ERROR);
+                    return Response.error(new ParseError(e));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Logger.getInstance().e(TAG, reqTAG + " onErrorResponse >> errorCode: " + ErrorCode.PARSE_ERROR);
+                    return Response.error(new ParseError(e));
+                }
+            }
+        };
+
+        jsonObjectRequest.setRetryPolicy(volleyRetryPolicy);
+        jsonObjectRequest.setShouldCache(false);
+
+        addToRequestQueue(jsonObjectRequest, TAG);
     }
 
 
