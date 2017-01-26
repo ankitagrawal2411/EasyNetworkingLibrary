@@ -8,7 +8,7 @@ It provides inbuilt Gson support.
 ### Initial Global Config
 
 ```java
-new GlobalRequest.Builder().client(new VolleyRequestHandler(getActivity()))
+new GlobalRequest.Builder().client(new VolleyRequestClient(getActivity()))
                            .converter(new GsonConverter())
                            .singleRequest(false)
                            .logLevel(LogLevel.ERROR)
@@ -34,7 +34,7 @@ This method allows you to make sure that at a time only one request is in queue 
 
 ```java
 new Request.Builder().get().url("your url here").tag("your request tag here")
-                           .asJsonObject(new IResponseListener<JSONObject, Data>() {
+                           .asJsonObject(new ResponseListener<JSONObject, Data>() {
                                 @Override
                                 public Data onRequestSuccess(JSONObject response) {
                                     return new Gson().fromJson(response.toString(), Data.class);
@@ -57,7 +57,7 @@ new Request.Builder().get().url("your url here").tag("your request tag here")
 
 ```java  
 new RequestBuilder().get().url("your url here").tag("your request tag here")
-                          .asClass(Data.class, new IParsedResponseListener<JSONObject, Data>() {
+                          .asClass(Data.class, new ParsedResponseListener<JSONObject, Data>() {
                               @Override
                               public void onParseSuccess(Response<Data> response) {
                                   Log.e("response", response.response.getRestrictedBrand());
@@ -83,7 +83,7 @@ This method indicates that the request is of `GET` type
  
 #### asClass()
 This method specifies that the response is to be auto-parsed into a class with the converter specified in the global request builder 
-the library only includes a GsonCOnverter(). You have to make your own if you want to use any other auto parsing lib other than Gson
+the library only includes a GsonConverter(). You have to make your own if you want to use any other auto parsing lib other than Gson
  
  
 #### asJsonObject()
