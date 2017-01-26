@@ -1,6 +1,6 @@
-package com.example.ankitagrawal.converters;
+package com.ankitagrawal.converters;
 
-import com.ankit.wrapper.Converter;
+import com.ankitagrawal.wrapper.Converter;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;

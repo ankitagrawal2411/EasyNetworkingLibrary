@@ -1,4 +1,4 @@
-package com.ankit.volleywrapper.wrapper;
+package com.ankitagrawal.volleywrapper.wrapper;
 
 import org.junit.Test;
 
