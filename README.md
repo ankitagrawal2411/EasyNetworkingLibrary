@@ -20,7 +20,7 @@ new GlobalRequest.Builder().client(new VolleyRequestClient(getActivity()))
 Specifies the client to use for sending request. No client set by default. If you do not specify a client, an exception will be thrown.
 
 #### converter()
-Using a converter is optional. A user can specify a custom converter. If no converter is specified, the library will use the default `GsonConverter`.
+Using a converter is optional. A user can specify a custom converter. If no converter is specified, and you used auto parsing an exception will be thrown.
 
 *Note:* Converter is required when you dont want to do the parsing yourself. If you want to parse yourself, adding a converter is not necessary.
 
@@ -30,7 +30,7 @@ This method allows you to make sure that at a time only one request is in queue 
 
 ## Request Send Usage
 
-### Using JSon Request
+### Using Json Request
 
 ```java
 new Request.Builder().get().url("your url here").tag("your request tag here")
