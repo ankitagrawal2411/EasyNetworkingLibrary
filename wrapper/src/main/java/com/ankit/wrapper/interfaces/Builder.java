@@ -4,10 +4,10 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.ankit.wrapper.IParsedResponseListener;
-import com.ankit.wrapper.IResponseListener;
 import com.ankit.wrapper.MemoryPolicy;
 import com.ankit.wrapper.NetworkPolicy;
+import com.ankit.wrapper.ParsedResponseListener;
+import com.ankit.wrapper.ResponseListener;
 import com.ankit.wrapper.RetryPolicy;
 
 import org.json.JSONObject;
@@ -19,59 +19,59 @@ import java.util.HashMap;
  */
 
 public class Builder {
-    public interface IBuildUrl {
+    public interface BuildUrl {
 
-        IBuildTag url(@NonNull String val);
+        BuildTag url(@NonNull String val);
     }
-    public interface IBuildOptions {
-        IBuildOptions build();
+    public interface BuildOptions {
+        BuildOptions build();
 
-        IBuildOptions memoryCache(boolean val);
+        BuildOptions memoryCache(boolean val);
 
-        IBuildOptions diskCache(boolean val);
+        BuildOptions diskCache(boolean val);
 
-        IBuildOptions retryPolicy(@Nullable RetryPolicy val);
+        BuildOptions retryPolicy(@Nullable RetryPolicy val);
 
         void send(@NonNull Context context);
 
-        IBuildOptions headers(HashMap<String, String> val);
+        BuildOptions headers(HashMap<String, String> val);
 
-        IBuildOptions asJsonObject(@NonNull IResponseListener<JSONObject,?> val);
+        BuildOptions asJsonObject(@NonNull ResponseListener<JSONObject,?> val);
 
-        <F> IBuildOptions asClass(@NonNull Class<F> mClass,@NonNull IParsedResponseListener<JSONObject,F> val);
+        <F> BuildOptions asClass(@NonNull Class<F> mClass,@NonNull ParsedResponseListener<JSONObject,F> val);
 
-        IBuildOptions asString(@NonNull IResponseListener<String,?> val);
+        BuildOptions asString(@NonNull ResponseListener<String,?> val);
 
-        IBuildOptions params(@Nullable JSONObject val);
+        BuildOptions params(@Nullable JSONObject val);
 
-        IBuildOptions cacheTime( long time);
+        BuildOptions cacheTime( long time);
 
-        IBuildOptions cancel();
+        BuildOptions cancel();
 
-        IBuildOptions logLevel( int level);
+        BuildOptions logLevel( int level);
 
-        IBuildOptions addHeader(@NonNull String key,@NonNull String value);
+        BuildOptions addHeader(@NonNull String key,@NonNull String value);
 
-        IBuildOptions memoryPolicy(@NonNull MemoryPolicy policy, @NonNull MemoryPolicy... additional);
+        BuildOptions memoryPolicy(@NonNull MemoryPolicy policy, @NonNull MemoryPolicy... additional);
 
-        IBuildOptions networkPolicy(@NonNull NetworkPolicy policy, @NonNull NetworkPolicy... additional);
+        BuildOptions networkPolicy(@NonNull NetworkPolicy policy, @NonNull NetworkPolicy... additional);
     }
 
-    public interface IBuildRequestType {
+    public interface BuildRequestType {
 
 
-        IBuildUrl post(@Nullable JSONObject val);
+        BuildUrl post(@Nullable JSONObject val);
 
-        IBuildUrl get();
+        BuildUrl get();
 
-        IBuildUrl method(int val);
+        BuildUrl method(int val);
 
         void invalidate(Context context,String tag);
 
         void clearCache(Context context);
     }
-    public interface IBuildTag {
+    public interface BuildTag {
 
-        IBuildOptions tag(@NonNull String val);
+        BuildOptions tag(@NonNull String val);
     }
 }

@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Created by asifmujteba on 07/08/15.
  */
-public interface ICache {
+public interface Cache {
     CacheEntry get(String key);
     void put(String key, CacheEntry entry);
     void initialize();

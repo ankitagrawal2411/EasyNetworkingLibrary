@@ -41,18 +41,18 @@ import okhttp3.Response;
  * limitations under the License.
  */
 
-public class okHttpRequestHandler extends RequestHandler {
+public class OkHttpClient extends RequestHandler {
 
-    private OkHttpClient client;
+    private okhttp3.OkHttpClient client;
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     public static final MediaType STRING = MediaType.parse("text/plain; charset=utf-8");
 
-    public okHttpRequestHandler(final RetryPolicy retryPolicy) {
+    public OkHttpClient(final RetryPolicy retryPolicy) {
         super(retryPolicy);
         createClient();
     }
 
-    public okHttpRequestHandler() {
+    public OkHttpClient() {
         super();
         createClient();
     }
@@ -62,7 +62,7 @@ public class okHttpRequestHandler extends RequestHandler {
     }
 
     private void createClient(final RetryPolicy retryPolicy) {
-        client = new OkHttpClient.Builder()
+        client = new okhttp3.OkHttpClient.Builder()
                 .connectTimeout(retryPolicy.getCurrentTimeout(), TimeUnit.MILLISECONDS)
                 .readTimeout(retryPolicy.getCurrentTimeout(), TimeUnit.MILLISECONDS)
                 .addInterceptor(new Interceptor() {

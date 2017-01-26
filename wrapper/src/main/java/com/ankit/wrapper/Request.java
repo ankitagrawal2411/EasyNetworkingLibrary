@@ -4,8 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.ankit.wrapper.interfaces.Builder;
-
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -17,7 +15,7 @@ public class Request  {
     private int method = Method.POST;
     private String requestUrl;
     private JSONObject jsonObject;
-    private IParsedResponseListener<?,?> iParsedResponseListener;
+    private BaseResponseListener<?,?> baseResponseListener;
     private RetryPolicy retryPolicy;
     private String reqTAG;
     private int memoryPolicy=0;
@@ -35,7 +33,7 @@ public class Request  {
         method = builder.method;
         requestUrl = builder.requestUrl;
         jsonObject = builder.jsonObject;
-        iParsedResponseListener = builder.iParsedResponseListener;
+        baseResponseListener = builder.baseResponseListener;
         retryPolicy = builder.retryPolicy;
         reqTAG = builder.reqTAG;
         memoryPolicy = builder.memoryPolicy;
@@ -54,18 +52,18 @@ public class Request  {
         if(reqTAG==null){
             throw new NullPointerException("reqTag cannot be null");
         }
-        if(mClass!=null && iParsedResponseListener instanceof IResponseListener){
-            throw new IllegalArgumentException("wrong interface registered, should be IParsedResponseListener and not IResponseListener");
+        if(mClass!=null && baseResponseListener instanceof ResponseListener){
+            throw new IllegalArgumentException("wrong interface registered, should be BaseResponseListener and not ResponseListener");
         }
         if(mRequestType==JSON) {
             CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
                     jsonObject, mHeaders, retryPolicy, reqTAG, memoryPolicy,
-                    networkPolicy, cacheTime, iParsedResponseListener,mLogLevel,mCancel, mClass);
+                    networkPolicy, cacheTime, baseResponseListener,mLogLevel,mCancel, mClass);
         }else if(mRequestType==STRING){
             CacheRequestHandler.getInstance().makeStringRequest(context, method, requestUrl,
                     jsonObject!=null?jsonObject.toString():null, mHeaders, retryPolicy, reqTAG,
                     memoryPolicy,
-                    networkPolicy, cacheTime, iParsedResponseListener,mLogLevel,mCancel,mClass);
+                    networkPolicy, cacheTime, baseResponseListener,mLogLevel,mCancel,mClass);
         }else{
             throw new IllegalArgumentException("no request type set please set it using as...()" +
                     "method of Request Builder");
@@ -80,7 +78,7 @@ public class Request  {
         builder.method = copy.method;
         builder.requestUrl = copy.requestUrl;
         builder.jsonObject = copy.jsonObject;
-        builder.iParsedResponseListener = copy.iParsedResponseListener;
+        builder.baseResponseListener = copy.baseResponseListener;
         builder.retryPolicy = copy.retryPolicy;
         builder.reqTAG = copy.reqTAG;
         builder.memoryPolicy = copy.memoryPolicy;
@@ -124,11 +122,11 @@ public class Request  {
 
         IBuildOptions headers(HashMap<String, String> val);
 
-        IBuildOptions asJsonObject(@NonNull IResponseListener<JSONObject,?> val);
+        IBuildOptions asJsonObject(@NonNull ResponseListener<JSONObject,?> val);
 
-        <F> IBuildOptions asClass(@NonNull Class<F> mClass,@NonNull IParsedResponseListener<JSONObject,F> val);
+        <F> IBuildOptions asClass(@NonNull Class<F> mClass,@NonNull BaseResponseListener<JSONObject,F> val);
 
-        IBuildOptions asString(@NonNull IResponseListener<String,?> val);
+        IBuildOptions asString(@NonNull ResponseListener<String,?> val);
 
         IBuildOptions params(@Nullable JSONObject val);
 
@@ -169,7 +167,7 @@ public class Request  {
         private int method= Method.GET;
         private String requestUrl;
         private JSONObject jsonObject;
-        private IParsedResponseListener<?, ?> iParsedResponseListener;
+        private BaseResponseListener<?, ?> baseResponseListener;
         private RetryPolicy retryPolicy;
         private String reqTAG;
         private int memoryPolicy;
@@ -290,38 +288,38 @@ public class Request  {
 
 
             @Override
-            public IBuildOptions asJsonObject(@NonNull IResponseListener<JSONObject, ?> val) {
+            public IBuildOptions asJsonObject(@NonNull ResponseListener<JSONObject, ?> val) {
                 if (mRequestType != -1) {
                     throw new IllegalArgumentException("only one of asJsonObject() asString() or " +
                             "asClass() method is allowed ");
                 }
                 mRequestType = JSON;
-                iParsedResponseListener = val;
+                baseResponseListener = val;
                 return this;
             }
 
 
             @Override
             public <F> IBuildOptions asClass(@NonNull Class<F> aClass, @NonNull
-            IParsedResponseListener<JSONObject, F> val) {
+            BaseResponseListener<JSONObject, F> val) {
                 if (mRequestType != -1) {
                     throw new IllegalArgumentException("only one of asJsonObject() asString() or " +
                             "asClass() method is allowed ");
                 }
-                iParsedResponseListener = val;
+                baseResponseListener = val;
                 mRequestType = JSON;
                 mClass = aClass;
                 return this;
             }
 
             @Override
-            public IBuildOptions asString(@NonNull IResponseListener<String, ?> val) {
+            public IBuildOptions asString(@NonNull ResponseListener<String, ?> val) {
                 if (mRequestType != -1) {
                     throw new IllegalArgumentException("only one of asJsonObject() asString() or " +
                             "asClass() method is allowed ");
                 }
                 mRequestType = STRING;
-                iParsedResponseListener = val;
+                baseResponseListener = val;
                 return this;
             }
 

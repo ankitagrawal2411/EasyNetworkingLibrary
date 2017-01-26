@@ -43,17 +43,17 @@ import java.util.Map;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class VolleyRequestHandler extends RequestHandler {
+public class VolleyClient extends RequestHandler {
     private RequestQueue mRequestQueue;
 
 
 
     private static final String TAG = "RequestHandler";
 
-    public VolleyRequestHandler(Context context) {
+    public VolleyClient(Context context) {
         this(context,null);
     }
-    public VolleyRequestHandler(Context context,RetryPolicy retryPolicy) {
+    public VolleyClient(Context context, RetryPolicy retryPolicy) {
         super(retryPolicy);
         mRequestQueue = Volley.newRequestQueue(context);
     }

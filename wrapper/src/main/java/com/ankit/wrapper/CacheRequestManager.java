@@ -94,7 +94,7 @@ import org.json.JSONObject;
     }
 
 
-    public void cacheResponse(ICache.CacheEntry cacheEntry) {
+    public void cacheResponse(Cache.CacheEntry cacheEntry) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("response",cacheEntry.getData());

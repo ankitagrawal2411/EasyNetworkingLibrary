@@ -16,19 +16,17 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 
-import com.ankit.volleywrapper.VolleyRequestHandler;
+import com.ankit.volleywrapper.VolleyClient;
 import com.ankit.wrapper.ErrorCode;
 import com.ankit.wrapper.GlobalRequest;
-import com.ankit.wrapper.IParsedResponseListener;
+import com.ankit.wrapper.BaseResponseListener;
 import com.ankit.wrapper.LogLevel;
-import com.ankit.wrapper.Logger;
-import com.ankit.wrapper.Request;
 import com.ankit.wrapper.RequestBuilder;
 import com.ankit.wrapper.Response;
-import com.ankit.wrapper.IResponseListener;
+import com.ankit.wrapper.ResponseListener;
 import com.ankit.wrapper.interfaces.Builder;
 import com.example.ankitagrawal.converters.GsonConverter;
-import com.example.ankitagrawal.okhttpwrapper.okHttpRequestHandler;
+import com.example.ankitagrawal.okhttpwrapper.OkHttpClient;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
@@ -56,7 +54,7 @@ public class Main2ActivityFragment extends Fragment {
         Spinner spinnerclient = (Spinner) view.findViewById(R.id.spinner_client);
        final TextView textView = (TextView) view.findViewById(R.id.resp);
 
-        new GlobalRequest.Builder().client(new VolleyRequestHandler(getActivity()))
+        new GlobalRequest.Builder().client(new VolleyClient(getActivity()))
                 .converter(new GsonConverter())
                 .singleRequest(false)
                 .logLevel(LogLevel.ERROR)
@@ -73,14 +71,14 @@ public class Main2ActivityFragment extends Fragment {
                 Log.e("pos", "pos is" + position);
                 switch (position) {
                     case 0:
-                        GlobalRequest.newBuilder().client(new VolleyRequestHandler(getActivity()))
+                        GlobalRequest.newBuilder().client(new VolleyClient(getActivity()))
                                 .converter(new GsonConverter())
                                 .singleRequest(false)
                                 .logLevel(LogLevel.ERROR)
                                 .build();
                         break;
                     case 1:
-                        GlobalRequest.newBuilder().client(new okHttpRequestHandler())
+                        GlobalRequest.newBuilder().client(new OkHttpClient())
                                 .converter(new GsonConverter())
                                 .singleRequest(false)
                                 .logLevel(LogLevel.ERROR)
@@ -115,7 +113,7 @@ public class Main2ActivityFragment extends Fragment {
                 switch (position) {
                     case 0:
                         new RequestBuilder().get().url(URL).tag("tag")
-                                .asJsonObject(new IResponseListener<JSONObject, Data>() {
+                                .asJsonObject(new ResponseListener<JSONObject, Data>() {
                                     @Override
                                     public Data onRequestSuccess(JSONObject response) {
                                         return new Gson().fromJson(response.toString(), Data.class);
@@ -134,10 +132,10 @@ public class Main2ActivityFragment extends Fragment {
                     case 1:
                         break;
                     case 2:
-                        Builder.IBuildOptions req = new RequestBuilder().get
+                        Builder.BuildOptions req = new RequestBuilder().get
                                 ().url
                                 (URL).tag("tag")
-                                .asClass(Data.class, new IParsedResponseListener<JSONObject, Data>
+                                .asClass(Data.class, new BaseResponseListener<JSONObject, Data>
                                         () {
                                     @Override
                                     public void onParseSuccess(Response<Data> response) {
@@ -163,7 +161,7 @@ public class Main2ActivityFragment extends Fragment {
                         break;
                     case 4:
                         new RequestBuilder().get().url(URL).tag("tag")
-                                .asString(new IResponseListener<String, Data>() {
+                                .asString(new ResponseListener<String, Data>() {
                                     @Override
                                     public Data onRequestSuccess(String response) {
                                         return new Gson().fromJson(response, Data.class);
@@ -188,7 +186,7 @@ public class Main2ActivityFragment extends Fragment {
                     case 6:
                         new RequestBuilder().get().url(URL).tag("tag").diskCache(true)
                                 .cacheTime(15000)
-                                .asString(new IResponseListener<String, Data>() {
+                                .asString(new ResponseListener<String, Data>() {
                                     @Override
                                     public Data onRequestSuccess(String response) {
                                         return new Gson().fromJson(response, Data.class);
@@ -211,7 +209,7 @@ public class Main2ActivityFragment extends Fragment {
                     case 7:
                         new RequestBuilder().get().url(URL).tag("tag").memoryCache(true)
                                 .cacheTime(15000)
-                                .asString(new IResponseListener<String, Data>() {
+                                .asString(new ResponseListener<String, Data>() {
                                     @Override
                                     public Data onRequestSuccess(String response) {
                                         return new Gson().fromJson(response, Data.class);
