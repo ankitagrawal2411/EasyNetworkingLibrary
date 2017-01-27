@@ -211,7 +211,7 @@ public class CacheClient implements CacheRequest {
         }
     }
 
-    private <T> T parseDataToModel(String jsonObject1,
+    private <T> T parseDataToModel(Object jsonObject1,
                                    Class<T> mClass) {
 
         if (converters != null && converters.size() > 0) {
@@ -380,7 +380,7 @@ public class CacheClient implements CacheRequest {
                         return new Response<>((((ResponseListener<JSONArray, F>) jsonRequestFinishedListener).onRequestSuccess(response.response)), response.headers, response.statusCode, response.networkTimeMs, response.loadedFrom);
                     } else {
                         return new Response<>
-                                (parseDataToModel(response.response.toString(), aClass), response.headers, response.statusCode, response.networkTimeMs, response.loadedFrom);
+                                (parseDataToModel(response.response, aClass), response.headers, response.statusCode, response.networkTimeMs, response.loadedFrom);
                     }
                 }
                 return new Response<>(response.loadedFrom);
@@ -448,7 +448,7 @@ public class CacheClient implements CacheRequest {
                         return new Response<>((((ResponseListener<JSONObject, F>) jsonRequestFinishedListener).onRequestSuccess(response.response)), response.headers, response.statusCode, response.networkTimeMs, response.loadedFrom);
                     } else {
                         return new Response<>
-                                (parseDataToModel(response.response.toString(), aClass), response.headers, response.statusCode, response.networkTimeMs, response.loadedFrom);
+                                (parseDataToModel(response.response, aClass), response.headers, response.statusCode, response.networkTimeMs, response.loadedFrom);
                     }
                 }
                 return new Response<>(response.loadedFrom);
