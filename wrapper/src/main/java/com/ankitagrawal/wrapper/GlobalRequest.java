@@ -12,16 +12,16 @@ import java.util.HashMap;
 public class GlobalRequest {
 
     private GlobalRequest(Builder builder) {
-        ArrayList<RequestHandler> mRequestHandler = builder.mRequestHandler;
+        ArrayList<Client> mClient = builder.mClient;
         ArrayList<Converter> mConverters = builder.mConverters;
-        CacheRequestHandler.getInstance().setRetryPolicy(builder.retryPolicy);
-        CacheRequestHandler.getInstance().setNetworkPolicy(builder.networkPolicy);
-        CacheRequestHandler.getInstance().setMemoryPolicy(builder.memoryPolicy);
-        CacheRequestHandler.getInstance().setHeaders(builder.mHeaders);
-        CacheRequestHandler.getInstance().setRequestHandlers(mRequestHandler);
-        CacheRequestHandler.getInstance().setConverters(mConverters);
-        CacheRequestHandler.getInstance().setBaseUrl(builder.baseUrl);
-        CacheRequestHandler.getInstance().setSingleRequestMode(builder.singleMode);
+        CacheClient.getInstance().setRetryPolicy(builder.retryPolicy);
+        CacheClient.getInstance().setNetworkPolicy(builder.networkPolicy);
+        CacheClient.getInstance().setMemoryPolicy(builder.memoryPolicy);
+        CacheClient.getInstance().setHeaders(builder.mHeaders);
+        CacheClient.getInstance().setClients(mClient);
+        CacheClient.getInstance().setConverters(mConverters);
+        CacheClient.getInstance().setBaseUrl(builder.baseUrl);
+        CacheClient.getInstance().setSingleRequestMode(builder.singleMode);
         Logger.getInstance().setLevel(builder.mLogLevel);
         Logger.getInstance().setDisabledLogs(builder.disableAllLogs);
     }
@@ -35,7 +35,7 @@ public class GlobalRequest {
      * {@code GlobalRequestBuilder} builder static inner class.
      */
     public static final class Builder {
-        private ArrayList<RequestHandler> mRequestHandler;
+        private ArrayList<Client> mClient;
         private ArrayList<Converter> mConverters;
         private HashMap<String, String> mHeaders;
         private String baseUrl;
@@ -138,12 +138,12 @@ public class GlobalRequest {
          * @param val the {@code mRequestManager} to set
          * @return a reference to this Builder
          */
-        public Builder client(RequestHandler val) {
-            if (mRequestHandler == null) {
-                mRequestHandler = new ArrayList<>(2);
+        public Builder client(Client val) {
+            if (mClient == null) {
+                mClient = new ArrayList<>(2);
             }
-            mRequestHandler.clear();
-            mRequestHandler.add(val);
+            mClient.clear();
+            mClient.add(val);
             return this;
         }
 
@@ -173,19 +173,19 @@ public class GlobalRequest {
             return this;
         }
 
-        public Builder addClient(RequestHandler requestHandler) {
-            if (mRequestHandler == null) {
-                mRequestHandler = new ArrayList<>(2);
+        public Builder addClient(Client client) {
+            if (mClient == null) {
+                mClient = new ArrayList<>(2);
             }
-            this.mRequestHandler.add(requestHandler);
+            this.mClient.add(client);
             return this;
         }
 
-        public Builder client(ArrayList<RequestHandler> requestHandler) {
-            if (mRequestHandler == null) {
-                mRequestHandler = new ArrayList<>(2);
+        public Builder client(ArrayList<Client> client) {
+            if (mClient == null) {
+                mClient = new ArrayList<>(2);
             }
-            this.mRequestHandler = requestHandler;
+            this.mClient = client;
             return this;
         }
 

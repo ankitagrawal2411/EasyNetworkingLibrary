@@ -9,17 +9,17 @@ import java.util.HashMap;
 /**
  * Created by ankitagrawal on 14/7/16.
  */
-public abstract class RequestHandler {
+public abstract class Client {
     protected static final int CONNECT_TIMEOUT_MILLIS = 10000;
     protected static final int MAX_RETRIES = 2;
     public static final float DEFAULT_BACKOFF_MULT = 1f;
-    protected static final String TAG="RequestHandler" ;
+    protected static final String TAG="Client" ;
     protected RetryPolicy mRetryPolicy;
-    public RequestHandler() {
+    public Client() {
         this(new DefaultRetryPolicy(CONNECT_TIMEOUT_MILLIS,MAX_RETRIES,
                 DEFAULT_BACKOFF_MULT));
     }
-    public RequestHandler(RetryPolicy retryPolicy) {
+    public Client(RetryPolicy retryPolicy) {
         if(mRetryPolicy!=null) {
             mRetryPolicy = retryPolicy;
         }else{
@@ -46,7 +46,7 @@ public abstract class RequestHandler {
                                             HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
 
 
-    protected abstract void makeStringRequest(int method, String requestUrl, String params,
+    protected abstract void makeStringRequest(int method, String requestUrl, JSONObject params,
                                               IRequest<Response<String>> onRequestFinishedListener,
                                               HashMap<String, String> requestHeader, RetryPolicy retryPolicy, String reqTAG);
 

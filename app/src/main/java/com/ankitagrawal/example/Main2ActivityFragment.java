@@ -55,6 +55,7 @@ public class Main2ActivityFragment extends Fragment {
                 .singleRequest(false)
                 .logLevel(LogLevel.ERROR)
                 .build();
+        new VolleyClient(getActivity()).cancelAllRequests();
         List<String> clientarray = new ArrayList<>();
         clientarray.add("Volley");
         clientarray.add("okhttp");
@@ -126,6 +127,22 @@ public class Main2ActivityFragment extends Fragment {
                                 }).send(getContext());
                         break;
                     case 1:
+                        new RequestBuilder().post(new JSONObject()).url(URL).tag("tag")
+                                .asJsonObject(new ResponseListener<JSONObject, Data>() {
+                                    @Override
+                                    public Data onRequestSuccess(JSONObject response) {
+                                        return new Gson().fromJson(response.toString(), Data.class);
+                                    }
+
+                                    @Override
+                                    public void onParseSuccess(Response<Data> response) {
+                                    }
+
+                                    @Override
+                                    public void onRequestErrorCode(int errorCode) {
+
+                                    }
+                                }).send(getContext());
                         break;
                     case 2:
                         Builder.BuildOptions req = new RequestBuilder().get

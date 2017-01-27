@@ -164,11 +164,11 @@ public class RequestBuilder implements Builder.BuildRequestType {
               throw new IllegalArgumentException("wrong interface registered, should be BaseResponseListener and not ResponseListener");
           }
           if(mRequestType==JSON) {
-              CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
+              CacheClient.getInstance().makeJsonRequest(context, method, requestUrl,
                       jsonObject, mHeaders, retryPolicy, reqTAG, memoryPolicy,
                       networkPolicy, cacheTime, baseResponseListener,mLogLevel,mCancel, mClass);
           }else if(mRequestType==STRING){
-              CacheRequestHandler.getInstance().makeStringRequest(context, method, requestUrl,
+              CacheClient.getInstance().makeStringRequest(context, method, requestUrl,
                       jsonObject!=null?jsonObject.toString():null, mHeaders, retryPolicy, reqTAG,
                       memoryPolicy,
                       networkPolicy, cacheTime, baseResponseListener,mLogLevel,mCancel,mClass);
@@ -323,13 +323,13 @@ public class RequestBuilder implements Builder.BuildRequestType {
     @Override
     public void invalidate(Context context,String tag) {
         CacheRequestManager.getInstance(context).invalidateCacheResponse(tag);
-        CacheRequestHandler.getInstance().invalidateCacheResponse(tag);
+        CacheClient.getInstance().invalidateCacheResponse(tag);
     }
 
     @Override
     public void clearCache(Context context) {
         CacheRequestManager.getInstance(context).clearCache();
-        CacheRequestHandler.getInstance().clearCache();
+        CacheClient.getInstance().clearCache();
     }
 
 

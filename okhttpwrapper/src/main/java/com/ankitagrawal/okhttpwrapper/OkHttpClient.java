@@ -1,8 +1,8 @@
 package com.ankitagrawal.okhttpwrapper;
 
+import com.ankitagrawal.wrapper.Client;
 import com.ankitagrawal.wrapper.ErrorCode;
 import com.ankitagrawal.wrapper.Logger;
-import com.ankitagrawal.wrapper.RequestHandler;
 import com.ankitagrawal.wrapper.RetryPolicy;
 
 import org.json.JSONArray;
@@ -41,7 +41,7 @@ import okhttp3.Response;
  * limitations under the License.
  */
 
-public class OkHttpClient extends RequestHandler {
+public class OkHttpClient extends Client {
 
     private okhttp3.OkHttpClient client;
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -56,7 +56,10 @@ public class OkHttpClient extends RequestHandler {
         super();
         createClient();
     }
-
+    public OkHttpClient(okhttp3.OkHttpClient client) {
+        super();
+        this.client = client;
+    }
     private void createClient() {
         createClient(mRetryPolicy);
     }
@@ -235,7 +238,7 @@ public class OkHttpClient extends RequestHandler {
     }
 
     @Override
-    public void makeStringRequest(int method, String requestUrl, String jsonObject, final IRequest<com.ankitagrawal.wrapper.Response<String>> onRequestFinishedListener, final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
+    public void makeStringRequest(int method, String requestUrl, JSONObject jsonObject, final IRequest<com.ankitagrawal.wrapper.Response<String>> onRequestFinishedListener, final HashMap<String, String> requestHeader, RetryPolicy retryPolicy, final String reqTAG) {
         Logger.getInstance().d(TAG, "Tag:" + reqTAG);
         Logger.getInstance().d(TAG, reqTAG + " request Url: " + requestUrl);
         Logger.getInstance().d(TAG, reqTAG + " request Json Params: " + jsonObject);
@@ -244,7 +247,7 @@ public class OkHttpClient extends RequestHandler {
                 .url(requestUrl)
                 .tag(reqTAG);
         if (jsonObject == null) {
-            jsonObject = "";
+            jsonObject = new JSONObject();
         }
         if (requestHeader != null) {
             for (Map.Entry<String, String> entry : requestHeader.entrySet()) {
@@ -260,19 +263,19 @@ public class OkHttpClient extends RequestHandler {
                 builder.get();
                 break;
             case com.ankitagrawal.wrapper.Request.Method.POST:
-                builder.post(RequestBody.create(STRING, jsonObject));
+                builder.post(RequestBody.create(STRING, jsonObject.toString()));
                 break;
             case com.ankitagrawal.wrapper.Request.Method.DELETE:
-                builder.delete(RequestBody.create(STRING, jsonObject));
+                builder.delete(RequestBody.create(STRING, jsonObject.toString()));
                 break;
             case com.ankitagrawal.wrapper.Request.Method.HEAD:
                 builder.head();
                 break;
             case com.ankitagrawal.wrapper.Request.Method.PATCH:
-                builder.patch(RequestBody.create(STRING, jsonObject));
+                builder.patch(RequestBody.create(STRING, jsonObject.toString()));
                 break;
             case com.ankitagrawal.wrapper.Request.Method.PUT:
-                builder.put(RequestBody.create(STRING, jsonObject));
+                builder.put(RequestBody.create(STRING, jsonObject.toString()));
                 break;
             case com.ankitagrawal.wrapper.Request.Method.OPTIONS: {
                 throw new IllegalArgumentException("okhttp does not support Options request type," +

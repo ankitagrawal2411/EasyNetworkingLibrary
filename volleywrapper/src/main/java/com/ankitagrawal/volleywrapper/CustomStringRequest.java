@@ -22,7 +22,7 @@ public abstract class CustomStringRequest<T> extends Request<T> {
     protected static final String PROTOCOL_CHARSET = "utf-8";
     /** Content type for request. */
     private static final String PROTOCOL_CONTENT_TYPE =
-            String.format("text/plain; charset=%s", PROTOCOL_CHARSET);
+            String.format("application/json; charset=%s", PROTOCOL_CHARSET);
     /**
      * Make a GET request and return a parsed object from JSON.
      *

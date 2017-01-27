@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -15,6 +16,7 @@ public class Request  {
     private int method = Method.POST;
     private String requestUrl;
     private JSONObject jsonObject;
+    private Client client;
     private BaseResponseListener<?,?> baseResponseListener;
     private RetryPolicy retryPolicy;
     private String reqTAG;
@@ -23,6 +25,7 @@ public class Request  {
     private long cacheTime;
     private int mRequestType=-1;
     private static final int JSON = 2;
+    private static final int JSON_ARRAY = 3;
     private static final int STRING = 1;
     private HashMap<String, String> mHeaders;
     private  Class mClass;
@@ -42,6 +45,7 @@ public class Request  {
         mRequestType = builder.mRequestType;
         mHeaders = builder.mHeaders;
         mClass = builder.mClass;
+        client = builder.client;
         mCancel = builder.mCancel;
         mLogLevel = builder.mLogLevel;
     }
@@ -56,14 +60,18 @@ public class Request  {
             throw new IllegalArgumentException("wrong interface registered, should be BaseResponseListener and not ResponseListener");
         }
         if(mRequestType==JSON) {
-            CacheRequestHandler.getInstance().makeJsonRequest(context, method, requestUrl,
+            CacheClient.getInstance().makeJsonRequest(context, method, requestUrl,
                     jsonObject, mHeaders, retryPolicy, reqTAG, memoryPolicy,
                     networkPolicy, cacheTime, baseResponseListener,mLogLevel,mCancel, mClass);
         }else if(mRequestType==STRING){
-            CacheRequestHandler.getInstance().makeStringRequest(context, method, requestUrl,
-                    jsonObject!=null?jsonObject.toString():null, mHeaders, retryPolicy, reqTAG,
+            CacheClient.getInstance().makeStringRequest(context, method, requestUrl,
+                    jsonObject, mHeaders, retryPolicy, reqTAG,
                     memoryPolicy,
                     networkPolicy, cacheTime, baseResponseListener,mLogLevel,mCancel,mClass);
+        }else if(mRequestType==JSON_ARRAY) {
+            CacheClient.getInstance().makeJsonArrayRequest(context, method, requestUrl,
+                    jsonObject, mHeaders, retryPolicy, reqTAG, memoryPolicy,
+                    networkPolicy, cacheTime, baseResponseListener, mLogLevel, mCancel, mClass);
         }else{
             throw new IllegalArgumentException("no request type set please set it using as...()" +
                     "method of Request Builder");
@@ -87,6 +95,7 @@ public class Request  {
         builder.mRequestType = copy.mRequestType;
         builder.mHeaders = copy.mHeaders;
         builder.mClass = copy.mClass;
+        builder.client = copy.client;
         builder.mCancel = copy.mCancel;
         builder.mLogLevel = copy.mLogLevel;
         return builder;
@@ -124,6 +133,8 @@ public class Request  {
 
         IBuildOptions asJsonObject(@NonNull ResponseListener<JSONObject,?> val);
 
+        IBuildOptions asJsonArray(@NonNull ResponseListener<JSONArray,?> val);
+
         <F> IBuildOptions asClass(@NonNull Class<F> mClass,@NonNull BaseResponseListener<JSONObject,F> val);
 
         IBuildOptions asString(@NonNull ResponseListener<String,?> val);
@@ -133,6 +144,8 @@ public class Request  {
         IBuildOptions cacheTime( long time);
 
         IBuildOptions cancel();
+
+        IBuildOptions client(Client client);
 
         IBuildOptions logLevel( int level);
 
@@ -167,6 +180,7 @@ public class Request  {
         private int method= Method.GET;
         private String requestUrl;
         private JSONObject jsonObject;
+        private Client client;
         private BaseResponseListener<?, ?> baseResponseListener;
         private RetryPolicy retryPolicy;
         private String reqTAG;
@@ -290,10 +304,21 @@ public class Request  {
             @Override
             public IBuildOptions asJsonObject(@NonNull ResponseListener<JSONObject, ?> val) {
                 if (mRequestType != -1) {
-                    throw new IllegalArgumentException("only one of asJsonObject() asString() or " +
+                    throw new IllegalArgumentException("only one of asJsonObject() asJsonArray() asString() or " +
                             "asClass() method is allowed ");
                 }
                 mRequestType = JSON;
+                baseResponseListener = val;
+                return this;
+            }
+
+            @Override
+            public IBuildOptions asJsonArray(@NonNull ResponseListener<JSONArray, ?> val) {
+                if (mRequestType != -1) {
+                    throw new IllegalArgumentException("only one of asJsonObject() asJsonArray() asString() or " +
+                            "asClass() method is allowed ");
+                }
+                mRequestType = JSON_ARRAY;
                 baseResponseListener = val;
                 return this;
             }
@@ -303,7 +328,7 @@ public class Request  {
             public <F> IBuildOptions asClass(@NonNull Class<F> aClass, @NonNull
             BaseResponseListener<JSONObject, F> val) {
                 if (mRequestType != -1) {
-                    throw new IllegalArgumentException("only one of asJsonObject() asString() or " +
+                    throw new IllegalArgumentException("only one of asJsonObject() asJsonArray() asString() or " +
                             "asClass() method is allowed ");
                 }
                 baseResponseListener = val;
@@ -315,7 +340,7 @@ public class Request  {
             @Override
             public IBuildOptions asString(@NonNull ResponseListener<String, ?> val) {
                 if (mRequestType != -1) {
-                    throw new IllegalArgumentException("only one of asJsonObject() asString() or " +
+                    throw new IllegalArgumentException("only one of asJsonObject() asJsonArray() asString() or " +
                             "asClass() method is allowed ");
                 }
                 mRequestType = STRING;
@@ -344,6 +369,12 @@ public class Request  {
             @Override
             public IBuildOptions cancel() {
                 mCancel = true;
+                return this;
+            }
+
+            @Override
+            public IBuildOptions client(Client localClient) {
+                client = localClient;
                 return this;
             }
 
@@ -420,14 +451,14 @@ public class Request  {
         @Override
         public IBuildRequestType invalidate(Context context,String tag) {
             CacheRequestManager.getInstance(context).invalidateCacheResponse(tag);
-            CacheRequestHandler.getInstance().invalidateCacheResponse(tag);
+            CacheClient.getInstance().invalidateCacheResponse(tag);
             return this;
         }
 
         @Override
         public IBuildRequestType clearCache(Context context) {
             CacheRequestManager.getInstance(context).clearCache();
-            CacheRequestHandler.getInstance().clearCache();
+            CacheClient.getInstance().clearCache();
             return this;
         }
 

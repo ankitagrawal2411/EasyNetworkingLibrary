@@ -15,9 +15,9 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.Volley;
+import com.ankitagrawal.wrapper.Client;
 import com.ankitagrawal.wrapper.ErrorCode;
 import com.ankitagrawal.wrapper.Logger;
-import com.ankitagrawal.wrapper.RequestHandler;
 import com.ankitagrawal.wrapper.RetryPolicy;
 
 import org.json.JSONArray;
@@ -43,12 +43,12 @@ import java.util.Map;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class VolleyClient extends RequestHandler {
+public class VolleyClient extends Client {
     private RequestQueue mRequestQueue;
 
 
 
-    private static final String TAG = "RequestHandler";
+    private static final String TAG = "Client";
 
     public VolleyClient(Context context) {
         this(context,null);
@@ -57,7 +57,10 @@ public class VolleyClient extends RequestHandler {
         super(retryPolicy);
         mRequestQueue = Volley.newRequestQueue(context);
     }
-
+    public VolleyClient(RequestQueue requestQueue, RetryPolicy retryPolicy) {
+        super(retryPolicy);
+        mRequestQueue = requestQueue;
+    }
     @Override
     public boolean canHandleRequest(String url, int method) {
         return true;
@@ -141,7 +144,7 @@ public class VolleyClient extends RequestHandler {
 
 
     @Override
-    public void makeStringRequest(int method, String url, final String stringParams, final
+    public void makeStringRequest(int method, String url, final JSONObject stringParams, final
     IRequest<com.ankitagrawal.wrapper.Response<String>> iRequestListener, final HashMap<String, String> requestHeader, RetryPolicy
                                           retryPolicy, final String reqTAG) {
         com.android.volley.RetryPolicy volleyRetryPolicy;

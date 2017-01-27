@@ -22,11 +22,11 @@ import java.util.HashMap;
 /**
  * Created by ankitagrawal on 6/7/16. yay
  */
-public class CacheRequestHandler implements CacheRequest {
+public class CacheClient implements CacheRequest {
 
     private MemoryCache mMemoryCache;
-    private static CacheRequestHandler mInstance;
-    private ArrayList<RequestHandler> requestHandlers;
+    private static CacheClient mInstance;
+    private ArrayList<Client> clients;
     private ArrayList<Converter> converters;
     private RetryPolicy retryPolicy;
     private int memoryPolicy;
@@ -36,14 +36,14 @@ public class CacheRequestHandler implements CacheRequest {
     private HashMap<String, String> mHeaders;
     private boolean singleRequestMode;
 
-    static CacheRequestHandler getInstance() {
+    static CacheClient getInstance() {
         if (mInstance == null) {
-            mInstance = new CacheRequestHandler();
+            mInstance = new CacheClient();
         }
         return mInstance;
     }
 
-    private CacheRequestHandler() {
+    private CacheClient() {
         mMemoryCache = new MemoryCache();
         singleRequestMode = true;
     }
@@ -53,7 +53,7 @@ public class CacheRequestHandler implements CacheRequest {
     }
 
     @Override
-    public <T, F> void makeJsonRequest(Context context, int method, String URL, JSONObject
+    public <T, F> void makeJsonRequest(Context context,Client client, int method, String URL, JSONObject
             jsonObject,
                                        HashMap<String, String> header, RetryPolicy retryPolicy, String reqTAG, int memoryPolicy, int networkPolicy, long cacheTime, BaseResponseListener<T, F> responseListener, int logLevel, boolean mCancel, Class<F> aClass) {
         if (!checkRequestQueue(reqTAG, responseListener, mCancel)) {
@@ -96,14 +96,26 @@ public class CacheRequestHandler implements CacheRequest {
             }
             return;
         }
-        if (requestHandlers == null || requestHandlers.size() == 0) {
+        boolean requestHandled = false;
+        if(client!=null){
+            if (client.canHandleRequest(URL, method)) {
+                sendJsonRequest(context, client, method, URL, jsonObject, header, responseListener, retryPolicy, reqTAG, memoryPolicy, networkPolicy, cacheTime, aClass);
+                return;
+            }else{
+                throw new IllegalArgumentException("the provided client cannot handle " +
+                        "this type of request, please set  client that can " +
+                        "handle this type of request" +
+                        " " + "by Changing the client.canHandleRequest(URL, method) method");
+            }
+        }
+        if ((clients == null || clients.size() == 0)) {
             throw new NoClientFoundException("no client set, please set one at least " +
                     "through GlobalBuilder class");
         }
-        boolean requestHandled = false;
-        for (int i = 0; i < requestHandlers.size(); i++) {
-            if (requestHandlers.get(i).canHandleRequest(URL, method)) {
-                sendJsonRequest(context, requestHandlers.get(i), method, URL, jsonObject, header, responseListener, retryPolicy, reqTAG, memoryPolicy, networkPolicy, cacheTime, aClass);
+
+        for (int i = 0; i < clients.size(); i++) {
+            if (clients.get(i).canHandleRequest(URL, method)) {
+                sendJsonRequest(context, clients.get(i), method, URL, jsonObject, header, responseListener, retryPolicy, reqTAG, memoryPolicy, networkPolicy, cacheTime, aClass);
                 requestHandled = true;
                 break;
             }
@@ -118,7 +130,7 @@ public class CacheRequestHandler implements CacheRequest {
     }
 
     @Override
-    public <T, F> void makeJsonArrayRequest(Context context, int method, String URL, JSONObject jsonObject, HashMap<String, String> header, RetryPolicy retryPolicy, String reqTAG, int memoryPolicy, int networkPolicy, long cacheTime, BaseResponseListener<T, F> responseListener, int logLevel, boolean mCancel, Class<F> aClass) {
+    public <T, F> void makeJsonArrayRequest(Context context,Client client, int method, String URL, JSONObject jsonObject, HashMap<String, String> header, RetryPolicy retryPolicy, String reqTAG, int memoryPolicy, int networkPolicy, long cacheTime, BaseResponseListener<T, F> responseListener, int logLevel, boolean mCancel, Class<F> aClass) {
         if (!checkRequestQueue(reqTAG, responseListener, mCancel)) {
             return;
         }
@@ -159,14 +171,25 @@ public class CacheRequestHandler implements CacheRequest {
             }
             return;
         }
-        if (requestHandlers == null || requestHandlers.size() == 0) {
+        boolean requestHandled = false;
+        if(client!=null){
+            if (client.canHandleRequest(URL, method)) {
+                sendJsonRequest(context, client, method, URL, jsonObject, header, responseListener, retryPolicy, reqTAG, memoryPolicy, networkPolicy, cacheTime, aClass);
+                return;
+            }else{
+                throw new IllegalArgumentException("the provided client cannot handle " +
+                        "this type of request, please set  client that can " +
+                        "handle this type of request" +
+                        " " + "by Changing the client.canHandleRequest(URL, method) method");
+            }
+        }
+        if (clients == null || clients.size() == 0) {
             throw new NoClientFoundException("no client set, please set one at least " +
                     "through GlobalBuilder class");
         }
-        boolean requestHandled = false;
-        for (int i = 0; i < requestHandlers.size(); i++) {
-            if (requestHandlers.get(i).canHandleRequest(URL, method)) {
-                sendJsonArrayRequest(context, requestHandlers.get(i), method, URL, jsonObject, header, responseListener, retryPolicy, reqTAG, memoryPolicy, networkPolicy, cacheTime, aClass);
+        for (int i = 0; i < clients.size(); i++) {
+            if (clients.get(i).canHandleRequest(URL, method)) {
+                sendJsonArrayRequest(context, clients.get(i), method, URL, jsonObject, header, responseListener, retryPolicy, reqTAG, memoryPolicy, networkPolicy, cacheTime, aClass);
                 requestHandled = true;
                 break;
             }
@@ -181,9 +204,9 @@ public class CacheRequestHandler implements CacheRequest {
     }
 
     private void clearRequest(String reqTAG) {
-        if (requestHandlers != null) {
-            for (int i = 0; i < requestHandlers.size(); i++) {
-                requestHandlers.get(i).cancelPendingRequests(reqTAG);
+        if (clients != null) {
+            for (int i = 0; i < clients.size(); i++) {
+                clients.get(i).cancelPendingRequests(reqTAG);
             }
         }
     }
@@ -219,7 +242,7 @@ public class CacheRequestHandler implements CacheRequest {
         return null;
     }
 
-    private <T, F> void sendJsonArrayRequest(final Context context, RequestHandler requestHandler, int method, String url, JSONObject jsonObject, HashMap<String, String> header, final BaseResponseListener<T, F> jsonRequestFinishedListener, RetryPolicy retryPolicy, final String reqTAG, final int memoryPolicy, final int networkPolicy, final long cacheTime, final Class<F> aClass) {
+    private <T, F> void sendJsonArrayRequest(final Context context, Client client, int method, String url, JSONObject jsonObject, HashMap<String, String> header, final BaseResponseListener<T, F> jsonRequestFinishedListener, RetryPolicy retryPolicy, final String reqTAG, final int memoryPolicy, final int networkPolicy, final long cacheTime, final Class<F> aClass) {
         if (header == null) {
             header = mHeaders;
         }
@@ -238,8 +261,8 @@ public class CacheRequestHandler implements CacheRequest {
         }
 
 
-        requestHandler.makeJsonArrayRequest(method, url, jsonObject, new
-                RequestHandler.IRequest<Response<JSONArray>>() {
+        client.makeJsonArrayRequest(method, url, jsonObject, new
+                Client.IRequest<Response<JSONArray>>() {
                     @Override
                     public void onRequestSuccess(final Response<JSONArray> response) {
                         onJsonArrayResponse(context, response, reqTAG, cacheTime, aClass, memoryPolicy, networkPolicy, jsonRequestFinishedListener);
@@ -254,7 +277,7 @@ public class CacheRequestHandler implements CacheRequest {
                 }, header, retryPolicy, reqTAG);
     }
 
-    private <T, F> void sendJsonRequest(final Context context, RequestHandler requestHandler, int method, String url, JSONObject jsonObject, HashMap<String, String> header, final BaseResponseListener<T, F> jsonRequestFinishedListener, RetryPolicy retryPolicy, final String reqTAG, final int memoryPolicy, final int networkPolicy, final long cacheTime, final Class<F> aClass) {
+    private <T, F> void sendJsonRequest(final Context context, Client client, int method, String url, JSONObject jsonObject, HashMap<String, String> header, final BaseResponseListener<T, F> jsonRequestFinishedListener, RetryPolicy retryPolicy, final String reqTAG, final int memoryPolicy, final int networkPolicy, final long cacheTime, final Class<F> aClass) {
         if (header == null) {
             header = mHeaders;
         }
@@ -273,8 +296,8 @@ public class CacheRequestHandler implements CacheRequest {
         }
 
 
-        requestHandler.makeJsonRequest(method, url, jsonObject, new
-                RequestHandler.IRequest<Response<JSONObject>>() {
+        client.makeJsonRequest(method, url, jsonObject, new
+                Client.IRequest<Response<JSONObject>>() {
                     @Override
                     public void onRequestSuccess(final Response<JSONObject> response) {
                         onResponse(context, response, reqTAG, cacheTime, aClass, memoryPolicy, networkPolicy, jsonRequestFinishedListener);
@@ -530,7 +553,7 @@ public class CacheRequestHandler implements CacheRequest {
     }
 
     @Override
-    public <T, F> void makeStringRequest(final Context context, int method, final String URL, String jsonObject, final HashMap<String, String> header, final RetryPolicy retryPolicy, final String reqTAG, int memoryPolicy, int networkPolicy, long cacheTime, BaseResponseListener<T, F> jsonRequestFinishedListener, int logLevel, boolean cancel, final Class<F> aClass) {
+    public <T, F> void makeStringRequest(final Context context,Client client, int method, final String URL, JSONObject jsonObject, final HashMap<String, String> header, final RetryPolicy retryPolicy, final String reqTAG, int memoryPolicy, int networkPolicy, long cacheTime, BaseResponseListener<T, F> jsonRequestFinishedListener, int logLevel, boolean cancel, final Class<F> aClass) {
         if (!checkRequestQueue(reqTAG, jsonRequestFinishedListener, cancel)) {
             return;
         }
@@ -571,14 +594,25 @@ public class CacheRequestHandler implements CacheRequest {
             }
             return;
         }
-        if (requestHandlers == null || requestHandlers.size() == 0) {
+        boolean requestHandled = false;
+        if(client!=null){
+            if (client.canHandleRequest(URL, method)) {
+                sendJsonRequest(context, client, method, URL, jsonObject, header, jsonRequestFinishedListener, retryPolicy, reqTAG, memoryPolicy, networkPolicy, cacheTime, aClass);
+                return;
+            }else{
+                throw new IllegalArgumentException("the provided client cannot handle " +
+                        "this type of request, please set  client that can " +
+                        "handle this type of request" +
+                        " " + "by Changing the client.canHandleRequest(URL, method) method");
+            }
+        }
+        if (clients == null || clients.size() == 0) {
             throw new NoClientFoundException("no client set, please set one at least " +
                     "through GlobalBuilder class");
         }
-        boolean requestHandled = false;
-        for (int i = 0; i < requestHandlers.size(); i++) {
-            if (requestHandlers.get(i).canHandleRequest(URL, method)) {
-                sendStringRequest(context, requestHandlers.get(i), method, URL, jsonObject, header, jsonRequestFinishedListener, retryPolicy, reqTAG, memoryPolicy, networkPolicy, cacheTime, aClass);
+        for (int i = 0; i < clients.size(); i++) {
+            if (clients.get(i).canHandleRequest(URL, method)) {
+                sendStringRequest(context, clients.get(i), method, URL, jsonObject, header, jsonRequestFinishedListener, retryPolicy, reqTAG, memoryPolicy, networkPolicy, cacheTime, aClass);
                 requestHandled = true;
                 break;
             }
@@ -593,7 +627,7 @@ public class CacheRequestHandler implements CacheRequest {
     }
 
 
-    private <T, F> void sendStringRequest(final Context context, RequestHandler requestHandler, int method, String url, String jsonObject, HashMap<String, String> header, final BaseResponseListener<T, F> jsonRequestFinishedListener, RetryPolicy retryPolicy, final String reqTAG, final int memoryPolicy, final int networkPolicy, final long cacheTime, final Class<F> aClass) {
+    private <T, F> void sendStringRequest(final Context context, Client client, int method, String url, JSONObject jsonObject, HashMap<String, String> header, final BaseResponseListener<T, F> jsonRequestFinishedListener, RetryPolicy retryPolicy, final String reqTAG, final int memoryPolicy, final int networkPolicy, final long cacheTime, final Class<F> aClass) {
         if (header == null) {
             header = mHeaders;
         }
@@ -608,7 +642,7 @@ public class CacheRequestHandler implements CacheRequest {
             throw new NullPointerException("baseUrl is not set, either pass full url or set base " +
                     "url");
         }
-        requestHandler.makeStringRequest(method, url, jsonObject, new RequestHandler.IRequest<Response<String>>
+        client.makeStringRequest(method, url, jsonObject, new Client.IRequest<Response<String>>
                 () {
             @Override
             public void onRequestSuccess(final Response<String> response) {
@@ -627,8 +661,8 @@ public class CacheRequestHandler implements CacheRequest {
         this.converters = converters;
     }
 
-    public void setRequestHandlers(ArrayList<RequestHandler> requestHandler) {
-        this.requestHandlers = requestHandler;
+    public void setClients(ArrayList<Client> client) {
+        this.clients = client;
     }
 
     public void setNetworkPolicy(int networkPolicy) {
