@@ -60,7 +60,7 @@ This method allows you to make sure that at a time only one request is in queue 
 
 
 ### Making a GET Request
-```
+
 ```java
    new RequestBuilder().get().url(URL).tag("tag")
                                 .asString(new ResponseListener<String, Data>() {
@@ -80,10 +80,9 @@ This method allows you to make sure that at a time only one request is in queue 
                                     }
                                 }).send(getActivity());         
 ```
-```
 
 ### Making a POST Request
-```
+
 ```java  
    new RequestBuilder().post(new JSONObject()).url(URL).tag("tag")
                                 .asJsonObject(new ResponseListener<JSONObject, Data>() {
@@ -100,7 +99,7 @@ This method allows you to make sure that at a time only one request is in queue 
                                     }
                                 }).send(getContext());
 ```
-```
+
 ### Using Gson To get Parsing Done Automatically
 ```
 Requirement is to add a Converter to GlobalBuilder.
