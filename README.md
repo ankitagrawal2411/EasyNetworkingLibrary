@@ -79,9 +79,11 @@ This method allows you to make sure that at a time only one request is in queue 
 
                                     }
                                 }).send(getActivity());         
+```
+```
 
 ### Making a POST Request
-```
+
 ```java  
    new RequestBuilder().post(new JSONObject()).url(URL).tag("tag")
                                 .asJsonObject(new ResponseListener<JSONObject, Data>() {
