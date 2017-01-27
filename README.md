@@ -150,6 +150,6 @@ This method specifies that the response is jsonObject and you are doing the pars
 Any request with a given tag can be cancelled. Just do like this.
 
 ```java
-AndroidNetworking.cancelPendingRequests("tag"); // All the requests with the given tag will be cancelled.
-AndroidNetworking.cancelAllRequests();  // All the requests will be cancelled.  
+client.cancelPendingRequests("tag"); // All the requests with the given tag will be cancelled.
+client.cancelAllRequests();  // All the requests will be cancelled.  
 ```
