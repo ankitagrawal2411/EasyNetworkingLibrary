@@ -143,9 +143,9 @@ the library only includes a GsonConverter(). You have to make your own if you wa
  
 #### asJsonObject()
 This method specifies that the response is jsonObject and you are doing the parsing yourself
+```
 
-
-
+```
 ### Cancelling a request.
 Any request with a given tag can be cancelled. Just do like this.
 ```
