@@ -101,7 +101,7 @@ This method allows you to make sure that at a time only one request is in queue 
 ```
 
 ### Using Gson To get Parsing Done Automatically
-```
+
 Requirement is to add a Converter to GlobalBuilder.
 
 ```java  
@@ -128,7 +128,7 @@ new RequestBuilder().get().url("your url here").tag("your request tag here")
                                   }
                               }
                           }).send(getContext());
-                      
+        ```              
                
 ### Methods Used
  
