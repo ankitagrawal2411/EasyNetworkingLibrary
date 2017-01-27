@@ -128,7 +128,7 @@ new RequestBuilder().get().url("your url here").tag("your request tag here")
                                   }
                               }
                           }).send(getContext());
-        ```              
+```              
                
 ### Methods Used
  
@@ -143,12 +143,10 @@ the library only includes a GsonConverter(). You have to make your own if you wa
  
 #### asJsonObject()
 This method specifies that the response is jsonObject and you are doing the parsing yourself
-```
 
-```
 ### Cancelling a request.
 Any request with a given tag can be cancelled. Just do like this.
-```
+
 ```java
 client.cancelPendingRequests("tag"); // All the requests with the given tag will be cancelled.
 client.cancelAllRequests();  // All the requests will be cancelled.  
