@@ -79,7 +79,7 @@ This method allows you to make sure that at a time only one request is in queue 
 
                                     }
                                 }).send(getActivity());         
-```
+
 ### Making a POST Request
 ```
 ```java  
@@ -143,3 +143,13 @@ the library only includes a GsonConverter(). You have to make your own if you wa
  
 #### asJsonObject()
 This method specifies that the response is jsonObject and you are doing the parsing yourself
+
+
+
+### Cancelling a request.
+Any request with a given tag can be cancelled. Just do like this.
+
+```java
+AndroidNetworking.cancelPendingRequests("tag"); // All the requests with the given tag will be cancelled.
+AndroidNetworking.cancelAllRequests();  // All the requests will be cancelled.  
+```
